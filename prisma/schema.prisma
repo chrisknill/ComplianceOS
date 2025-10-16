@@ -1,0 +1,656 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  password          String
+  name              String?
+  role              String   @default("USER") // ADMIN, USER
+  jobTitle          String?
+  department        String?
+  managerId         String?  // Self-referential for org chart
+  phone             String?
+  startDate         DateTime?
+  status            String   @default("ACTIVE") // ACTIVE, ON_LEAVE, TERMINATED
+  avatarUrl         String?
+  location          String?
+  hasCompletedSetup Boolean  @default(false)
+  companyId         String?
+  company           Company? @relation(fields: [companyId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  trainings         TrainingRecord[]
+  manager           User?    @relation("ManagerSubordinates", fields: [managerId], references: [id], onDelete: SetNull)
+  subordinates      User[]   @relation("ManagerSubordinates")
+}
+
+model Company {
+  id            String   @id @default(cuid())
+  name          String
+  sicCode       String?
+  address       String?
+  postCode      String?
+  telephone     String?
+  email         String?
+  adminPerson   String?      // free text for now; can upgrade to relation later
+  employees     Int?         // headcount
+  website       String?
+  services      String       // JSON array stored as string for SQLite compatibility
+  owners        User[]       // reverse relation
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Document {
+  id              String    @id @default(cuid())
+  type            String    // POLICY, PROCEDURE, WORK_INSTRUCTION, REGISTER
+  title           String
+  code            String?
+  version         String    @default("1.0")
+  status          String    @default("DRAFT") // DRAFT, PENDING_APPROVAL, APPROVED, ARCHIVED
+  owner           String?
+  nextReview      DateTime?
+  isoClauses      String    // JSON array as string
+  url             String?   // SharePoint/OneDrive URL
+  sharepointId    String?   // SharePoint file/item ID
+  driveId         String?   // OneDrive/SharePoint drive ID
+  trackChanges    Boolean   @default(true) // Enforce track changes
+  lastEditedBy    String?
+  lastEditedAt    DateTime?
+  editorsCount    Int?      // Number of people who edited
+  commentsCount   Int?      // Number of comments/tracked changes
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  approvals       DocumentApproval[]
+  versions        DocumentVersion[]
+}
+
+model DocumentApproval {
+  id          String   @id @default(cuid())
+  documentId  String
+  level       Int      // 1, 2, 3 (e.g., Manager, Director, CEO)
+  approverRole String  // e.g., "Quality Manager", "Operations Director"
+  approverName String?
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  comments    String?
+  signedAt    DateTime?
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model DocumentVersion {
+  id          String   @id @default(cuid())
+  documentId  String
+  version     String
+  changes     String?  // Description of changes
+  changedBy   String
+  approvedBy  String?
+  approvedAt  DateTime?
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  code        String?
+  mandatory   Boolean  @default(false)
+  renewalDays Int?
+  records     TrainingRecord[]
+}
+
+model TrainingRecord {
+  id            String    @id @default(cuid())
+  userId        String
+  courseId      String
+  status        String    @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, COMPLETE, EXPIRED
+  dueDate       DateTime?
+  completed     DateTime?
+  score         Int?
+  documentUrl   String?   // URL or path to uploaded certificate/evidence
+  documentName  String?   // Original filename
+  notes         String?   // Additional notes
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course        Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  
+  @@unique([userId, courseId])
+}
+
+model Risk {
+  id         String   @id @default(cuid())
+  title      String
+  category   String   @default("QUALITY") // QUALITY, ENVIRONMENTAL, HSE
+  context    String?
+  likelihood Int
+  severity   Int
+  controls   String   // JSON array as string
+  owner      String?
+  reviewDate DateTime?
+  status     String   @default("OPEN") // OPEN, TREATED, CLOSED
+  isoRefs    String   // JSON array as string
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  approvals  RiskApproval[]
+}
+
+model RiskApproval {
+  id          String   @id @default(cuid())
+  riskId      String
+  level       Int      // 1, 2, 3
+  approverRole String
+  approverName String?
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  comments    String?
+  signedAt    DateTime?
+  risk        Risk     @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model Equipment {
+  id           String        @id @default(cuid())
+  name         String
+  assetTag     String?       @unique
+  location     String?
+  maintDue     DateTime?
+  status       String        @default("ACTIVE") // ACTIVE, OUT_OF_SERVICE
+  calibrations Calibration[]
+}
+
+model Calibration {
+  id             String    @id @default(cuid())
+  equipmentId    String
+  dueDate        DateTime
+  performedOn    DateTime?
+  certificateUrl String?
+  result         String?
+  equipment      Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+}
+
+model RegisterEntry {
+  id      String   @id @default(cuid())
+  type    String   // RISK, INCIDENT, NONCONFORMITY, COMPLIANCE_OBLIGATION, LEGAL, ASPECT_IMPACT
+  title   String
+  details String?
+  owner   String?
+  status  String?
+  date    DateTime @default(now())
+}
+
+// ========================================
+// ISO 45001 OH&S MODELS
+// ========================================
+
+model OHSHazard {
+  id          String   @id @default(cuid())
+  title       String
+  area        String?
+  description String?
+  likelihood  Int
+  severity    Int
+  residualL   Int?
+  residualS   Int?
+  controls    String   // JSON array
+  owner       String?
+  reviewDate  DateTime?
+  status      String   @default("OPEN") // OPEN, TREATED, CLOSED
+  isoRefs     String   // JSON array
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Incident {
+  id               String         @id @default(cuid())
+  ref              String?        @unique
+  type             String         // NEAR_MISS, UNSAFE_ACT, UNSAFE_CONDITION, INJURY, ILL_HEALTH, PROPERTY_DAMAGE, ENVIRONMENTAL
+  date             DateTime
+  location         String?
+  description      String?
+  people           String         // JSON array
+  severityType     String         // FIRST_AID, MEDICAL_TREATMENT, RESTRICTED_WORK, LOST_TIME, FATALITY
+  lostTimeDays     Int?
+  hoursWorked      Int?
+  immediateActions String?
+  status           String         @default("OPEN") // OPEN, UNDER_INVESTIGATION, CLOSED
+  isoRefs          String         // JSON array
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  investigation    Investigation?
+  actions          Action[]       @relation("IncidentActions")
+}
+
+model Investigation {
+  id              String   @id @default(cuid())
+  incidentId      String   @unique
+  rootCause       String?
+  method          String?
+  findings        String?
+  recommendations String?
+  incident        Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+}
+
+model Action {
+  id                  String    @id @default(cuid())
+  type                String    // CORRECTIVE, PREVENTIVE, CONTAINMENT, IMPROVEMENT
+  title               String
+  details             String?
+  owner               String?
+  dueDate             DateTime?
+  completedAt         DateTime?
+  effectivenessReview String?
+  status              String    @default("OPEN") // OPEN, IN_PROGRESS, COMPLETED, OVERDUE
+  incidentId          String?
+  auditId             String?
+  incident            Incident? @relation("IncidentActions", fields: [incidentId], references: [id], onDelete: Cascade)
+  audit               OHSAudit? @relation("AuditActions", fields: [auditId], references: [id], onDelete: Cascade)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model OHSAudit {
+  id          String   @id @default(cuid())
+  type        String   // OHS_AUDIT, WORKPLACE_INSPECTION, BEHAVIORAL_SAFETY
+  title       String
+  date        DateTime
+  location    String?
+  auditor     String?
+  scope       String?
+  findings    String?  // JSON array
+  nonConformities Int  @default(0)
+  observations    Int  @default(0)
+  opportunities   Int  @default(0)
+  status      String   @default("PLANNED") // PLANNED, IN_PROGRESS, COMPLETED
+  nextAudit   DateTime?
+  isoRefs     String   // JSON array
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  actions     Action[] @relation("AuditActions")
+}
+
+model Permit {
+  id              String   @id @default(cuid())
+  title           String
+  type            String   // HOT_WORK, CONFINED_SPACE, ELECTRICAL, HEIGHT_WORK, EXCAVATION, LIFTING
+  location        String?
+  validFrom       DateTime
+  validUntil      DateTime
+  issuedBy        String?
+  approvedBy      String?  // Internal approver
+  clientApprover  String?  // Client/3rd party approver
+  contractor      String?
+  status          String   @default("PENDING") // PENDING, APPROVED, ACTIVE, EXPIRED, CANCELLED
+  hazards         String?  // JSON array of hazards
+  controlMeasures String?  // JSON array of control measures
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  approvals       PermitApproval[]
+}
+
+model PermitApproval {
+  id            String   @id @default(cuid())
+  permitId      String
+  level         Int      // 1 = Internal, 2 = Client/3rd Party
+  approverRole  String
+  approverName  String?
+  status        String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  comments      String?
+  signedAt      DateTime?
+  permit        Permit   @relation(fields: [permitId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+}
+
+model Contractor {
+  id              String   @id @default(cuid())
+  name            String
+  contact         String?
+  email           String?
+  phone           String?
+  services        String?
+  preQualified    Boolean  @default(false)
+  preQualDate     DateTime?
+  preQualExpiry   DateTime?
+  inductionStatus String   @default("PENDING") // PENDING, COMPLETED, EXPIRED
+  inductionDate   DateTime?
+  safetyRating    Int?     // 1-5
+  lastEvaluation  DateTime?
+  permitCount     Int      @default(0)
+  incidentCount   Int      @default(0)
+  status          String   @default("ACTIVE") // ACTIVE, SUSPENDED, TERMINATED
+  isoRefs         String   // JSON array
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model OHSCompetence {
+  id          String   @id @default(cuid())
+  userId      String
+  role        String
+  requiredPPE String   // JSON array of PPE types
+  training    String   // JSON array of required training
+  medicalFit  Boolean  @default(true)
+  medicalDate DateTime?
+  medicalExpiry DateTime?
+  authorized  String   // JSON array of authorizations (e.g., forklift, crane)
+  restrictions String?
+  isoRefs     String   // JSON array
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model HealthSurveillance {
+  id            String   @id @default(cuid())
+  userId        String
+  exposureType  String   // NOISE, DUST, FUMES, VIBRATION, CHEMICAL, BIOLOGICAL, ERGONOMIC
+  exposureLevel String?  // measurement/description
+  monitoringFreq String? // daily, monthly, annual
+  lastTest      DateTime?
+  nextTest      DateTime?
+  results       String?
+  restrictions  String?
+  status        String   @default("COMPLIANT") // COMPLIANT, DUE_SOON, OVERDUE, ACTION_REQUIRED
+  isoRefs       String   // JSON array
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model EmergencyDrill {
+  id            String   @id @default(cuid())
+  type          String   // FIRE, EVACUATION, SPILL, MEDICAL, LOCKDOWN, NATURAL_DISASTER
+  date          DateTime
+  location      String?
+  participants  Int?
+  duration      Int?     // minutes
+  scenarioDesc  String?
+  observations  String?
+  effectiveness String?  // rating or description
+  improvements  String   // JSON array
+  nextDrill     DateTime?
+  isoRefs       String   // JSON array
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model OHSObjective {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  category    String   // INCIDENT_REDUCTION, COMPLIANCE, TRAINING, CULTURE, ENVIRONMENTAL
+  target      String
+  baseline    String?
+  current     String?
+  dueDate     DateTime?
+  owner       String?
+  programs    String   // JSON array of action programs
+  status      String   @default("IN_PROGRESS") // IN_PROGRESS, ACHIEVED, OVERDUE, CANCELLED
+  progress    Int      @default(0) // percentage
+  isoRefs     String   // JSON array
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model OHSMetric {
+  id            String   @id @default(cuid())
+  period        String   // YYYY-MM format
+  totalHours    Float
+  workers       Int?
+  workDays      Int?
+  incidents     Int
+  nearMisses    Int
+  firstAid      Int
+  medicalTreatment Int
+  restrictedWork Int
+  lostTime      Int
+  fatalities    Int
+  lostTimeDays  Int
+  trir          Float?   // Total Recordable Incident Rate
+  ltifr         Float?   // Lost Time Injury Frequency Rate
+  dart          Float?   // Days Away, Restricted or Transferred
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@unique([period])
+}
+
+// ========================================
+// NON-CONFORMANCE & IMPROVEMENTS
+// ========================================
+
+model NonConformance {
+  id                  String   @id @default(cuid())
+  refNumber           String   @unique // NC-YYYY-####, CC-YYYY-####, SNC-YYYY-####, OFI-YYYY-####
+  caseType            String   // OFI, NC, CC, SNC
+  title               String
+  raisedBy            String
+  dateRaised          DateTime @default(now())
+  process             String?
+  area                String?
+  department          String?
+  category            String   // Product, Process, Service, Documentation, H&S, Environmental
+  severity            String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  riskImpact          String   // JSON array: Quality, Safety, Environmental, Customer, Cost
+  evidence            String?  // JSON array of file URLs/links
+  linkedItems         String?  // JSON: {productNo, jobNo, customer, supplier}
+  problemStatement    String   // Rich text
+  
+  // Conditional fields (CC - Customer Complaint)
+  customerName        String?
+  customerContact     String?
+  complaintChannel    String?
+  complaintDate       DateTime?
+  externalRef         String?
+  contractualImpact   Boolean  @default(false)
+  responseDueDate     DateTime?
+  
+  // Conditional fields (SNC - Supplier)
+  supplierName        String?
+  supplierContact     String?
+  poReference         String?
+  warrantyClause      String?
+  request8D           Boolean  @default(false)
+  
+  // Conditional fields (NC - Internal)
+  detectionPoint      String?  // In-process, Final, Audit, Incoming
+  scrapRework         Boolean  @default(false)
+  containmentNeeded   Boolean  @default(false)
+  
+  // Conditional fields (OFI)
+  expectedBenefit     String?  // Quality, Safety, Cost, Delivery
+  effortEstimate      String?  // S, M, L
+  suggestedOwner      String?
+  
+  // Record management
+  status              String   @default("OPEN") // OPEN, UNDER_INVESTIGATION, CONTAINMENT_IN_PLACE, CORRECTIVE_ACTIONS_IN_PROGRESS, PENDING_VERIFICATION, CLOSED
+  owner               String?
+  approver            String?
+  dueDate             DateTime?
+  closedDate          DateTime?
+  
+  // Investigation
+  investigationNotes  String?  // Rich text
+  rootCauseTool       String?  // 5_WHYS, ISHIKAWA, PARETO
+  rootCauseOutput     String?  // JSON or text
+  escapePoint         String?
+  verificationMethod  String?
+  
+  // Costs/Impact
+  scrapHours          Float?
+  reworkHours         Float?
+  materialCost        Float?
+  customerCredit      Float?
+  downtimeHours       Float?
+  
+  // Standards mapping
+  iso9001Clause       String?  // JSON array
+  iso14001Clause      String?  // JSON array
+  iso45001Clause      String?  // JSON array
+  
+  // Communications
+  communications      String?  // JSON array of communication logs
+  
+  // Closure
+  closureSignature    String?
+  closureApprovedBy   String?
+  closureApprovedAt   DateTime?
+  closureComments     String?
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  actions             NCAction[]
+  auditLogs           NCAuditLog[]
+}
+
+model NCAction {
+  id                  String   @id @default(cuid())
+  ncId                String
+  actionType          String   // CONTAINMENT, CORRECTION, CORRECTIVE, PREVENTIVE, VERIFICATION
+  title               String
+  description         String?
+  owner               String?
+  dueDate             DateTime?
+  priority            String   @default("MEDIUM") // LOW, MEDIUM, HIGH
+  status              String   @default("OPEN") // OPEN, IN_PROGRESS, BLOCKED, DONE
+  completedDate       DateTime?
+  evidence            String?  // JSON array of files/links
+  checklist           String?  // JSON array of checklist items
+  globalActionId      String?  // Link to global Action table
+  
+  nonConformance      NonConformance @relation(fields: [ncId], references: [id], onDelete: Cascade)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model NCAuditLog {
+  id                  String   @id @default(cuid())
+  ncId                String
+  eventType           String   // CREATED, EDITED, STATUS_CHANGE, ACTION_CREATED, ACTION_COMPLETED, APPROVED, CLOSED, REOPENED
+  description         String
+  userId              String
+  userName            String?
+  metadata            String?  // JSON for additional data
+  
+  nonConformance      NonConformance @relation(fields: [ncId], references: [id], onDelete: Cascade)
+  createdAt           DateTime @default(now())
+}
+
+// ========================================
+// MANAGEMENT REVIEW MODELS (ISO 9001, 14001, 45001 Clause 9.3)
+// ========================================
+
+model ManagementReview {
+  id               String   @id @default(cuid())
+  orgId            String
+  title            String
+  scheduledAt      DateTime
+  startedAt        DateTime?
+  endedAt          DateTime?
+  location         String?
+  meetingType      String   // e.g., "Quarterly", "Annual", "Extraordinary"
+  standards        String   // JSON array as string: ["ISO9001","ISO14001","ISO45001"]
+  agenda           String?  // JSON as string for ordered list of agenda items
+  discussionNotes  String?  // Rich text minutes
+  status           String   @default("DRAFT") // DRAFT, SCHEDULED, IN_PROGRESS, COMPLETED, CLOSED
+  createdById      String
+  updatedById      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  attendees        ManagementReviewAttendee[]
+  inputs           ManagementReviewInput[]
+  outputs          ManagementReviewOutput[]
+  actions          ManagementReviewAction[]
+  evidenceLinks    ManagementReviewEvidence[]
+  auditLog         ManagementReviewAudit[]
+}
+
+model ManagementReviewAttendee {
+  id          String @id @default(cuid())
+  reviewId    String
+  userId      String?
+  name        String
+  role        String? // e.g., MD, HSE Manager, Quality, Ops, HR
+  required    Boolean @default(false)
+  present     Boolean @default(false)
+  signedOffAt DateTime?
+  signature   String? // store hash or path to signature image
+  
+  review      ManagementReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ManagementReviewInput {
+  id          String @id @default(cuid())
+  reviewId    String
+  standard    String // ISO9001 | ISO14001 | ISO45001
+  clauseRef   String // e.g., "9.3.2 a)"
+  title       String // short label
+  description String // requirement description
+  dataSource  String? // module ref (audits, KPIs, incidents, etc.)
+  evidence    String? // JSON array as string for URLs/fileIds
+  status      String  @default("PENDING") // PENDING | PROVIDED | N/A
+  remarks     String?
+  
+  review      ManagementReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ManagementReviewOutput {
+  id          String @id @default(cuid())
+  reviewId    String
+  standard    String
+  clauseRef   String // e.g., "9.3.3 a)"
+  decision    String // conclusion/decision text
+  type        String // e.g., "Change Needed","Resource Need","Improvement Opportunity"
+  
+  review      ManagementReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ManagementReviewAction {
+  id          String @id @default(cuid())
+  reviewId    String
+  actionId    String? // foreign key to Actions/Tasks module
+  title       String
+  ownerId     String?
+  dueDate     DateTime?
+  status      String  @default("OPEN") // OPEN | IN_PROGRESS | DONE | CLOSED
+  linkage     String? // e.g., links back to input(s) that triggered it
+  
+  review      ManagementReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ManagementReviewEvidence {
+  id          String @id @default(cuid())
+  reviewId    String
+  label       String
+  url         String  // SharePoint/OneDrive/Local file route
+  uploadedBy  String?
+  uploadedAt  DateTime @default(now())
+  
+  review      ManagementReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+}
+
+model ManagementReviewAudit {
+  id          String @id @default(cuid())
+  reviewId    String
+  actorId     String?
+  event       String // CREATED | UPDATED | STATUS_CHANGE | SIGN_OFF | EXPORT
+  details     String?
+  at          DateTime @default(now())
+  
+  review      ManagementReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+}
+

@@ -1,0 +1,78 @@
+╔══════════════════════════════════════════════════════════════════╗
+║                    ComplianceOS - Quick Start                    ║
+╚══════════════════════════════════════════════════════════════════╝
+
+📁 PROJECT LOCATION:
+/Users/chrisknill/Documents/ComplianceConnect/ComplianceOS/
+
+🚀 TO START THE APP:
+
+1. Open Terminal and navigate to project:
+   cd /Users/chrisknill/Documents/ComplianceConnect/ComplianceOS
+
+2. Start the development server:
+   npm run dev
+
+3. Open browser to:
+   http://localhost:3000
+
+4. Login with:
+   Email: admin@complianceos.com
+   Password: password123
+
+✅ DATABASE IS ALREADY SET UP with demo data!
+
+═══════════════════════════════════════════════════════════════════
+
+📋 WHAT'S INCLUDED:
+
+✓ Dashboard with compliance metrics
+✓ Documentation (Policies, Procedures, Work Instructions, Registers)
+✓ Training Matrix with RAG status
+✓ Risk Assessment with interactive 5×5 matrix
+✓ Equipment Management
+✓ Calibration Tracking
+✓ Compliance Registers (Incidents, NCRs, Legal, etc.)
+✓ User Profiles
+✓ Settings
+
+═══════════════════════════════════════════════════════════════════
+
+💰 AZURE DEPLOYMENT COST: ~$20-30/month
+
+See README.md for detailed Azure deployment instructions.
+
+═══════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTATION:
+
+• README.md - Full documentation and Azure deployment guide
+• SETUP.md - Detailed setup instructions
+• PROJECT_SUMMARY.md - Complete project overview
+• This file - Quick reference
+
+═══════════════════════════════════════════════════════════════════
+
+🎯 DEMO USERS (all password: password123):
+
+• admin@complianceos.com (Admin)
+• john.smith@complianceos.com
+• sarah.jones@complianceos.com
+• mike.brown@complianceos.com
+• emma.wilson@complianceos.com
+• david.taylor@complianceos.com
+
+═══════════════════════════════════════════════════════════════════
+
+🔧 USEFUL COMMANDS:
+
+npm run dev              - Start development server
+npm run build            - Build for production
+npm run start            - Start production server
+npm run prisma:studio    - Open database GUI
+npm run setup            - Complete database setup
+
+═══════════════════════════════════════════════════════════════════
+
+✨ READY TO USE - NO ADDITIONAL SETUP REQUIRED! ✨
+

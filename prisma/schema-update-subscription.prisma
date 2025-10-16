@@ -1,0 +1,31 @@
+// Add these models to your existing schema.prisma file
+
+model Subscription {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  stripeCustomerId  String?  @unique
+  stripeSubscriptionId String? @unique
+  stripePriceId     String?
+  stripeCurrentPeriodEnd DateTime?
+  plan              String   @default("FREE") // FREE, STARTER, PROFESSIONAL, ENTERPRISE
+  status            String   @default("ACTIVE") // ACTIVE, CANCELED, PAST_DUE
+  maxUsers          Int      @default(1)
+  maxDocuments      Int      @default(10)
+  features          String   // JSON array
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model UsageMetrics {
+  id           String   @id @default(cuid())
+  userId       String
+  period       String   // YYYY-MM
+  documentsCreated Int  @default(0)
+  risksCreated  Int     @default(0)
+  incidentsReported Int @default(0)
+  users        Int      @default(1)
+  createdAt    DateTime @default(now())
+  
+  @@unique([userId, period])
+}
+

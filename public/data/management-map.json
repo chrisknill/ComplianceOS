@@ -1,0 +1,572 @@
+{
+  "metadata": {
+    "name": "ComplianceOS Management System Map",
+    "version": "1.0.0",
+    "generatedAt": "2024-01-15T10:00:00Z"
+  },
+  "nodes": [
+    {
+      "id": "pol-quality-management",
+      "code": "POL-001",
+      "title": "Quality Management Policy",
+      "type": "policy",
+      "description": "Establishes the organization's commitment to quality management and continuous improvement",
+      "owner": "CEO",
+      "version": "2.1",
+      "status": "green",
+      "nextReviewDate": "2024-12-31",
+      "isoClauses": ["ISO9001: 5.2"],
+      "location": ["Head Office", "All Sites"],
+      "roles": ["CEO", "Quality Manager", "Executive Team"],
+      "inputs": ["Management Review Outputs", "Customer Requirements"],
+      "outputs": ["Quality Objectives", "Management Commitment"],
+      "tags": ["quality", "management", "policy", "iso9001"],
+      "link": {
+        "url": "/documentation/policies/quality-management-policy.pdf"
+      },
+      "position": { "x": 100, "y": 100 }
+    },
+    {
+      "id": "pol-health-safety",
+      "code": "POL-002",
+      "title": "Health & Safety Policy",
+      "type": "policy",
+      "description": "Defines the organization's commitment to providing a safe and healthy workplace",
+      "owner": "CEO",
+      "version": "1.8",
+      "status": "green",
+      "nextReviewDate": "2024-12-31",
+      "isoClauses": ["ISO45001: 5.2"],
+      "location": ["All Sites"],
+      "roles": ["CEO", "H&S Manager", "Site Managers"],
+      "inputs": ["Legal Requirements", "Risk Assessments"],
+      "outputs": ["Safety Objectives", "H&S Commitments"],
+      "tags": ["health", "safety", "policy", "iso45001"],
+      "link": {
+        "url": "/documentation/policies/health-safety-policy.pdf"
+      },
+      "position": { "x": 100, "y": 250 }
+    },
+    {
+      "id": "proc-document-control",
+      "code": "PROC-001",
+      "title": "Document Control Procedure",
+      "type": "procedure",
+      "description": "Establishes how documents are created, reviewed, approved, distributed, and maintained",
+      "owner": "Quality Manager",
+      "version": "3.2",
+      "status": "green",
+      "nextReviewDate": "2024-06-30",
+      "isoClauses": ["ISO9001: 7.5.2", "ISO45001: 7.5.2"],
+      "location": ["All Sites"],
+      "roles": ["Quality Manager", "Document Controller", "Process Owners"],
+      "inputs": ["Document Creation Requests", "Review Requirements"],
+      "outputs": ["Controlled Documents", "Document Register"],
+      "tags": ["document", "control", "procedure", "iso9001"],
+      "link": {
+        "url": "/documentation/procedures/document-control.pdf"
+      },
+      "position": { "x": 300, "y": 100 }
+    },
+    {
+      "id": "proc-incident-management",
+      "code": "PROC-002",
+      "title": "Incident Management Procedure",
+      "type": "procedure",
+      "description": "Defines the process for reporting, investigating, and managing workplace incidents",
+      "owner": "H&S Manager",
+      "version": "2.5",
+      "status": "green",
+      "nextReviewDate": "2024-08-15",
+      "isoClauses": ["ISO45001: 8.2", "ISO9001: 8.7"],
+      "location": ["All Sites"],
+      "roles": ["H&S Manager", "Site Supervisors", "Investigation Team"],
+      "inputs": ["Incident Reports", "Safety Observations"],
+      "outputs": ["Investigation Reports", "Corrective Actions"],
+      "tags": ["incident", "management", "safety", "iso45001"],
+      "link": {
+        "url": "/documentation/procedures/incident-management.pdf"
+      },
+      "position": { "x": 300, "y": 250 }
+    },
+    {
+      "id": "proc-purchasing",
+      "code": "PROC-003",
+      "title": "Purchasing & Supplier Management Procedure",
+      "type": "procedure",
+      "description": "Establishes criteria for supplier evaluation, selection, and ongoing management",
+      "owner": "Procurement Manager",
+      "version": "1.9",
+      "status": "green",
+      "nextReviewDate": "2024-09-30",
+      "isoClauses": ["ISO9001: 8.4"],
+      "location": ["Head Office", "All Sites"],
+      "roles": ["Procurement Manager", "Quality Manager", "Buyers"],
+      "inputs": ["Purchase Requirements", "Supplier Information"],
+      "outputs": ["Approved Suppliers", "Supplier Performance Records"],
+      "tags": ["purchasing", "supplier", "management", "iso9001"],
+      "link": {
+        "url": "/documentation/procedures/purchasing-supplier-management.pdf"
+      },
+      "position": { "x": 300, "y": 400 }
+    },
+    {
+      "id": "wi-document-creation",
+      "code": "WI-001",
+      "title": "Document Creation Work Instruction",
+      "type": "workInstruction",
+      "description": "Step-by-step guide for creating new documents in the management system",
+      "owner": "Document Controller",
+      "version": "2.0",
+      "status": "green",
+      "nextReviewDate": "2024-07-15",
+      "isoClauses": ["ISO9001: 7.5.2"],
+      "location": ["All Sites"],
+      "roles": ["Document Controller", "Process Owners", "Authors"],
+      "inputs": ["Document Requirements", "Template Library"],
+      "outputs": ["Draft Documents", "Review Requests"],
+      "tags": ["document", "creation", "work-instruction", "iso9001"],
+      "link": {
+        "url": "/documentation/work-instructions/document-creation.pdf"
+      },
+      "position": { "x": 500, "y": 100 }
+    },
+    {
+      "id": "wi-incident-investigation",
+      "code": "WI-002",
+      "title": "Incident Investigation Work Instruction",
+      "type": "workInstruction",
+      "description": "Detailed steps for conducting thorough incident investigations",
+      "owner": "H&S Manager",
+      "version": "1.7",
+      "status": "green",
+      "nextReviewDate": "2024-08-15",
+      "isoClauses": ["ISO45001: 8.2"],
+      "location": ["All Sites"],
+      "roles": ["H&S Manager", "Investigation Team", "Supervisors"],
+      "inputs": ["Incident Reports", "Witness Statements"],
+      "outputs": ["Investigation Findings", "Root Cause Analysis"],
+      "tags": ["incident", "investigation", "work-instruction", "iso45001"],
+      "link": {
+        "url": "/documentation/work-instructions/incident-investigation.pdf"
+      },
+      "position": { "x": 500, "y": 250 }
+    },
+    {
+      "id": "sop-equipment-calibration",
+      "code": "SOP-001",
+      "title": "Equipment Calibration Standard Operating Procedure",
+      "type": "sop",
+      "description": "Standard procedure for calibrating measuring and test equipment",
+      "owner": "Quality Manager",
+      "version": "2.3",
+      "status": "green",
+      "nextReviewDate": "2024-10-31",
+      "isoClauses": ["ISO9001: 7.1.5", "ISO45001: 8.1"],
+      "location": ["All Sites"],
+      "roles": ["Quality Manager", "Calibration Technician", "Equipment Users"],
+      "inputs": ["Calibration Schedule", "Equipment List"],
+      "outputs": ["Calibration Records", "Equipment Status"],
+      "tags": ["equipment", "calibration", "sop", "iso9001"],
+      "link": {
+        "url": "/documentation/sops/equipment-calibration.pdf"
+      },
+      "position": { "x": 500, "y": 400 }
+    },
+    {
+      "id": "sop-emergency-response",
+      "code": "SOP-002",
+      "title": "Emergency Response Standard Operating Procedure",
+      "type": "sop",
+      "description": "Emergency response procedures for various workplace emergencies",
+      "owner": "H&S Manager",
+      "version": "1.5",
+      "status": "green",
+      "nextReviewDate": "2024-11-30",
+      "isoClauses": ["ISO45001: 8.2"],
+      "location": ["All Sites"],
+      "roles": ["H&S Manager", "Emergency Coordinators", "All Employees"],
+      "inputs": ["Emergency Scenarios", "Contact Lists"],
+      "outputs": ["Emergency Response Records", "Drill Reports"],
+      "tags": ["emergency", "response", "sop", "iso45001"],
+      "link": {
+        "url": "/documentation/sops/emergency-response.pdf"
+      },
+      "position": { "x": 500, "y": 550 }
+    },
+    {
+      "id": "risk-workplace-safety",
+      "code": "RA-001",
+      "title": "Workplace Safety Risk Assessment",
+      "type": "riskAssessment",
+      "description": "Comprehensive risk assessment for workplace safety hazards",
+      "owner": "H&S Manager",
+      "version": "3.1",
+      "status": "green",
+      "nextReviewDate": "2024-05-31",
+      "isoClauses": ["ISO45001: 6.1", "ISO9001: 6.1"],
+      "location": ["All Sites"],
+      "roles": ["H&S Manager", "Risk Assessors", "Site Managers"],
+      "inputs": ["Hazard Identification", "Legal Requirements"],
+      "outputs": ["Risk Register", "Control Measures"],
+      "tags": ["risk", "safety", "assessment", "iso45001"],
+      "link": {
+        "url": "/documentation/risk-assessments/workplace-safety.pdf"
+      },
+      "position": { "x": 700, "y": 250 }
+    },
+    {
+      "id": "risk-quality-process",
+      "code": "RA-002",
+      "title": "Quality Process Risk Assessment",
+      "type": "riskAssessment",
+      "description": "Risk assessment for quality management processes and product conformity",
+      "owner": "Quality Manager",
+      "version": "2.4",
+      "status": "green",
+      "nextReviewDate": "2024-07-31",
+      "isoClauses": ["ISO9001: 6.1"],
+      "location": ["All Sites"],
+      "roles": ["Quality Manager", "Process Owners", "Quality Team"],
+      "inputs": ["Process Maps", "Customer Requirements"],
+      "outputs": ["Process Risk Register", "Mitigation Plans"],
+      "tags": ["risk", "quality", "process", "iso9001"],
+      "link": {
+        "url": "/documentation/risk-assessments/quality-process.pdf"
+      },
+      "position": { "x": 700, "y": 400 }
+    },
+    {
+      "id": "form-nonconformance",
+      "code": "FORM-001",
+      "title": "Non-Conformance Report Form",
+      "type": "form",
+      "description": "Form for reporting and managing non-conformances in products or processes",
+      "owner": "Quality Manager",
+      "version": "2.0",
+      "status": "green",
+      "nextReviewDate": "2024-06-30",
+      "isoClauses": ["ISO9001: 8.7", "ISO45001: 8.2"],
+      "location": ["All Sites"],
+      "roles": ["Quality Manager", "Process Owners", "All Employees"],
+      "inputs": ["Non-Conformance Details", "Investigation Findings"],
+      "outputs": ["Non-Conformance Records", "Corrective Action Plans"],
+      "tags": ["nonconformance", "form", "quality", "iso9001"],
+      "link": {
+        "url": "/documentation/forms/nonconformance-report.pdf"
+      },
+      "position": { "x": 900, "y": 100 }
+    },
+    {
+      "id": "form-training-record",
+      "code": "FORM-002",
+      "title": "Training Record Form",
+      "type": "form",
+      "description": "Form for recording employee training and competency development",
+      "owner": "HR Manager",
+      "version": "1.8",
+      "status": "green",
+      "nextReviewDate": "2024-08-31",
+      "isoClauses": ["ISO9001: 7.2", "ISO45001: 7.2"],
+      "location": ["All Sites"],
+      "roles": ["HR Manager", "Training Coordinator", "Supervisors"],
+      "inputs": ["Training Programs", "Competency Requirements"],
+      "outputs": ["Training Records", "Competency Matrix"],
+      "tags": ["training", "record", "form", "competency"],
+      "link": {
+        "url": "/documentation/forms/training-record.pdf"
+      },
+      "position": { "x": 900, "y": 250 }
+    },
+    {
+      "id": "record-management-review",
+      "code": "REC-001",
+      "title": "Management Review Meeting Record",
+      "type": "record",
+      "description": "Record of management review meetings and decisions",
+      "owner": "Quality Manager",
+      "version": "1.0",
+      "status": "green",
+      "nextReviewDate": "2024-12-31",
+      "isoClauses": ["ISO9001: 9.3", "ISO45001: 9.3"],
+      "location": ["Head Office"],
+      "roles": ["CEO", "Quality Manager", "Executive Team"],
+      "inputs": ["Performance Data", "Audit Results"],
+      "outputs": ["Management Decisions", "Action Plans"],
+      "tags": ["management", "review", "record", "iso9001"],
+      "link": {
+        "url": "/documentation/records/management-review-2024-q1.pdf"
+      },
+      "position": { "x": 900, "y": 400 }
+    },
+    {
+      "id": "training-iso-awareness",
+      "code": "TRAIN-001",
+      "title": "ISO Standards Awareness Training",
+      "type": "training",
+      "description": "Training program for ISO 9001 and 45001 awareness and requirements",
+      "owner": "Training Coordinator",
+      "version": "2.2",
+      "status": "green",
+      "nextReviewDate": "2024-09-30",
+      "isoClauses": ["ISO9001: 7.2", "ISO45001: 7.2"],
+      "location": ["All Sites"],
+      "roles": ["Training Coordinator", "All Employees"],
+      "inputs": ["ISO Requirements", "Training Needs"],
+      "outputs": ["Training Completion Records", "Competency Assessments"],
+      "tags": ["training", "iso", "awareness", "competency"],
+      "link": {
+        "url": "/training/iso-standards-awareness"
+      },
+      "position": { "x": 1100, "y": 100 }
+    },
+    {
+      "id": "external-iso9001",
+      "code": "EXT-001",
+      "title": "ISO 9001:2015 Quality Management Systems",
+      "type": "externalStandard",
+      "description": "International standard for quality management systems",
+      "owner": "ISO",
+      "version": "2015",
+      "status": "green",
+      "nextReviewDate": "2027-12-31",
+      "isoClauses": ["ISO9001: All"],
+      "location": ["All Sites"],
+      "roles": ["Quality Manager", "Management", "Auditors"],
+      "inputs": ["Industry Best Practices", "Customer Requirements"],
+      "outputs": ["Compliance Requirements", "Certification Standards"],
+      "tags": ["iso", "standard", "quality", "external"],
+      "link": {
+        "url": "https://www.iso.org/standard/62085.html"
+      },
+      "position": { "x": 1100, "y": 250 }
+    },
+    {
+      "id": "external-iso45001",
+      "code": "EXT-002",
+      "title": "ISO 45001:2018 Occupational Health and Safety",
+      "type": "externalStandard",
+      "description": "International standard for occupational health and safety management systems",
+      "owner": "ISO",
+      "version": "2018",
+      "status": "green",
+      "nextReviewDate": "2027-12-31",
+      "isoClauses": ["ISO45001: All"],
+      "location": ["All Sites"],
+      "roles": ["H&S Manager", "Management", "Auditors"],
+      "inputs": ["Safety Regulations", "Industry Standards"],
+      "outputs": ["Safety Requirements", "Certification Standards"],
+      "tags": ["iso", "standard", "health", "safety", "external"],
+      "link": {
+        "url": "https://www.iso.org/standard/63787.html"
+      },
+      "position": { "x": 1100, "y": 400 }
+    }
+  ],
+  "edges": [
+    {
+      "id": "pol-quality-to-proc-doc",
+      "source": "pol-quality-management",
+      "target": "proc-document-control",
+      "relationship": "prerequisite",
+      "label": "Establishes Requirements",
+      "critical": true
+    },
+    {
+      "id": "pol-hs-to-proc-incident",
+      "source": "pol-health-safety",
+      "target": "proc-incident-management",
+      "relationship": "prerequisite",
+      "label": "Establishes Requirements",
+      "critical": true
+    },
+    {
+      "id": "proc-doc-to-wi-doc",
+      "source": "proc-document-control",
+      "target": "wi-document-creation",
+      "relationship": "outputToInput",
+      "label": "Implementation Guide",
+      "critical": true
+    },
+    {
+      "id": "proc-incident-to-wi-investigation",
+      "source": "proc-incident-management",
+      "target": "wi-incident-investigation",
+      "relationship": "outputToInput",
+      "label": "Implementation Guide",
+      "critical": true
+    },
+    {
+      "id": "proc-purchasing-to-sop-calibration",
+      "source": "proc-purchasing",
+      "target": "sop-equipment-calibration",
+      "relationship": "prerequisite",
+      "label": "Supplier Requirements",
+      "critical": false
+    },
+    {
+      "id": "proc-incident-to-sop-emergency",
+      "source": "proc-incident-management",
+      "target": "sop-emergency-response",
+      "relationship": "outputToInput",
+      "label": "Emergency Procedures",
+      "critical": true
+    },
+    {
+      "id": "risk-safety-to-proc-incident",
+      "source": "risk-workplace-safety",
+      "target": "proc-incident-management",
+      "relationship": "evidence",
+      "label": "Risk Controls",
+      "critical": true
+    },
+    {
+      "id": "risk-quality-to-proc-purchasing",
+      "source": "risk-quality-process",
+      "target": "proc-purchasing",
+      "relationship": "evidence",
+      "label": "Risk Controls",
+      "critical": true
+    },
+    {
+      "id": "wi-doc-to-form-nc",
+      "source": "wi-document-creation",
+      "target": "form-nonconformance",
+      "relationship": "outputToInput",
+      "label": "Document Template",
+      "critical": false
+    },
+    {
+      "id": "proc-incident-to-form-nc",
+      "source": "proc-incident-management",
+      "target": "form-nonconformance",
+      "relationship": "outputToInput",
+      "label": "Incident Reporting",
+      "critical": true
+    },
+    {
+      "id": "training-iso-to-form-training",
+      "source": "training-iso-awareness",
+      "target": "form-training-record",
+      "relationship": "outputToInput",
+      "label": "Training Documentation",
+      "critical": true
+    },
+    {
+      "id": "form-training-to-record-mgmt",
+      "source": "form-training-record",
+      "target": "record-management-review",
+      "relationship": "evidence",
+      "label": "Competency Evidence",
+      "critical": false
+    },
+    {
+      "id": "form-nc-to-record-mgmt",
+      "source": "form-nonconformance",
+      "target": "record-management-review",
+      "relationship": "evidence",
+      "label": "Performance Data",
+      "critical": true
+    },
+    {
+      "id": "ext-iso9001-to-pol-quality",
+      "source": "external-iso9001",
+      "target": "pol-quality-management",
+      "relationship": "reference",
+      "label": "Standard Requirements",
+      "critical": true
+    },
+    {
+      "id": "ext-iso45001-to-pol-hs",
+      "source": "external-iso45001",
+      "target": "pol-health-safety",
+      "relationship": "reference",
+      "label": "Standard Requirements",
+      "critical": true
+    },
+    {
+      "id": "ext-iso9001-to-proc-doc",
+      "source": "external-iso9001",
+      "target": "proc-document-control",
+      "relationship": "reference",
+      "label": "Clause 7.5.2",
+      "critical": true
+    },
+    {
+      "id": "ext-iso45001-to-proc-incident",
+      "source": "external-iso45001",
+      "target": "proc-incident-management",
+      "relationship": "reference",
+      "label": "Clause 8.2",
+      "critical": true
+    },
+    {
+      "id": "sop-calibration-to-risk-quality",
+      "source": "sop-equipment-calibration",
+      "target": "risk-quality-process",
+      "relationship": "control",
+      "label": "Quality Control",
+      "critical": false
+    },
+    {
+      "id": "sop-emergency-to-risk-safety",
+      "source": "sop-emergency-response",
+      "target": "risk-workplace-safety",
+      "relationship": "control",
+      "label": "Emergency Control",
+      "critical": true
+    }
+  ],
+  "rolesCatalog": [
+    "CEO",
+    "Executive Team",
+    "Quality Manager",
+    "H&S Manager",
+    "Document Controller",
+    "Process Owners",
+    "Procurement Manager",
+    "HR Manager",
+    "Training Coordinator",
+    "Site Managers",
+    "Site Supervisors",
+    "Investigation Team",
+    "Buyers",
+    "Authors",
+    "Calibration Technician",
+    "Equipment Users",
+    "Emergency Coordinators",
+    "All Employees",
+    "Risk Assessors",
+    "Quality Team",
+    "Management",
+    "Auditors"
+  ],
+  "locationsCatalog": [
+    "Head Office",
+    "All Sites",
+    "Manufacturing Site",
+    "Warehouse",
+    "Office Building",
+    "Remote Locations"
+  ],
+  "activitiesCatalog": [
+    "Document Creation",
+    "Incident Investigation",
+    "Equipment Calibration",
+    "Emergency Response",
+    "Risk Assessment",
+    "Non-Conformance Management",
+    "Training Delivery",
+    "Management Review",
+    "Supplier Evaluation",
+    "Quality Control",
+    "Safety Management",
+    "Competency Development",
+    "Performance Monitoring",
+    "Corrective Action",
+    "Preventive Action",
+    "Internal Auditing",
+    "External Auditing",
+    "Compliance Monitoring"
+  ]
+}

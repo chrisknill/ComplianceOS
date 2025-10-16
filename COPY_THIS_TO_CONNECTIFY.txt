@@ -1,0 +1,273 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║   📦 COPY THESE FILES FROM ComplianceOS TO CONNECTIFY                      ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🎨 STEP 1: UI COMPONENTS (Essential - Copy All)                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+FROM: /Users/chrisknill/Documents/ComplianceConnect/ComplianceOS/components/ui/
+
+  ✅ badge.tsx              → Status badges, labels
+  ✅ button.tsx             → Primary UI button
+  ✅ dialog.tsx             → Modal dialogs
+  ✅ input.tsx              → Form text inputs
+  ✅ label.tsx              → Form labels
+  ✅ select.tsx             → Dropdown selects
+  ✅ tabs.tsx               → Tab navigation
+  ✅ textarea.tsx           → Multi-line text input
+  ✅ view-toggle.tsx        → List/Grid/Board switcher
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🛠️  STEP 2: UTILITIES (Essential)                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+FROM: /Users/chrisknill/Documents/ComplianceConnect/ComplianceOS/lib/
+
+  ✅ utils.ts               → Core utilities (cn, formatDate, etc.)
+  ✅ export.ts              → CSV export functionality
+  ✅ pdf.ts                 → PDF export with jsPDF
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🎯 STEP 3: RAG STATUS (Recommended)                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+FROM: /Users/chrisknill/Documents/ComplianceConnect/ComplianceOS/
+
+  ✅ components/rag/StatusBadge.tsx    → Red/Amber/Green indicators
+  ✅ lib/rag.ts                        → RAG calculation logic
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 📦 STEP 4: NPM PACKAGES (Install These)                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Run in Connectify directory:
+
+npm install @radix-ui/react-dialog @radix-ui/react-tabs @radix-ui/react-select @radix-ui/react-label @radix-ui/react-slot lucide-react jspdf jspdf-autotable papaparse class-variance-authority clsx tailwind-merge
+
+npm install -D @types/papaparse
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🎨 STEP 5: OPTIONAL COMPONENTS (Copy as Needed)                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+FROM: /Users/chrisknill/Documents/ComplianceConnect/ComplianceOS/
+
+Layout:
+  💡 components/layout/Shell.tsx        → Page wrapper with sidebar
+  💡 components/layout/Sidebar.tsx      → Navigation sidebar
+  💡 components/layout/Topbar.tsx       → Top navigation bar
+
+Forms:
+  💡 components/forms/ApprovalWorkflow.tsx    → Multi-level approval system
+  💡 components/forms/NCIntakeForm.tsx        → Smart form example
+  💡 components/forms/NCDetailView.tsx        → Detail view with tabs
+
+Domain-Specific:
+  💡 lib/company.ts                     → Company settings
+  💡 lib/ohs.ts                         → OH&S calculations (if applicable)
+  💡 components/risk/RiskMatrix.tsx     → Risk matrix (if applicable)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 📖 STEP 6: REFERENCE IMPLEMENTATIONS                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Study these pages for implementation patterns:
+
+📄 app/nonconformance/page.tsx
+   → Complete example with 5 views (Dashboard, List, Grid, Calendar, Board)
+   → Advanced filtering and sorting
+   → Clickable items opening detail view
+   → Export functionality
+
+📄 app/ohs/actions/page.tsx
+   → Board view with 5 columns
+   → Approval workflow integration
+   → Dashboard with KPIs
+
+📄 app/documentation/page.tsx
+   → Document management with approval workflow
+   → Board view for approval stages
+   → Microsoft Word integration
+
+📄 app/ohs/incidents/page.tsx
+   → Dashboard with statistics
+   → Board view with 3 columns
+   → Severity-based color coding
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🗄️  STEP 7: DATABASE PATTERNS (If Using Prisma)                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+FROM: /Users/chrisknill/Documents/ComplianceConnect/ComplianceOS/prisma/
+
+  📋 schema.prisma          → Review for patterns:
+                              - Audit logs
+                              - Approvals
+                              - Versioning
+                              - Relationships
+
+  📋 seed.ts                → Example seed data structure
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🎯 QUICK START COMMANDS                                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+# 1. Navigate to ComplianceOS
+cd /Users/chrisknill/Documents/ComplianceConnect/ComplianceOS
+
+# 2. Set Connectify path (UPDATE THIS!)
+CONNECTIFY="/path/to/your/connectify"
+
+# 3. Copy essential files
+mkdir -p $CONNECTIFY/components/ui
+mkdir -p $CONNECTIFY/components/rag
+mkdir -p $CONNECTIFY/lib
+
+cp components/ui/*.tsx $CONNECTIFY/components/ui/
+cp lib/utils.ts lib/export.ts lib/pdf.ts $CONNECTIFY/lib/
+cp components/rag/StatusBadge.tsx $CONNECTIFY/components/rag/
+
+# 4. Install packages
+cd $CONNECTIFY
+npm install @radix-ui/react-dialog @radix-ui/react-tabs @radix-ui/react-select @radix-ui/react-label lucide-react jspdf jspdf-autotable papaparse class-variance-authority clsx tailwind-merge
+
+# 5. Test
+npm run dev
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 📋 IMPLEMENTATION CHECKLIST                                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Phase 1: Foundation
+  [ ] Copy UI components
+  [ ] Install dependencies
+  [ ] Test components render
+  [ ] Copy utilities
+  [ ] Test export functions
+
+Phase 2: Add Views (Pick One Page First)
+  [ ] Add ViewMode state
+  [ ] Add view switcher
+  [ ] Implement dashboard view
+  [ ] Implement board view
+  [ ] Test all views
+
+Phase 3: Enhance (Apply to All Pages)
+  [ ] Add filtering
+  [ ] Add sorting
+  [ ] Add export buttons
+  [ ] Add detail views
+  [ ] Test thoroughly
+
+Phase 4: Polish
+  [ ] Fix bugs
+  [ ] Improve performance
+  [ ] Accessibility check
+  [ ] Mobile responsive check
+  [ ] Deploy
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🎓 KEY PATTERNS TO LEARN                                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1. Multi-View Architecture
+   → See: app/nonconformance/page.tsx (lines 1-1200)
+
+2. Kanban Board Layout
+   → See: app/nonconformance/page.tsx (lines 922-1167)
+
+3. Calendar Implementation
+   → See: app/nonconformance/page.tsx (lines 720-920)
+
+4. Advanced Filtering
+   → See: app/nonconformance/page.tsx (lines 78-120)
+
+5. Sortable Tables
+   → See: app/documentation/page.tsx (table section)
+
+6. Detail View with Tabs
+   → See: components/forms/NCDetailView.tsx (complete file)
+
+7. Export Functions
+   → See: lib/export.ts and lib/pdf.ts
+
+8. RAG Status System
+   → See: components/rag/StatusBadge.tsx and lib/rag.ts
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ ⚡ FASTEST PATH TO RESULTS                                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Want to see results in 1 day? Do this:
+
+MORNING (3 hours):
+  1. Copy UI components (30 min)
+  2. Install dependencies (15 min)
+  3. Copy export utilities (15 min)
+  4. Test on one page (2 hours)
+
+AFTERNOON (4 hours):
+  5. Add board view to your main page (2 hours)
+  6. Add export button (30 min)
+  7. Test thoroughly (1 hour)
+  8. Demo to team (30 min)
+
+RESULT: One page with board view + export = Immediate value! 🎉
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 📞 TROUBLESHOOTING                                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Issue: "Module not found"
+  → Run: npm install
+  → Check import paths match your structure
+
+Issue: "Type errors"
+  → Update interfaces to match your data
+  → Add missing fields
+
+Issue: "Styles not working"
+  → Check Tailwind config includes all paths
+  → Run: npm run dev (restart)
+
+Issue: "Components look broken"
+  → Verify all Radix UI packages installed
+  → Check for CSS conflicts
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 🎉 SUCCESS INDICATORS                                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+You're doing it right when:
+
+  ✅ No console errors
+  ✅ Components render beautifully
+  ✅ Board view shows your data
+  ✅ Export downloads files
+  ✅ Filters work instantly
+  ✅ Mobile looks good
+  ✅ Team is impressed! 😎
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 📚 DOCUMENTATION                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Read these guides in order:
+
+  1. FILES_TO_COPY_TO_CONNECTIFY.md (this file)
+  2. MIGRATION_GUIDE_TO_CONNECTIFY.md (detailed guide)
+  3. CONNECTIFY_UPDATE_CHECKLIST.md (daily checklist)
+  4. BOARD_VIEW_STATUS.md (board view reference)
+  5. NC_SYSTEM_COMPLETE.md (feature example)
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║   🚀 READY TO START? FOLLOW THE STEPS ABOVE!                              ║
+║                                                                            ║
+║   Questions? Review the MIGRATION_GUIDE_TO_CONNECTIFY.md                  ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
