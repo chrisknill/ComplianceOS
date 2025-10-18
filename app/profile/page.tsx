@@ -33,7 +33,9 @@ export default async function ProfilePage() {
   });
 
   if (!user?.company) {
-    redirect("/onboarding");
+    // redirect("/onboarding"); // DISABLED - Setup page disabled
+    // For now, redirect to dashboard instead
+    redirect("/dashboard");
   }
 
   const company: Company = {

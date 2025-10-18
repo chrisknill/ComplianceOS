@@ -27,6 +27,9 @@ import {
   AlertCircle,
   Network,
   ClipboardEdit,
+  FileSignature,
+  Heart,
+  Recycle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -39,8 +42,12 @@ const navigation = [
   { name: 'Equipment', href: '/equipment', icon: Wrench },
   { name: 'Calibration', href: '/calibration', icon: Calendar },
   { name: 'Registers', href: '/registers', icon: ClipboardList },
+  { name: 'Contract Review', href: '/contract-review', icon: FileSignature },
+  { name: 'Customer Satisfaction', href: '/customer-satisfaction', icon: Heart },
+  { name: 'Waste Management', href: '/waste-management', icon: Recycle },
+  { name: 'Audits & Inspections', href: '/audits', icon: ClipboardCheck },
   { name: 'Management Review', href: '/management-review', icon: ClipboardEdit },
-  { name: 'Management System Map', href: '/management-system-map', icon: Network },
+  { name: 'System Map', href: '/management-system-map', icon: Network },
 ]
 
 const ohsNavigation = [

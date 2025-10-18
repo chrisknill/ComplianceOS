@@ -654,3 +654,567 @@ model ManagementReviewAudit {
   review      ManagementReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 }
 
+// Contract Review Models
+model ContractReview {
+  id                String   @id @default(cuid())
+  contractNumber    String
+  contractTitle     String
+  contractType      String   // SUPPLY, SERVICE, CONSULTING, MAINTENANCE, OTHER
+  supplierName      String
+  supplierContact   String?
+  supplierEmail     String?
+  value             Float?
+  currency          String   @default("USD")
+  startDate         DateTime?
+  endDate           DateTime?
+  renewalDate       DateTime?
+  status            String   @default("DRAFT") // DRAFT, UNDER_REVIEW, APPROVED, REJECTED, EXPIRED, TERMINATED
+  priority          String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  riskLevel         String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  reviewerId        String?
+  reviewerName      String?
+  reviewDate        DateTime?
+  approvalDate      DateTime?
+  approverId        String?
+  approverName      String?
+  comments          String?
+  terms             String?  // JSON string for contract terms
+  complianceNotes   String?
+  nextReviewDate    DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  attachments       ContractAttachment[]
+  reviews           ContractReviewLog[]
+}
+
+// Customer Satisfaction Models
+model CustomerSatisfactionSurvey {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  surveyType        String   @default("GENERAL") // GENERAL, PRODUCT, SERVICE, SUPPORT, PROJECT
+  status            String   @default("DRAFT") // DRAFT, ACTIVE, CLOSED, ARCHIVED
+  targetAudience    String?  // Customer segment or criteria
+  startDate         DateTime?
+  endDate           DateTime?
+  createdBy         String?
+  createdByName     String?
+  totalResponses    Int      @default(0)
+  averageRating     Float?
+  responseRate      Float?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  questions         CustomerSatisfactionQuestion[]
+  responses         CustomerSatisfactionResponse[]
+}
+
+model CustomerSatisfactionQuestion {
+  id                String   @id @default(cuid())
+  surveyId          String
+  questionText      String
+  questionType      String   // RATING, MULTIPLE_CHOICE, TEXT, YES_NO, NPS
+  options           String?  // JSON array for multiple choice options
+  required          Boolean  @default(true)
+  order             Int
+  weight            Float    @default(1.0) // For weighted scoring
+  createdAt         DateTime @default(now())
+  
+  // Relations
+  survey            CustomerSatisfactionSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  answers           CustomerSatisfactionAnswer[]
+}
+
+model CustomerSatisfactionResponse {
+  id                String   @id @default(cuid())
+  surveyId          String
+  customerName      String?
+  customerEmail     String?
+  customerCompany   String?
+  customerSegment   String?  // VIP, REGULAR, NEW, etc.
+  responseDate      DateTime @default(now())
+  overallRating     Int?     // 1-5 or 1-10 scale
+  npsScore          Int?     // Net Promoter Score
+  comments          String?
+  ipAddress         String?
+  userAgent         String?
+  completed         Boolean  @default(false)
+  
+  // Relations
+  survey            CustomerSatisfactionSurvey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  answers           CustomerSatisfactionAnswer[]
+}
+
+model CustomerSatisfactionAnswer {
+  id                String   @id @default(cuid())
+  responseId        String
+  questionId        String
+  answerText        String?
+  answerRating      Int?     // For rating questions
+  answerChoice      String?  // For multiple choice
+  createdAt         DateTime @default(now())
+  
+  // Relations
+  response          CustomerSatisfactionResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  question          CustomerSatisfactionQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model CustomerComplaint {
+  id                String   @id @default(cuid())
+  complaintNumber   String   @unique
+  customerName      String
+  customerEmail     String?
+  customerPhone     String?
+  customerCompany   String?
+  complaintType     String   // PRODUCT, SERVICE, BILLING, DELIVERY, SUPPORT, OTHER
+  priority          String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  status            String   @default("OPEN") // OPEN, INVESTIGATING, RESOLVED, CLOSED, ESCALATED
+  subject           String
+  description       String
+  receivedDate      DateTime @default(now())
+  dueDate           DateTime?
+  assignedTo        String?
+  assignedToName    String?
+  resolution        String?
+  resolutionDate    DateTime?
+  customerSatisfied Boolean?
+  followUpRequired  Boolean  @default(false)
+  followUpDate      DateTime?
+  tags              String?  // JSON array of tags
+  attachments       String?  // JSON array of file URLs
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  actions           CustomerComplaintAction[]
+  logs              CustomerComplaintLog[]
+  project           Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectId         String?
+}
+
+model CustomerComplaintAction {
+  id                String   @id @default(cuid())
+  complaintId       String
+  actionType        String   // CORRECTIVE, PREVENTIVE, COMMUNICATION, INVESTIGATION, CAPA
+  description       String
+  assignedTo        String?
+  assignedToName    String?
+  dueDate           DateTime?
+  completedDate     DateTime?
+  status            String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, OVERDUE
+  effectiveness     String?  // EFFECTIVE, PARTIALLY_EFFECTIVE, INEFFECTIVE
+  capaActionId      String?  // Link to CAPA action if applicable
+  capaActionNumber  String?  // CAPA reference number
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  complaint         CustomerComplaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+}
+
+model CustomerComplaintLog {
+  id                String   @id @default(cuid())
+  complaintId       String
+  action            String   // CREATED, UPDATED, ASSIGNED, RESOLVED, CLOSED, ESCALATED
+  performedBy       String?
+  performedByName   String?
+  comments          String?
+  timestamp         DateTime @default(now())
+  
+  // Relations
+  complaint         CustomerComplaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+}
+
+// Testimonial Models
+model Testimonial {
+  id                String   @id @default(cuid())
+  customerName      String
+  customerEmail     String?
+  customerCompany   String?
+  customerTitle     String?
+  projectName       String?
+  projectType       String?  // COMPLETED, ONGOING, MAINTENANCE
+  testimonialText   String
+  rating            Int      // 1-5 stars
+  status            String   @default("DRAFT") // DRAFT, APPROVED, PUBLISHED, REJECTED
+  approvedBy        String?
+  approvedByName    String?
+  approvedAt        DateTime?
+  publishedAt       DateTime?
+  featured          Boolean  @default(false)
+  tags              String?  // JSON array of tags
+  attachments       String?  // JSON array of file URLs (photos, documents)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  questionnaire     TestimonialQuestionnaire?
+  responses         TestimonialResponse[]
+  project           Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectId         String?
+}
+
+model TestimonialQuestionnaire {
+  id                String   @id @default(cuid())
+  testimonialId     String   @unique
+  questionnaireType String   @default("STANDARD") // STANDARD, CUSTOM, COMPLAINT
+  status            String   @default("DRAFT") // DRAFT, SENT, COMPLETED, EXPIRED
+  sentDate          DateTime?
+  completedDate     DateTime?
+  expiresAt         DateTime?
+  reminderSent      Boolean  @default(false)
+  reminderDate       DateTime?
+  emailSubject      String?
+  emailBody         String?
+  promptingStatements String? // JSON array of prompting statements
+  questions         String?  // JSON array of questions
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  testimonial       Testimonial @relation(fields: [testimonialId], references: [id], onDelete: Cascade)
+  responses         TestimonialResponse[]
+}
+
+model TestimonialResponse {
+  id                String   @id @default(cuid())
+  testimonialId     String
+  questionnaireId   String?
+  customerName      String
+  customerEmail     String?
+  customerCompany   String?
+  responseDate      DateTime @default(now())
+  overallRating     Int?     // 1-5 stars
+  npsScore          Int?     // Net Promoter Score
+  responses         String   // JSON object of question responses
+  comments          String?
+  ipAddress         String?
+  userAgent         String?
+  completed         Boolean  @default(false)
+  
+  // Relations
+  testimonial       Testimonial @relation(fields: [testimonialId], references: [id], onDelete: Cascade)
+  questionnaire     TestimonialQuestionnaire? @relation(fields: [questionnaireId], references: [id], onDelete: SetNull)
+}
+
+// Job/Project Integration Models
+model Project {
+  id                String   @id @default(cuid())
+  projectName       String
+  projectNumber     String   @unique
+  customerName      String
+  customerEmail     String?
+  customerCompany   String?
+  projectType       String   // CONSTRUCTION, MAINTENANCE, CONSULTING, OTHER
+  status            String   @default("PLANNING") // PLANNING, IN_PROGRESS, COMPLETED, ON_HOLD, CANCELLED
+  startDate         DateTime?
+  endDate           DateTime?
+  completionDate    DateTime?
+  projectManager    String?
+  projectManagerName String?
+  value             Float?
+  currency          String   @default("USD")
+  description       String?
+  location          String?
+  autoTestimonial   Boolean  @default(true) // Auto-send testimonial request
+  testimonialSent   Boolean  @default(false)
+  testimonialSentDate DateTime?
+  testimonialReceived Boolean @default(false)
+  testimonialReceivedDate DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  testimonials      Testimonial[]
+  complaints        CustomerComplaint[]
+}
+
+model ContractAttachment {
+  id              String   @id @default(cuid())
+  contractId      String
+  fileName        String
+  fileType        String
+  fileSize        Int?
+  fileUrl         String?
+  uploadedBy      String?
+  uploadedAt      DateTime @default(now())
+  description     String?
+  
+  contract        ContractReview @relation(fields: [contractId], references: [id], onDelete: Cascade)
+}
+
+model ContractReviewLog {
+  id          String   @id @default(cuid())
+  contractId  String
+  action      String   // CREATED, UPDATED, REVIEWED, APPROVED, REJECTED, EXPIRED, TERMINATED
+  performedBy String?
+  comments    String?
+  timestamp   DateTime @default(now())
+  
+  contract    ContractReview @relation(fields: [contractId], references: [id], onDelete: Cascade)
+}
+
+// ========================================
+// ENVIRONMENTAL MANAGEMENT SYSTEM (EMS)
+// ========================================
+
+// Waste Management Models
+model WasteType {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  description       String?
+  category          String   // HAZARDOUS, NON_HAZARDOUS, RECYCLABLE, ORGANIC, ELECTRONIC
+  hazardClass       String?  // For hazardous waste
+  disposalMethod    String?  // LANDFILL, INCINERATION, RECYCLING, COMPOSTING, TREATMENT
+  regulatoryCode    String?  // EPA, DOT, or other regulatory codes
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  wasteRecords      WasteRecord[]
+}
+
+model WasteRecord {
+  id                String   @id @default(cuid())
+  recordNumber      String   @unique // WM-YYYY-####
+  wasteTypeId       String
+  quantity          Float
+  unit              String   // KG, LITERS, CUBIC_METERS, PIECES
+  location          String
+  generatedBy       String   // Department or person
+  generatedDate     DateTime
+  storedDate        DateTime?
+  disposalDate      DateTime?
+  disposalMethod    String   // LANDFILL, INCINERATION, RECYCLING, COMPOSTING, TREATMENT
+  disposalFacility  String?  // Name of disposal facility
+  transporter       String?  // Name of waste transporter
+  manifestNumber    String?  // Waste manifest number
+  cost              Float?   // Disposal cost
+  status            String   @default("GENERATED") // GENERATED, STORED, IN_TRANSIT, DISPOSED
+  notes             String?
+  attachments       String?  // JSON array of file URLs
+  createdBy         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  wasteType         WasteType @relation(fields: [wasteTypeId], references: [id], onDelete: Restrict)
+  logs              WasteRecordLog[]
+}
+
+model WasteRecordLog {
+  id                String   @id @default(cuid())
+  wasteRecordId     String
+  action            String   // GENERATED, STORED, PICKED_UP, DISPOSED, UPDATED
+  performedBy       String?
+  comments          String?
+  timestamp         DateTime @default(now())
+  
+  wasteRecord       WasteRecord @relation(fields: [wasteRecordId], references: [id], onDelete: Cascade)
+}
+
+model WasteDisposalFacility {
+  id                String   @id @default(cuid())
+  name              String
+  facilityType      String   // LANDFILL, INCINERATION, RECYCLING, TREATMENT, COMPOSTING
+  address           String?
+  contactPerson     String?
+  contactPhone      String?
+  contactEmail      String?
+  licenseNumber     String?
+  licenseExpiry     DateTime?
+  acceptedWasteTypes String? // JSON array of accepted waste types
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model WasteTransporter {
+  id                String   @id @default(cuid())
+  name              String
+  licenseNumber     String?
+  contactPerson     String?
+  contactPhone      String?
+  contactEmail      String?
+  address           String?
+  licenseExpiry     DateTime?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ========================================
+// AUDITS & INSPECTIONS
+// ========================================
+
+model AuditType {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  description       String?
+  category          String   // INTERNAL, EXTERNAL, SUPPLIER, CUSTOMER, REGULATORY
+  frequency         String   // ANNUAL, BI_ANNUAL, QUARTERLY, MONTHLY, AD_HOC
+  standard          String?  // ISO 9001, ISO 14001, ISO 45001, CUSTOM
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  audits            Audit[]
+}
+
+model Audit {
+  id                String   @id @default(cuid())
+  auditNumber       String   @unique // AUD-YYYY-####
+  auditTypeId       String
+  title             String
+  description       String?
+  scope             String
+  objectives        String?
+  auditStandard     String   // ISO 9001, ISO 14001, ISO 45001, CUSTOM
+  auditCriteria     String?  // Specific clauses or requirements
+  plannedStartDate  DateTime
+  plannedEndDate    DateTime
+  actualStartDate   DateTime?
+  actualEndDate     DateTime?
+  status            String   @default("PLANNED") // PLANNED, IN_PROGRESS, COMPLETED, CANCELLED, DEFERRED
+  ragStatus         String   @default("GREEN") // GREEN, AMBER, RED
+  leadAuditor       String?
+  leadAuditorName   String?
+  auditTeam         String?  // JSON array of auditor names
+  auditee           String?  // Department or process owner
+  auditeeName       String?
+  location          String?
+  auditMethod       String?  // ON_SITE, REMOTE, HYBRID
+  findings          Int      @default(0) // Number of findings
+  nonConformities   Int      @default(0) // Number of NCs
+  observations      Int      @default(0) // Number of observations
+  opportunities     Int      @default(0) // Number of OFIs
+  effectiveness     Int?     // 1-5 rating
+  notes             String?
+  attachments       String?  // JSON array of file URLs
+  createdBy         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  auditType         AuditType @relation(fields: [auditTypeId], references: [id], onDelete: Restrict)
+  auditFindings     AuditFinding[]
+  logs              AuditLog[]
+}
+
+model AuditFinding {
+  id                String   @id @default(cuid())
+  auditId           String
+  findingNumber     String   // AUD-YYYY-####-F001
+  type              String   // NON_CONFORMITY, OBSERVATION, OPPORTUNITY_FOR_IMPROVEMENT
+  severity          String   // MAJOR, MINOR, OBSERVATION, OFI
+  clause            String?  // ISO clause reference
+  description       String
+  evidence          String?  // Evidence of the finding
+  rootCause         String?  // Root cause analysis
+  correctiveAction  String?  // Proposed corrective action
+  responsible       String?  // Person responsible for action
+  dueDate           DateTime?
+  status            String   @default("OPEN") // OPEN, IN_PROGRESS, CLOSED, VERIFIED
+  verificationDate  DateTime?
+  verifiedBy        String?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  audit             Audit @relation(fields: [auditId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id                String   @id @default(cuid())
+  auditId           String
+  action            String   // CREATED, UPDATED, STARTED, COMPLETED, CANCELLED, DEFERRED
+  performedBy       String?
+  comments          String?
+  timestamp         DateTime @default(now())
+  
+  audit             Audit @relation(fields: [auditId], references: [id], onDelete: Cascade)
+}
+
+model InspectionType {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  description       String?
+  category          String   // SAFETY, ENVIRONMENTAL, QUALITY, EQUIPMENT, FACILITY
+  frequency         String   // DAILY, WEEKLY, MONTHLY, QUARTERLY, ANNUAL, AD_HOC
+  checklist         String?  // JSON array of checklist items
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  inspections       Inspection[]
+}
+
+model Inspection {
+  id                String   @id @default(cuid())
+  inspectionNumber  String   @unique // INS-YYYY-####
+  inspectionTypeId  String
+  title             String
+  description       String?
+  location          String
+  inspector         String
+  inspectorName     String?
+  plannedDate       DateTime
+  actualDate        DateTime?
+  status            String   @default("PLANNED") // PLANNED, IN_PROGRESS, COMPLETED, CANCELLED
+  ragStatus         String   @default("GREEN") // GREEN, AMBER, RED
+  findings          Int      @default(0)
+  criticalIssues    Int      @default(0)
+  minorIssues       Int      @default(0)
+  observations      Int      @default(0)
+  score             Int?     // Overall inspection score
+  maxScore          Int?     // Maximum possible score
+  notes             String?
+  attachments       String?  // JSON array of file URLs
+  createdBy         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  inspectionType    InspectionType @relation(fields: [inspectionTypeId], references: [id], onDelete: Restrict)
+  inspectionFindings InspectionFinding[]
+  logs              InspectionLog[]
+}
+
+model InspectionFinding {
+  id                String   @id @default(cuid())
+  inspectionId      String
+  findingNumber     String   // INS-YYYY-####-F001
+  type              String   // CRITICAL, MAJOR, MINOR, OBSERVATION
+  description       String
+  location          String?
+  correctiveAction  String?
+  responsible       String?
+  dueDate           DateTime?
+  status            String   @default("OPEN") // OPEN, IN_PROGRESS, CLOSED, VERIFIED
+  verificationDate  DateTime?
+  verifiedBy        String?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  inspection        Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+}
+
+model InspectionLog {
+  id                String   @id @default(cuid())
+  inspectionId      String
+  action            String   // CREATED, UPDATED, STARTED, COMPLETED, CANCELLED
+  performedBy       String?
+  comments          String?
+  timestamp         DateTime @default(now())
+  
+  inspection        Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+}
+

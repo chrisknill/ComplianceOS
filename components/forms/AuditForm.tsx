@@ -1,297 +1,476 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
-interface AuditFormProps {
-  open: boolean
-  onClose: () => void
-  audit?: any
-  onSave: () => void
+interface Audit {
+  id: string
+  auditNumber: string
+  auditTypeId: string
+  title: string
+  description?: string
+  scope: string
+  objectives?: string
+  auditStandard: string
+  auditCriteria?: string
+  plannedStartDate: string
+  plannedEndDate: string
+  actualStartDate?: string
+  actualEndDate?: string
+  status: string
+  ragStatus: string
+  leadAuditor?: string
+  leadAuditorName?: string
+  auditTeam?: string
+  auditee?: string
+  auditeeName?: string
+  location?: string
+  auditMethod?: string
+  effectiveness?: number
+  notes?: string
+  attachments?: string
 }
 
-export function AuditForm({ open, onClose, audit, onSave }: AuditFormProps) {
+interface AuditType {
+  id: string
+  name: string
+  category: string
+  frequency: string
+  standard?: string
+}
+
+interface AuditFormProps {
+  audit?: Audit | null
+  auditTypes: AuditType[]
+  onSubmit: () => void
+  onCancel: () => void
+}
+
+export function AuditForm({ audit, auditTypes, onSubmit, onCancel }: AuditFormProps) {
   const [formData, setFormData] = useState({
-    type: audit?.type || 'INTERNAL_AUDIT',
-    title: audit?.title || '',
-    auditor: audit?.auditor || '',
-    date: audit?.date ? new Date(audit.date).toISOString().split('T')[0] : '',
-    area: audit?.area || '',
-    duration: audit?.duration?.toString() || '',
-    status: audit?.status || 'SCHEDULED',
-    outcome: audit?.outcome || '',
-    actionItems: audit?.actionItems?.toString() || '0',
-    findings: audit?.findings || '',
+    auditTypeId: '',
+    title: '',
+    description: '',
+    scope: '',
+    objectives: '',
+    auditStandard: 'ISO 9001',
+    auditCriteria: '',
+    plannedStartDate: new Date().toISOString().split('T')[0],
+    plannedEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    actualStartDate: '',
+    actualEndDate: '',
+    status: 'PLANNED',
+    ragStatus: 'GREEN',
+    leadAuditor: '',
+    leadAuditorName: '',
+    auditTeam: '',
+    auditee: '',
+    auditeeName: '',
+    location: '',
+    auditMethod: 'ON_SITE',
+    effectiveness: '',
+    notes: '',
   })
 
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (audit) {
       setFormData({
-        type: audit.type || 'INTERNAL_AUDIT',
-        title: audit.title || '',
-        auditor: audit.auditor || '',
-        date: audit.date ? new Date(audit.date).toISOString().split('T')[0] : '',
-        area: audit.area || '',
-        duration: audit.duration?.toString() || '',
-        status: audit.status || 'SCHEDULED',
-        outcome: audit.outcome || '',
-        actionItems: audit.actionItems?.toString() || '0',
-        findings: audit.findings || '',
-      })
-    } else {
-      setFormData({
-        type: 'INTERNAL_AUDIT',
-        title: '',
-        auditor: '',
-        date: '',
-        area: '',
-        duration: '',
-        status: 'SCHEDULED',
-        outcome: '',
-        actionItems: '0',
-        findings: '',
+        auditTypeId: audit.auditTypeId,
+        title: audit.title,
+        description: audit.description || '',
+        scope: audit.scope,
+        objectives: audit.objectives || '',
+        auditStandard: audit.auditStandard,
+        auditCriteria: audit.auditCriteria || '',
+        plannedStartDate: audit.plannedStartDate.split('T')[0],
+        plannedEndDate: audit.plannedEndDate.split('T')[0],
+        actualStartDate: audit.actualStartDate ? audit.actualStartDate.split('T')[0] : '',
+        actualEndDate: audit.actualEndDate ? audit.actualEndDate.split('T')[0] : '',
+        status: audit.status,
+        ragStatus: audit.ragStatus,
+        leadAuditor: audit.leadAuditor || '',
+        leadAuditorName: audit.leadAuditorName || '',
+        auditTeam: audit.auditTeam || '',
+        auditee: audit.auditee || '',
+        auditeeName: audit.auditeeName || '',
+        location: audit.location || '',
+        auditMethod: audit.auditMethod || 'ON_SITE',
+        effectiveness: audit.effectiveness ? audit.effectiveness.toString() : '',
+        notes: audit.notes || '',
       })
     }
-  }, [audit, open])
+  }, [audit])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError(null)
 
     try {
-      const method = audit?.id ? 'PUT' : 'POST'
-      const url = audit?.id ? `/api/ohs/audits/${audit.id}` : '/api/ohs/audits'
-
       const payload = {
-        type: formData.type,
-        title: formData.title,
-        auditor: formData.auditor || null,
-        date: formData.date ? new Date(formData.date) : new Date(),
-        area: formData.area || null,
-        duration: formData.duration ? parseInt(formData.duration) : null,
-        status: formData.status,
-        outcome: formData.outcome || null,
-        actionItems: formData.actionItems ? parseInt(formData.actionItems) : 0,
-        findings: formData.findings || null,
+        ...formData,
+        effectiveness: formData.effectiveness ? parseInt(formData.effectiveness) : undefined,
+        plannedStartDate: new Date(formData.plannedStartDate).toISOString(),
+        plannedEndDate: new Date(formData.plannedEndDate).toISOString(),
+        actualStartDate: formData.actualStartDate ? new Date(formData.actualStartDate).toISOString() : undefined,
+        actualEndDate: formData.actualEndDate ? new Date(formData.actualEndDate).toISOString() : undefined,
       }
+
+      const url = audit 
+        ? `/api/audits/${audit.id}`
+        : '/api/audits'
+      
+      const method = audit ? 'PUT' : 'POST'
 
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(payload),
       })
 
-      if (!response.ok) throw new Error('Failed to save audit')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save audit')
+      }
 
-      onSave()
-      onClose()
-    } catch (error) {
-      console.error('Error saving audit:', error)
-      alert('Failed to save audit/inspection')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleDelete = async () => {
-    if (!audit?.id) return
-    if (!confirm('Are you sure you want to delete this audit/inspection?')) return
-
-    setLoading(true)
-    try {
-      const response = await fetch(`/api/ohs/audits/${audit.id}`, {
-        method: 'DELETE',
-      })
-
-      if (!response.ok) throw new Error('Failed to delete audit')
-
-      onSave()
-      onClose()
-    } catch (error) {
-      console.error('Error deleting audit:', error)
-      alert('Failed to delete audit/inspection')
+      onSubmit()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{audit?.id ? 'Edit' : 'Add'} Audit/Inspection</DialogTitle>
-        </DialogHeader>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <p className="text-red-800">{error}</p>
+        </div>
+      )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="type">Type *</Label>
-            <Select
-              value={formData.type}
-              onValueChange={(value) => setFormData({ ...formData, type: value })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="INTERNAL_AUDIT">Internal Audit</SelectItem>
-                <SelectItem value="THIRD_PARTY_AUDIT">3rd Party Audit</SelectItem>
-                <SelectItem value="CERTIFICATION_AUDIT">Certification Audit</SelectItem>
-                <SelectItem value="INSPECTION">Inspection</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="title">Title *</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              required
-              placeholder="e.g., Q4 Internal Safety Audit"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Basic Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Basic Information</CardTitle>
+            <CardDescription>Audit details and scope</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="auditor">Auditor/Inspector</Label>
-              <Input
-                id="auditor"
-                value={formData.auditor}
-                onChange={(e) => setFormData({ ...formData, auditor: e.target.value })}
-                placeholder="Name or organization"
-              />
+              <Label htmlFor="auditTypeId">Audit Type *</Label>
+              <Select value={formData.auditTypeId} onValueChange={(value) => setFormData({ ...formData, auditTypeId: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select audit type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {auditTypes?.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.name} ({type.category})
+                    </SelectItem>
+                  )) || []}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
-              <Label htmlFor="area">Area/Department</Label>
+              <Label htmlFor="title">Title *</Label>
               <Input
-                id="area"
-                value={formData.area}
-                onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                placeholder="e.g., Warehouse, Production"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="date">Date *</Label>
-              <Input
-                id="date"
-                type="date"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Audit title"
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="duration">Duration (hours)</Label>
-              <Input
-                id="duration"
-                type="number"
-                min="0"
-                step="0.5"
-                value={formData.duration}
-                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                placeholder="e.g., 4"
+              <Label htmlFor="scope">Scope *</Label>
+              <Textarea
+                id="scope"
+                value={formData.scope}
+                onChange={(e) => setFormData({ ...formData, scope: e.target.value })}
+                placeholder="Audit scope and areas to be covered"
+                rows={3}
+                required
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="status">Status *</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => setFormData({ ...formData, status: value })}
-              >
+              <Label htmlFor="objectives">Objectives</Label>
+              <Textarea
+                id="objectives"
+                value={formData.objectives}
+                onChange={(e) => setFormData({ ...formData, objectives: e.target.value })}
+                placeholder="Audit objectives"
+                rows={2}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="auditStandard">Audit Standard *</Label>
+              <Select value={formData.auditStandard} onValueChange={(value) => setFormData({ ...formData, auditStandard: value })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="SCHEDULED">Scheduled</SelectItem>
-                  <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                  <SelectItem value="COMPLETED">Completed</SelectItem>
+                  <SelectItem value="ISO 9001">ISO 9001:2015</SelectItem>
+                  <SelectItem value="ISO 14001">ISO 14001:2015</SelectItem>
+                  <SelectItem value="ISO 45001">ISO 45001:2018</SelectItem>
+                  <SelectItem value="CUSTOM">Custom Standard</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <Label htmlFor="outcome">Outcome</Label>
-              <Select
-                value={formData.outcome || 'PENDING'}
-                onValueChange={(value) => setFormData({ ...formData, outcome: value === 'PENDING' ? '' : value })}
-              >
+              <Label htmlFor="auditCriteria">Audit Criteria</Label>
+              <Input
+                id="auditCriteria"
+                value={formData.auditCriteria}
+                onChange={(e) => setFormData({ ...formData, auditCriteria: e.target.value })}
+                placeholder="Specific clauses or requirements"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Schedule & Status */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Schedule & Status</CardTitle>
+            <CardDescription>Timing and current status</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="plannedStartDate">Planned Start *</Label>
+                <Input
+                  id="plannedStartDate"
+                  type="date"
+                  value={formData.plannedStartDate}
+                  onChange={(e) => setFormData({ ...formData, plannedStartDate: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="plannedEndDate">Planned End *</Label>
+                <Input
+                  id="plannedEndDate"
+                  type="date"
+                  value={formData.plannedEndDate}
+                  onChange={(e) => setFormData({ ...formData, plannedEndDate: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="actualStartDate">Actual Start</Label>
+                <Input
+                  id="actualStartDate"
+                  type="date"
+                  value={formData.actualStartDate}
+                  onChange={(e) => setFormData({ ...formData, actualStartDate: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="actualEndDate">Actual End</Label>
+                <Input
+                  id="actualEndDate"
+                  type="date"
+                  value={formData.actualEndDate}
+                  onChange={(e) => setFormData({ ...formData, actualEndDate: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="status">Status</Label>
+                <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PLANNED">Planned</SelectItem>
+                    <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                    <SelectItem value="COMPLETED">Completed</SelectItem>
+                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                    <SelectItem value="DEFERRED">Deferred</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="ragStatus">RAG Status</Label>
+                <Select value={formData.ragStatus} onValueChange={(value) => setFormData({ ...formData, ragStatus: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="GREEN">Green</SelectItem>
+                    <SelectItem value="AMBER">Amber</SelectItem>
+                    <SelectItem value="RED">Red</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="auditMethod">Audit Method</Label>
+              <Select value={formData.auditMethod} onValueChange={(value) => setFormData({ ...formData, auditMethod: value })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Not completed yet" />
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="PENDING">Not completed yet</SelectItem>
-                  <SelectItem value="PASS">Pass</SelectItem>
-                  <SelectItem value="CONDITIONAL">Conditional</SelectItem>
-                  <SelectItem value="FAIL">Fail</SelectItem>
+                  <SelectItem value="ON_SITE">On-Site</SelectItem>
+                  <SelectItem value="REMOTE">Remote</SelectItem>
+                  <SelectItem value="HYBRID">Hybrid</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          <div>
-            <Label htmlFor="actionItems">Action Items Raised</Label>
-            <Input
-              id="actionItems"
-              type="number"
-              min="0"
-              value={formData.actionItems}
-              onChange={(e) => setFormData({ ...formData, actionItems: e.target.value })}
-              placeholder="Number of corrective actions required"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="findings">Findings/Notes</Label>
-            <Textarea
-              id="findings"
-              value={formData.findings}
-              onChange={(e) => setFormData({ ...formData, findings: e.target.value })}
-              rows={4}
-              placeholder="Key findings, observations, or notes..."
-            />
-          </div>
-
-          <DialogFooter className="flex justify-between">
             <div>
-              {audit?.id && (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={handleDelete}
-                  disabled={loading}
-                >
-                  Delete
-                </Button>
-              )}
+              <Label htmlFor="effectiveness">Effectiveness Rating</Label>
+              <Select value={formData.effectiveness} onValueChange={(value) => setFormData({ ...formData, effectiveness: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select rating" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1 - Poor</SelectItem>
+                  <SelectItem value="2">2 - Below Average</SelectItem>
+                  <SelectItem value="3">3 - Average</SelectItem>
+                  <SelectItem value="4">4 - Good</SelectItem>
+                  <SelectItem value="5">5 - Excellent</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? 'Saving...' : 'Save'}
-              </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Team & Location */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Team & Location</CardTitle>
+          <CardDescription>Audit team and location details</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="leadAuditor">Lead Auditor ID</Label>
+              <Input
+                id="leadAuditor"
+                value={formData.leadAuditor}
+                onChange={(e) => setFormData({ ...formData, leadAuditor: e.target.value })}
+                placeholder="Auditor ID"
+              />
             </div>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <div>
+              <Label htmlFor="leadAuditorName">Lead Auditor Name</Label>
+              <Input
+                id="leadAuditorName"
+                value={formData.leadAuditorName}
+                onChange={(e) => setFormData({ ...formData, leadAuditorName: e.target.value })}
+                placeholder="Full name"
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="auditTeam">Audit Team</Label>
+            <Textarea
+              id="auditTeam"
+              value={formData.auditTeam}
+              onChange={(e) => setFormData({ ...formData, auditTeam: e.target.value })}
+              placeholder="List of audit team members (one per line)"
+              rows={2}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="auditee">Auditee Department</Label>
+              <Input
+                id="auditee"
+                value={formData.auditee}
+                onChange={(e) => setFormData({ ...formData, auditee: e.target.value })}
+                placeholder="Department or area"
+              />
+            </div>
+            <div>
+              <Label htmlFor="auditeeName">Auditee Contact</Label>
+              <Input
+                id="auditeeName"
+                value={formData.auditeeName}
+                onChange={(e) => setFormData({ ...formData, auditeeName: e.target.value })}
+                placeholder="Contact person name"
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="location">Location</Label>
+            <Input
+              id="location"
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              placeholder="Audit location"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Additional Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Additional Information</CardTitle>
+          <CardDescription>Notes and additional details</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div>
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Detailed audit description..."
+              rows={3}
+            />
+          </div>
+
+          <div className="mt-4">
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea
+              id="notes"
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              placeholder="Additional notes..."
+              rows={3}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Form Actions */}
+      <div className="flex justify-end gap-3">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? 'Saving...' : audit ? 'Update Audit' : 'Create Audit'}
+        </Button>
+      </div>
+    </form>
   )
 }
-

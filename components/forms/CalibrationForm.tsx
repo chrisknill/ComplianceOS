@@ -140,7 +140,7 @@ export function CalibrationForm({ open, onClose, calibration, onSave }: Calibrat
                 <SelectValue placeholder="Select result" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Not tested yet</SelectItem>
+                <SelectItem value="NOT_TESTED">Not tested yet</SelectItem>
                 <SelectItem value="PASS">Pass</SelectItem>
                 <SelectItem value="FAIL">Fail</SelectItem>
                 <SelectItem value="AS FOUND">As Found</SelectItem>

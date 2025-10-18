@@ -1,17 +1,18 @@
 'use client'
 
-import { List, Grid, Kanban } from 'lucide-react'
+import { List, Grid, Kanban, Calendar } from 'lucide-react'
 import { Button } from './button'
 import { cn } from '@/lib/utils'
 
 interface ViewToggleProps {
-  view: 'list' | 'grid' | 'board'
-  onViewChange: (view: 'list' | 'grid' | 'board') => void
+  view: 'list' | 'grid' | 'board' | 'calendar'
+  onViewChange: (view: 'list' | 'grid' | 'board' | 'calendar') => void
   className?: string
   showBoard?: boolean
+  showCalendar?: boolean
 }
 
-export function ViewToggle({ view, onViewChange, className, showBoard = true }: ViewToggleProps) {
+export function ViewToggle({ view, onViewChange, className, showBoard = true, showCalendar = true }: ViewToggleProps) {
   return (
     <div className={cn('inline-flex rounded-lg border border-slate-200 p-1', className)}>
       <button
@@ -50,6 +51,20 @@ export function ViewToggle({ view, onViewChange, className, showBoard = true }: 
         >
           <Kanban className="h-4 w-4" />
           Board
+        </button>
+      )}
+      {showCalendar && (
+        <button
+          onClick={() => onViewChange('calendar')}
+          className={cn(
+            'inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
+            view === 'calendar'
+              ? 'bg-slate-900 text-white'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+          )}
+        >
+          <Calendar className="h-4 w-4" />
+          Calendar
         </button>
       )}
     </div>

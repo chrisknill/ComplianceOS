@@ -68,8 +68,8 @@ export default function ManagementReviewPage() {
   const [reviews, setReviews] = useState<ManagementReview[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('')
-  const [standardFilter, setStandardFilter] = useState<string>('')
+  const [statusFilter, setStatusFilter] = useState<string>('ALL')
+  const [standardFilter, setStandardFilter] = useState<string>('ALL')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 
   useEffect(() => {
@@ -81,8 +81,8 @@ export default function ManagementReviewPage() {
       setLoading(true)
       const params = new URLSearchParams()
       if (searchQuery) params.append('search', searchQuery)
-      if (statusFilter) params.append('status', statusFilter)
-      if (standardFilter) params.append('standards', standardFilter)
+      if (statusFilter && statusFilter !== 'ALL') params.append('status', statusFilter)
+      if (standardFilter && standardFilter !== 'ALL') params.append('standards', standardFilter)
       
       const response = await fetch(`/api/management-review?${params.toString()}`, {
         credentials: 'include',
@@ -269,7 +269,7 @@ export default function ManagementReviewPage() {
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="ALL">All Status</SelectItem>
                   <SelectItem value="DRAFT">Draft</SelectItem>
                   <SelectItem value="SCHEDULED">Scheduled</SelectItem>
                   <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
@@ -282,7 +282,7 @@ export default function ManagementReviewPage() {
                   <SelectValue placeholder="Standard" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Standards</SelectItem>
+                  <SelectItem value="ALL">All Standards</SelectItem>
                   <SelectItem value="ISO9001">ISO 9001</SelectItem>
                   <SelectItem value="ISO14001">ISO 14001</SelectItem>
                   <SelectItem value="ISO45001">ISO 45001</SelectItem>
