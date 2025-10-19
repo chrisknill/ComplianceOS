@@ -1218,3 +1218,608 @@ model InspectionLog {
   inspection        Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
 }
 
+// ========================================
+// NEW MANAGEMENT SYSTEM MODULES
+// ========================================
+
+// Governance Models
+model OrganizationalContext {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  type              String   // INTERNAL, EXTERNAL
+  category          String   // CULTURE, CAPABILITIES, MARKET, REGULATORY, TECHNOLOGICAL
+  status            String   @default("ACTIVE") // ACTIVE, ARCHIVED
+  ownerId           String?
+  nextReviewAt      DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model InterestedParty {
+  id                String   @id @default(cuid())
+  name              String
+  type              String   // INTERNAL, EXTERNAL
+  requirements      String?
+  expectations      String?
+  contactInfo       String?  // JSON object
+  status            String   @default("ACTIVE")
+  lastReview        DateTime?
+  nextReview        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Policy {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  type              String   // QMS, EMS, OHS, GENERAL
+  version            String   @default("1.0")
+  status            String   @default("DRAFT") // DRAFT, ACTIVE, UNDER_REVIEW, ARCHIVED
+  content           String?  // Policy content
+  ownerId           String?
+  lastReview        DateTime?
+  nextReview        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Role {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  responsibilities  String?  // JSON array
+  assignedTo        String?  // User ID
+  status            String   @default("ACTIVE")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ComplianceRequirement {
+  id                String   @id @default(cuid())
+  requirement       String
+  source            String   // Legal source
+  applicable        Boolean  @default(true)
+  status            String   @default("COMPLIANT") // COMPLIANT, NON_COMPLIANT, UNDER_REVIEW
+  lastCheck         DateTime?
+  nextCheck         DateTime?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Planning Models
+model BusinessRisk {
+  id                String   @id @default(cuid())
+  description       String
+  category          String   // OPERATIONAL, FINANCIAL, STRATEGIC, COMPLIANCE
+  likelihood        String   // LOW, MEDIUM, HIGH
+  impact            String   // LOW, MEDIUM, HIGH
+  rating            String   // Calculated risk rating
+  mitigation        String?
+  ownerId           String?
+  status            String   @default("ACTIVE")
+  lastReview        DateTime?
+  nextReview        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model EnvironmentalAspect {
+  id                String   @id @default(cuid())
+  aspect            String
+  impact            String
+  significance      String   // LOW, MEDIUM, HIGH
+  controlMeasures   String?
+  ownerId           String?
+  status            String   @default("ACTIVE")
+  lastReview        DateTime?
+  nextReview        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model OHSHazardNew {
+  id                String   @id @default(cuid())
+  hazard            String
+  risk              String
+  likelihood        String   // LOW, MEDIUM, HIGH
+  severity          String   // LOW, MEDIUM, HIGH
+  rating            String   // Calculated risk rating
+  controlMeasures   String?
+  ownerId           String?
+  status            String   @default("ACTIVE")
+  lastReview        DateTime?
+  nextReview        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Objective {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  type              String   // QUALITY, ENVIRONMENTAL, SAFETY, BUSINESS
+  target            String?
+  progress          String   @default("0%")
+  dueDate           DateTime?
+  ownerId           String?
+  status            String   @default("ACTIVE")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ChangeRequest {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  type              String   // PROCESS, INFRASTRUCTURE, DOCUMENTATION, POLICY
+  status            String   @default("DRAFT") // DRAFT, APPROVED, IN_PROGRESS, COMPLETED, CANCELLED
+  requestedBy       String?
+  approvedBy        String?
+  dueDate           DateTime?
+  completedDate     DateTime?
+  impact            String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Support Models
+model DocumentNew {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  type              String   // MANUAL, POLICY, PROCEDURE, FORM, RECORD
+  version           String   @default("1.0")
+  status            String   @default("DRAFT") // DRAFT, ACTIVE, UNDER_REVIEW, ARCHIVED
+  content           String?  // Document content
+  ownerId           String?
+  lastReview        DateTime?
+  nextReview        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model TrainingCourse {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  type              String   // QUALITY, ENVIRONMENTAL, SAFETY, GENERAL
+  duration          Int?     // Duration in hours
+  participants      Int      @default(0)
+  status            String   @default("PLANNED") // PLANNED, IN_PROGRESS, COMPLETED, CANCELLED
+  instructor        String?
+  nextSession       DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Communication {
+  id                String   @id @default(cuid())
+  title             String
+  message           String?
+  type              String   // QUALITY, ENVIRONMENTAL, SAFETY, GENERAL
+  audience          String?  // Target audience
+  status            String   @default("DRAFT") // DRAFT, SENT, SCHEDULED
+  sentBy            String?
+  sentAt            DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model InfrastructureAsset {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  type              String   // MANUFACTURING, FACILITIES, IT_INFRASTRUCTURE, EQUIPMENT
+  location          String?
+  status            String   @default("OPERATIONAL") // OPERATIONAL, UNDER_MAINTENANCE, OUT_OF_SERVICE
+  nextMaintenance   DateTime?
+  ownerId           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model CalibrationRecord {
+  id                String   @id @default(cuid())
+  equipment         String
+  type              String   // MEASUREMENT, WEIGHING, TESTING
+  lastCalibration   DateTime?
+  nextDue           DateTime?
+  status            String   @default("VALID") // VALID, DUE_SOON, OVERDUE, INVALID
+  calibrator        String?
+  certificate       String?  // Certificate number
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Supplier {
+  id                String   @id @default(cuid())
+  name              String
+  category          String   // RAW_MATERIALS, SERVICES, EQUIPMENT, CONSULTING
+  rating            String?  // A, B, C rating
+  status            String   @default("APPROVED") // APPROVED, UNDER_REVIEW, SUSPENDED
+  contactInfo       String?  // JSON object
+  lastAudit         DateTime?
+  nextAudit         DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Operations Models
+model ProcessMap {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  processType       String   // MANAGEMENT, CORE, SUPPORT
+  status            String   @default("ACTIVE")
+  ownerId           String?
+  lastReview        DateTime?
+  nextReview        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model SOP {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  department        String?
+  version           String   @default("1.0")
+  status            String   @default("DRAFT") // DRAFT, ACTIVE, UNDER_REVIEW, ARCHIVED
+  content           String?  // SOP content
+  ownerId           String?
+  lastReview        DateTime?
+  nextReview        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model DesignProject {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  phase             String   // DESIGN, DEVELOPMENT, TESTING, IMPLEMENTATION
+  status            String   @default("PLANNING") // PLANNING, IN_PROGRESS, COMPLETED, CANCELLED
+  responsible       String?
+  dueDate           DateTime?
+  completedDate     DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ProductionOrder {
+  id                String   @id @default(cuid())
+  orderNumber       String   @unique
+  product           String
+  quantity          Int
+  status            String   @default("PLANNED") // PLANNED, IN_PRODUCTION, COMPLETED, CANCELLED
+  dueDate           DateTime?
+  completedDate     DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ContractorNew {
+  id                String   @id @default(cuid())
+  name              String
+  service           String
+  status            String   @default("ACTIVE") // ACTIVE, UNDER_REVIEW, SUSPENDED
+  certification     String?  // Certification status
+  expiry            DateTime?
+  contactInfo       String?  // JSON object
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model EmergencyScenario {
+  id                String   @id @default(cuid())
+  scenario          String
+  type              String   // SAFETY, ENVIRONMENTAL, INFRASTRUCTURE
+  status            String   @default("ACTIVE")
+  lastDrill         DateTime?
+  nextDrill         DateTime?
+  responsePlan      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model WasteRecordNew {
+  id                String   @id @default(cuid())
+  type              String
+  quantity          String
+  disposal          String   // Disposal method
+  cost              Float?
+  date              DateTime
+  location          String?
+  transporter       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Performance Models
+model CustomerSurvey {
+  id                String   @id @default(cuid())
+  customer          String
+  surveyType        String   // PRODUCT_QUALITY, SERVICE_DELIVERY, OVERALL_SATISFACTION
+  rating            String?  // Rating or score
+  status            String   @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, CANCELLED
+  date              DateTime?
+  comments          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model AuditRecord {
+  id                String   @id @default(cuid())
+  auditType         String   // INTERNAL, EXTERNAL, SUPPLIER
+  scope             String?
+  status            String   @default("PLANNED") // PLANNED, IN_PROGRESS, COMPLETED, CANCELLED
+  auditor           String?
+  date              DateTime?
+  findings          Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model EnvironmentalMonitoring {
+  id                String   @id @default(cuid())
+  parameter         String
+  location          String?
+  value             String
+  limit             String?
+  status            String   @default("COMPLIANT") // COMPLIANT, NON_COMPLIANT, WARNING
+  date              DateTime
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model OHSPerformance {
+  id                String   @id @default(cuid())
+  metric            String
+  target            String?
+  actual            String?
+  trend             String?  // IMPROVING, STABLE, DECLINING
+  status            String   @default("ON_TARGET") // ON_TARGET, BELOW_TARGET, ABOVE_TARGET
+  period            String?  // Reporting period
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ComplianceEvaluation {
+  id                String   @id @default(cuid())
+  requirement       String
+  standard          String?  // ISO 9001, ISO 14001, ISO 45001
+  status            String   @default("COMPLIANT") // COMPLIANT, NON_COMPLIANT, UNDER_REVIEW
+  lastCheck         DateTime?
+  nextCheck         DateTime?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ManagementReviewNew {
+  id                String   @id @default(cuid())
+  reviewType        String   // QMS, EMS, OHS, INTEGRATED
+  period            String?  // Q1 2025, Annual 2024, etc.
+  status            String   @default("PLANNED") // PLANNED, IN_PROGRESS, COMPLETED, CANCELLED
+  chair             String?
+  date              DateTime?
+  attendees         String?  // JSON array
+  outcomes          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Improvement Models
+model NonConformity {
+  id                String   @id @default(cuid())
+  ncNumber          String   @unique
+  description       String
+  type              String   // MAJOR, MINOR, OBSERVATION
+  status            String   @default("OPEN") // OPEN, IN_PROGRESS, CLOSED, VERIFIED
+  ownerId           String?
+  dueDate           DateTime?
+  closedDate        DateTime?
+  correctiveAction  String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model IncidentNew {
+  id                String   @id @default(cuid())
+  incidentNumber    String   @unique
+  description       String
+  severity          String   // MINOR, MAJOR, CRITICAL, NEAR_MISS
+  status            String   @default("REPORTED") // REPORTED, INVESTIGATED, CLOSED
+  reportedBy        String?
+  investigatedBy    String?
+  date              DateTime
+  location          String?
+  correctiveAction  String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ImprovementOpportunity {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  type              String   // EFFICIENCY, ENVIRONMENTAL, QUALITY, SAFETY
+  priority          String   // LOW, MEDIUM, HIGH
+  status            String   @default("IDENTIFIED") // IDENTIFIED, PLANNED, IN_PROGRESS, COMPLETED, CANCELLED
+  assignedTo        String?
+  dueDate           DateTime?
+  completedDate     DateTime?
+  impact            String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model LessonLearned {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  source            String?  // AUDIT_FINDING, INCIDENT_INVESTIGATION, PROJECT_REVIEW
+  category          String   // PROCESS, SAFETY, QUALITY, ENVIRONMENTAL
+  status            String   @default("CAPTURED") // CAPTURED, IMPLEMENTED, ARCHIVED
+  implementation    String?
+  date              DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ContinuousImprovement {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  type              String   // PROCESS, TECHNOLOGY, PEOPLE, SYSTEM
+  status            String   @default("PLANNED") // PLANNED, IN_PROGRESS, COMPLETED, CANCELLED
+  impact            String   // LOW, MEDIUM, HIGH
+  completion        String   @default("0%")
+  ownerId           String?
+  dueDate           DateTime?
+  completedDate     DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Register Models
+model LegalRegister {
+  id                String   @id @default(cuid())
+  requirement       String
+  source            String
+  applicable        Boolean  @default(true)
+  status            String   @default("COMPLIANT") // COMPLIANT, NON_COMPLIANT, UNDER_REVIEW
+  lastCheck         DateTime?
+  nextCheck         DateTime?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model RiskRegister {
+  id                String   @id @default(cuid())
+  risk              String
+  category          String?
+  likelihood        String   // LOW, MEDIUM, HIGH
+  impact            String   // LOW, MEDIUM, HIGH
+  rating            String   // Calculated risk rating
+  mitigation        String?
+  ownerId           String?
+  status            String   @default("ACTIVE")
+  lastReview        DateTime?
+  nextReview        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ObjectivesRegister {
+  id                String   @id @default(cuid())
+  objective         String
+  type              String   // QUALITY, ENVIRONMENTAL, SAFETY, BUSINESS
+  target            String?
+  progress          String   @default("0%")
+  dueDate           DateTime?
+  ownerId           String?
+  status            String   @default("ACTIVE")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model AssetsRegister {
+  id                String   @id @default(cuid())
+  asset             String
+  type              String?
+  location          String?
+  status            String   @default("OPERATIONAL")
+  nextMaintenance   DateTime?
+  ownerId           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model SuppliersRegister {
+  id                String   @id @default(cuid())
+  supplier          String
+  category          String?
+  rating            String?
+  status            String   @default("APPROVED")
+  lastAudit         DateTime?
+  nextAudit         DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model TrainingRegister {
+  id                String   @id @default(cuid())
+  employee          String
+  course            String
+  status            String   @default("PLANNED") // PLANNED, IN_PROGRESS, COMPLETED, CANCELLED
+  completion        DateTime?
+  expiry            DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model DocumentsRegister {
+  id                String   @id @default(cuid())
+  document          String
+  type              String?
+  version           String   @default("1.0")
+  status            String   @default("ACTIVE")
+  lastReview        DateTime?
+  nextReview        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model ActionsRegister {
+  id                String   @id @default(cuid())
+  actionNumber      String   @unique
+  description       String
+  type              String   // CORRECTIVE, PREVENTIVE, IMPROVEMENT
+  status            String   @default("OPEN") // OPEN, IN_PROGRESS, CLOSED, VERIFIED
+  ownerId           String?
+  dueDate           DateTime?
+  completedDate     DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Admin Models
+model SystemUser {
+  id                String   @id @default(cuid())
+  name              String
+  email             String   @unique
+  role              String   // ADMIN, MANAGER, AUDITOR, WORKER
+  status            String   @default("ACTIVE") // ACTIVE, INACTIVE, SUSPENDED
+  lastLogin         DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model SystemIntegration {
+  id                String   @id @default(cuid())
+  name              String
+  type              String   // DOCUMENT_MANAGEMENT, COMMUNICATION, BUSINESS_SYSTEM
+  status            String   @default("ACTIVE") // ACTIVE, INACTIVE, ERROR
+  lastSync          DateTime?
+  nextSync          DateTime?
+  config            String?  // JSON configuration
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model SystemLog {
+  id                String   @id @default(cuid())
+  timestamp         DateTime @default(now())
+  level             String   // INFO, WARNING, ERROR, DEBUG
+  module            String?
+  message           String
+  user              String?
+  metadata          String?  // JSON additional data
+}
+

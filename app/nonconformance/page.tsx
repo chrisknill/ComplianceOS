@@ -1,19 +1,20 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Shell } from '@/components/layout/Shell'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
-  AlertCircle, Plus, Download, Search, LayoutDashboard, 
-  TrendingUp, Clock, CheckCircle, AlertTriangle, ArrowUpDown, ArrowUp, ArrowDown,
-  Calendar as CalendarIcon, ChevronLeft, ChevronRight
+  AlertCircle, Plus, Download, Search, 
+  TrendingUp, Clock, CheckCircle, AlertTriangle, ArrowUpDown, ArrowUp, ArrowDown
 } from 'lucide-react'
 import { StatusBadge } from '@/components/rag/StatusBadge'
 import { NCIntakeForm } from '@/components/forms/NCIntakeForm'
 import { NCDetailView } from '@/components/forms/NCDetailView'
+import { ViewToggle } from '@/components/ui/view-toggle'
 import { formatDate } from '@/lib/utils'
 import { convertToCSV, downloadFile } from '@/lib/export'
 
@@ -31,15 +32,12 @@ interface NonConformance {
   dueDate: Date | null
 }
 
-type ViewMode = 'dashboard' | 'list' | 'grid' | 'calendar' | 'board'
-type CalendarView = 'day' | 'week' | 'month'
-
 export default function NonConformancePage() {
+  const searchParams = useSearchParams()
   const [records, setRecords] = useState<NonConformance[]>([])
   const [loading, setLoading] = useState(true)
-  const [viewMode, setViewMode] = useState<ViewMode>('dashboard')
-  const [calendarView, setCalendarView] = useState<CalendarView>('month')
-  const [currentDate, setCurrentDate] = useState(new Date())
+  const [filter, setFilter] = useState<string>('DASHBOARD')
+  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'board'>('list')
   const [showForm, setShowForm] = useState(false)
   const [showDetailView, setShowDetailView] = useState(false)
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null)
@@ -50,6 +48,14 @@ export default function NonConformancePage() {
   const [severityFilter, setSeverityFilter] = useState<string>('ALL')
   const [sortField, setSortField] = useState<string>('dateRaised')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+
+  // Set initial filter from URL params
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab) {
+      setFilter(tab)
+    }
+  }, [searchParams])
 
   const loadRecords = () => {
     setLoading(true)
@@ -78,7 +84,20 @@ export default function NonConformancePage() {
     }
   }
 
+  const tabs = [
+    { key: 'DASHBOARD', label: 'Dashboard' },
+    { key: 'ALL', label: 'All Cases' },
+    { key: 'NC', label: 'Non-Conformance' },
+    { key: 'OFI', label: 'OFI' },
+    { key: 'CC', label: 'Incidents' },
+    { key: 'SNC', label: 'Lessons Learned' },
+    { key: 'CI', label: 'CI Tracker' },
+  ]
+
   const filteredAndSortedRecords = records
+    // Filter by tab
+    .filter(r => filter === 'ALL' || filter === 'DASHBOARD' || r.caseType === filter)
+    // Filter by search
     .filter(r => {
       if (searchTerm) {
         const search = searchTerm.toLowerCase()
@@ -198,42 +217,6 @@ export default function NonConformancePage() {
     return sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
   }
 
-  // Calendar helpers
-  const getRecordsForDate = (date: Date) => {
-    return records.filter(r => {
-      const raisedDate = new Date(r.dateRaised)
-      return raisedDate.toDateString() === date.toDateString()
-    })
-  }
-
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
-    const daysInMonth = lastDay.getDate()
-    const startingDayOfWeek = firstDay.getDay()
-    
-    return { daysInMonth, startingDayOfWeek, firstDay, lastDay }
-  }
-
-  const navigateCalendar = (direction: 'prev' | 'next') => {
-    const newDate = new Date(currentDate)
-    
-    if (calendarView === 'day') {
-      newDate.setDate(newDate.getDate() + (direction === 'next' ? 1 : -1))
-    } else if (calendarView === 'week') {
-      newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7))
-    } else {
-      newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1))
-    }
-    
-    setCurrentDate(newDate)
-  }
-
-  const goToToday = () => {
-    setCurrentDate(new Date())
-  }
 
   if (loading) {
     return (
@@ -255,59 +238,8 @@ export default function NonConformancePage() {
             <p className="text-slate-600 mt-1">OFI, NC, Customer Complaints, Supplier Non-Conformances</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('dashboard')}
-                className={`px-3 py-1.5 text-sm font-medium rounded ${
-                  viewMode === 'dashboard'
-                    ? 'bg-white text-slate-900 shadow'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Dashboard
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`px-3 py-1.5 text-sm font-medium rounded ${
-                  viewMode === 'list'
-                    ? 'bg-white text-slate-900 shadow'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                List
-              </button>
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`px-3 py-1.5 text-sm font-medium rounded ${
-                  viewMode === 'grid'
-                    ? 'bg-white text-slate-900 shadow'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Grid
-              </button>
-              <button
-                onClick={() => setViewMode('calendar')}
-                className={`px-3 py-1.5 text-sm font-medium rounded ${
-                  viewMode === 'calendar'
-                    ? 'bg-white text-slate-900 shadow'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Calendar
-              </button>
-              <button
-                onClick={() => setViewMode('board')}
-                className={`px-3 py-1.5 text-sm font-medium rounded ${
-                  viewMode === 'board'
-                    ? 'bg-white text-slate-900 shadow'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Board
-              </button>
-            </div>
-            {viewMode !== 'dashboard' && viewMode !== 'calendar' && viewMode !== 'board' && (
+            <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+            {viewMode !== 'board' && (
               <Button variant="outline" onClick={handleExportCSV}>
                 <Download className="h-4 w-4 mr-2" />
                 CSV
@@ -320,8 +252,27 @@ export default function NonConformancePage() {
           </div>
         </div>
 
-        {/* Dashboard View */}
-        {viewMode === 'dashboard' && (
+        {/* Tabs */}
+        <div className="border-b border-slate-200">
+          <nav className="flex space-x-8">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setFilter(tab.key)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  filter === tab.key
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {/* Dashboard Tab */}
+        {filter === 'DASHBOARD' && (
           <div className="space-y-6">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -376,37 +327,49 @@ export default function NonConformancePage() {
               <div className="bg-white rounded-lg shadow p-6">
                 <h3 className="text-lg font-semibold text-slate-900 mb-4">Case Types</h3>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => setFilter('OFI')}
+                    className="flex items-center justify-between w-full text-left hover:bg-slate-50 p-2 rounded"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
                       <span className="text-slate-700">Opportunities for Improvement (OFI)</span>
                     </div>
                     <span className="text-2xl font-bold text-slate-900">{stats.ofi}</span>
-                  </div>
+                  </button>
 
-                  <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => setFilter('NC')}
+                    className="flex items-center justify-between w-full text-left hover:bg-slate-50 p-2 rounded"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-3 h-3 bg-rose-500 rounded-full"></div>
                       <span className="text-slate-700">Internal Non-Conformance (NC)</span>
                     </div>
                     <span className="text-2xl font-bold text-slate-900">{stats.nc}</span>
-                  </div>
+                  </button>
 
-                  <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => setFilter('CC')}
+                    className="flex items-center justify-between w-full text-left hover:bg-slate-50 p-2 rounded"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
                       <span className="text-slate-700">Customer Complaint (CC)</span>
                     </div>
                     <span className="text-2xl font-bold text-slate-900">{stats.cc}</span>
-                  </div>
+                  </button>
 
-                  <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => setFilter('SNC')}
+                    className="flex items-center justify-between w-full text-left hover:bg-slate-50 p-2 rounded"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
                       <span className="text-slate-700">Supplier Non-Conformance (SNC)</span>
                     </div>
                     <span className="text-2xl font-bold text-slate-900">{stats.snc}</span>
-                  </div>
+                  </button>
                 </div>
               </div>
 
@@ -451,6 +414,7 @@ export default function NonConformancePage() {
                     size="sm"
                     onClick={() => {
                       setSeverityFilter('CRITICAL')
+                      setFilter('ALL')
                       setViewMode('list')
                     }}
                   >
@@ -471,7 +435,10 @@ export default function NonConformancePage() {
                     variant="outline"
                     size="sm"
                     className="border-amber-600 text-amber-700 hover:bg-amber-100"
-                    onClick={() => setViewMode('list')}
+                    onClick={() => {
+                      setFilter('ALL')
+                      setViewMode('list')
+                    }}
                   >
                     View Overdue →
                   </Button>
@@ -482,7 +449,7 @@ export default function NonConformancePage() {
         )}
 
         {/* Filters (List/Grid View) */}
-        {(viewMode === 'list' || viewMode === 'grid') && (
+        {filter !== 'DASHBOARD' && (viewMode === 'list' || viewMode === 'grid') && (
           <div className="bg-white rounded-lg shadow p-4">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div className="relative">
@@ -566,7 +533,7 @@ export default function NonConformancePage() {
         )}
 
         {/* List View */}
-        {viewMode === 'list' && (
+        {filter !== 'DASHBOARD' && viewMode === 'list' && (
           <div className="bg-white rounded-lg shadow overflow-x-auto">
             <table className="w-full">
               <thead className="bg-slate-50 border-b border-slate-200">
@@ -667,7 +634,7 @@ export default function NonConformancePage() {
         )}
 
         {/* Grid View */}
-        {viewMode === 'grid' && (
+        {filter !== 'DASHBOARD' && viewMode === 'grid' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredData.map((record) => {
               const rag = getStatusRAG(record.status)
@@ -722,205 +689,8 @@ export default function NonConformancePage() {
           </div>
         )}
 
-        {/* Calendar View */}
-        {viewMode === 'calendar' && (
-          <div className="bg-white rounded-lg shadow">
-            {/* Calendar Header */}
-            <div className="p-6 border-b border-slate-200">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-slate-900">
-                  {calendarView === 'day' && currentDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                  {calendarView === 'week' && `Week of ${currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
-                  {calendarView === 'month' && currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                </h2>
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
-                    <button
-                      onClick={() => setCalendarView('day')}
-                      className={`px-3 py-1 text-sm font-medium rounded ${
-                        calendarView === 'day' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'
-                      }`}
-                    >
-                      Day
-                    </button>
-                    <button
-                      onClick={() => setCalendarView('week')}
-                      className={`px-3 py-1 text-sm font-medium rounded ${
-                        calendarView === 'week' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'
-                      }`}
-                    >
-                      Week
-                    </button>
-                    <button
-                      onClick={() => setCalendarView('month')}
-                      className={`px-3 py-1 text-sm font-medium rounded ${
-                        calendarView === 'month' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'
-                      }`}
-                    >
-                      Month
-                    </button>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={goToToday}>
-                    Today
-                  </Button>
-                  <div className="flex gap-1">
-                    <Button variant="outline" size="sm" onClick={() => navigateCalendar('prev')}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => navigateCalendar('next')}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Calendar Grid - Month View */}
-            {calendarView === 'month' && (
-              <div className="p-6">
-                <div className="grid grid-cols-7 gap-2">
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="text-center text-xs font-medium text-slate-600 py-2">
-                      {day}
-                    </div>
-                  ))}
-                  
-                  {(() => {
-                    const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentDate)
-                    const days = []
-                    
-                    // Empty cells before first day
-                    for (let i = 0; i < startingDayOfWeek; i++) {
-                      days.push(<div key={`empty-${i}`} className="min-h-24 bg-slate-50 rounded"></div>)
-                    }
-                    
-                    // Days of month
-                    for (let day = 1; day <= daysInMonth; day++) {
-                      const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
-                      const dayRecords = getRecordsForDate(date)
-                      const isToday = date.toDateString() === new Date().toDateString()
-                      
-                      days.push(
-                        <div
-                          key={day}
-                          className={`min-h-24 border rounded-lg p-2 ${
-                            isToday ? 'border-blue-500 bg-blue-50' : 'border-slate-200'
-                          }`}
-                        >
-                          <div className="text-sm font-medium text-slate-900 mb-1">{day}</div>
-                          <div className="space-y-1">
-                            {dayRecords.slice(0, 3).map(record => (
-                              <div
-                                key={record.id}
-                                className={`text-xs p-1 rounded truncate cursor-pointer hover:opacity-80 ${getCaseTypeColor(record.caseType)}`}
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  setSelectedRecordId(record.id)
-                                  setShowDetailView(true)
-                                }}
-                              >
-                                {record.refNumber}
-                              </div>
-                            ))}
-                            {dayRecords.length > 3 && (
-                              <div className="text-xs text-slate-500">+{dayRecords.length - 3} more</div>
-                            )}
-                          </div>
-                        </div>
-                      )
-                    }
-                    
-                    return days
-                  })()}
-                </div>
-              </div>
-            )}
-
-            {/* Calendar - Week View */}
-            {calendarView === 'week' && (
-              <div className="p-6">
-                <div className="grid grid-cols-7 gap-4">
-                  {[0, 1, 2, 3, 4, 5, 6].map(offset => {
-                    const date = new Date(currentDate)
-                    date.setDate(date.getDate() - date.getDay() + offset)
-                    const dayRecords = getRecordsForDate(date)
-                    const isToday = date.toDateString() === new Date().toDateString()
-                    
-                    return (
-                      <div key={offset} className={`border rounded-lg p-3 ${isToday ? 'border-blue-500 bg-blue-50' : 'border-slate-200'}`}>
-                        <div className="text-center mb-3">
-                          <div className="text-xs text-slate-600">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                          <div className="text-lg font-semibold text-slate-900">{date.getDate()}</div>
-                        </div>
-                        <div className="space-y-2">
-                          {dayRecords.map(record => (
-                            <div
-                              key={record.id}
-                              className={`text-xs p-2 rounded cursor-pointer hover:opacity-80 ${getCaseTypeColor(record.caseType)}`}
-                              onClick={() => {
-                                setSelectedRecordId(record.id)
-                                setShowDetailView(true)
-                              }}
-                            >
-                              <div className="font-medium">{record.refNumber}</div>
-                              <div className="truncate mt-1">{record.title}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Calendar - Day View */}
-            {calendarView === 'day' && (
-              <div className="p-6">
-                <div className="space-y-3">
-                  {getRecordsForDate(currentDate).map(record => {
-                    const rag = getStatusRAG(record.status)
-                    return (
-                    <div
-                      key={record.id}
-                      className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                      onClick={() => {
-                        setSelectedRecordId(record.id)
-                        setShowDetailView(true)
-                      }}
-                    >
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className={`px-2 py-1 rounded-md text-xs font-medium border ${getCaseTypeColor(record.caseType)}`}>
-                              {record.caseType}
-                            </span>
-                            <span className="font-medium text-slate-900">{record.refNumber}</span>
-                          </div>
-                          <StatusBadge status={rag} label={record.status.replace(/_/g, ' ')} />
-                        </div>
-                        <h3 className="font-semibold text-slate-900 mb-2">{record.title}</h3>
-                        <div className="flex items-center gap-4 text-sm text-slate-600">
-                          <span>Owner: {record.owner || 'Unassigned'}</span>
-                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${getSeverityColor(record.severity)}`}>
-                            {record.severity}
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  })}
-                  {getRecordsForDate(currentDate).length === 0 && (
-                    <div className="text-center py-12 text-slate-500">
-                      No cases raised on this date
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Board View (Kanban) */}
-        {viewMode === 'board' && (
+        {filter !== 'DASHBOARD' && viewMode === 'board' && (
           <div className="overflow-x-auto">
             <div className="flex gap-4 min-w-max pb-4">
               {/* OPEN Column */}
@@ -1166,7 +936,7 @@ export default function NonConformancePage() {
           </div>
         )}
 
-        {filteredData.length === 0 && viewMode !== 'dashboard' && viewMode !== 'calendar' && viewMode !== 'board' && (
+        {filteredData.length === 0 && filter !== 'DASHBOARD' && (
           <div className="text-center py-12 bg-white rounded-lg shadow">
             <AlertCircle className="h-12 w-12 text-slate-300 mx-auto mb-4" />
             <p className="text-slate-500">No cases found</p>

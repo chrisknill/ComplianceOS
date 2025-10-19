@@ -1,5 +1,6 @@
 # dependencies
 /node_modules
+/contract-review-module/node_modules
 /.pnp
 .pnp.js
 
