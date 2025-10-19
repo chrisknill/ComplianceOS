@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 // GET - Fetch version history for a document
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -14,8 +14,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const versions = await prisma.documentVersion.findMany({
-      where: { documentId: params.id },
+      where: { documentId: id },
       orderBy: { createdAt: 'desc' },
     })
 
@@ -32,7 +33,7 @@ export async function GET(
 // POST - Create a new version record
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -40,12 +41,13 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await req.json()
     const { version, changes, changedBy, approvedBy } = body
 
     const versionRecord = await prisma.documentVersion.create({
       data: {
-        documentId: params.id,
+        documentId: id,
         version,
         changes,
         changedBy,

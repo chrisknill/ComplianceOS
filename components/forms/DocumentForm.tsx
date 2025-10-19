@@ -113,7 +113,7 @@ export function DocumentForm({ open, onClose, document: doc, onSave, nextSequenc
               </SelectContent>
             </Select>
             <p className="text-xs text-slate-500 mt-1">
-              Set to "Pending Approval" to initiate approval workflow
+              Set to &quot;Pending Approval&quot; to initiate approval workflow
             </p>
           </div>
 
@@ -133,7 +133,7 @@ export function DocumentForm({ open, onClose, document: doc, onSave, nextSequenc
                     <li>Level 3: CEO (optional for high-level policies)</li>
                   </ul>
                   <p className="text-xs text-blue-600 mt-3">
-                    💡 After saving, use the "Approvals" button on the document to sign at each level
+                    💡 After saving, use the &quot;Approvals&quot; button on the document to sign at each level
                   </p>
                 </div>
               </div>

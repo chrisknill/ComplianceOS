@@ -25,7 +25,7 @@ const updateWasteRecordSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -33,8 +33,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const wasteRecord = await prisma.wasteRecord.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         wasteType: true,
         logs: {
@@ -56,7 +57,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -64,12 +65,13 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await request.json()
     const validatedData = updateWasteRecordSchema.parse(body)
 
     // Get current record to compare status changes
     const currentRecord = await prisma.wasteRecord.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!currentRecord) {
@@ -77,7 +79,7 @@ export async function PUT(
     }
 
     const wasteRecord = await prisma.wasteRecord.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...validatedData,
         generatedDate: validatedData.generatedDate ? new Date(validatedData.generatedDate) : undefined,
@@ -93,7 +95,7 @@ export async function PUT(
     if (validatedData.status && validatedData.status !== currentRecord.status) {
       await prisma.wasteRecordLog.create({
         data: {
-          wasteRecordId: params.id,
+          wasteRecordId: id,
           action: validatedData.status,
           performedBy: session.user.id,
           comments: `Status changed from ${currentRecord.status} to ${validatedData.status}`,
@@ -113,7 +115,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -121,8 +123,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     await prisma.wasteRecord.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })

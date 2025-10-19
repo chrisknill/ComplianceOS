@@ -7,7 +7,7 @@ import { updateAttendeeSchema } from '@/lib/validation/management-review'
 // PUT /api/management-review/[id]/attendees/[attendeeId] - Update attendee
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; attendeeId: string } }
+  { params }: { params: Promise<{ id: string; attendeeId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -15,12 +15,13 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id, attendeeId } = await params
     const body = await request.json()
     const validatedData = updateAttendeeSchema.parse(body)
 
     // Check if attendee exists
     const existingAttendee = await prisma.managementReviewAttendee.findUnique({
-      where: { id: params.attendeeId },
+      where: { id: attendeeId },
     })
 
     if (!existingAttendee) {
@@ -28,12 +29,12 @@ export async function PUT(
     }
 
     // Verify the attendee belongs to the review
-    if (existingAttendee.reviewId !== params.id) {
+    if (existingAttendee.reviewId !== id) {
       return NextResponse.json({ error: 'Attendee not found in this review' }, { status: 404 })
     }
 
     const attendee = await prisma.managementReviewAttendee.update({
-      where: { id: params.attendeeId },
+      where: { id: attendeeId },
       data: validatedData,
     })
 
@@ -41,7 +42,7 @@ export async function PUT(
     if (validatedData.signedOffAt && !existingAttendee.signedOffAt) {
       await prisma.managementReviewAudit.create({
         data: {
-          reviewId: params.id,
+          reviewId: id,
           actorId: session.user.id,
           event: 'SIGN_OFF',
           details: `Attendee ${attendee.name} signed off`,
@@ -69,7 +70,7 @@ export async function PUT(
 // DELETE /api/management-review/[id]/attendees/[attendeeId] - Remove attendee
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; attendeeId: string } }
+  { params }: { params: Promise<{ id: string; attendeeId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -77,9 +78,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id, attendeeId } = await params
     // Check if attendee exists
     const existingAttendee = await prisma.managementReviewAttendee.findUnique({
-      where: { id: params.attendeeId },
+      where: { id: attendeeId },
     })
 
     if (!existingAttendee) {
@@ -87,18 +89,18 @@ export async function DELETE(
     }
 
     // Verify the attendee belongs to the review
-    if (existingAttendee.reviewId !== params.id) {
+    if (existingAttendee.reviewId !== id) {
       return NextResponse.json({ error: 'Attendee not found in this review' }, { status: 404 })
     }
 
     await prisma.managementReviewAttendee.delete({
-      where: { id: params.attendeeId },
+      where: { id: attendeeId },
     })
 
     // Create audit log entry
     await prisma.managementReviewAudit.create({
       data: {
-        reviewId: params.id,
+        reviewId: id,
         actorId: session.user.id,
         event: 'UPDATED',
         details: `Attendee ${existingAttendee.name} removed`,

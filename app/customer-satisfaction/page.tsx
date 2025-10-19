@@ -31,6 +31,7 @@ interface CustomerSatisfactionSurvey {
   targetAudience?: string
   startDate?: Date
   endDate?: Date
+  expiresAt?: Date
   createdByName?: string
   totalResponses: number
   averageRating?: number
@@ -355,7 +356,12 @@ export default function CustomerSatisfactionPage() {
         createdAt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
         updatedAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
         expiresAt: new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-        questions: []
+        questions: [],
+        responses: [],
+        _count: {
+          questions: 0,
+          responses: 0
+        }
       },
       {
         id: 'survey-2',
@@ -368,7 +374,12 @@ export default function CustomerSatisfactionPage() {
         createdAt: new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000), // 21 days ago
         updatedAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
         expiresAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-        questions: []
+        questions: [],
+        responses: [],
+        _count: {
+          questions: 0,
+          responses: 0
+        }
       },
       {
         id: 'survey-3',
@@ -381,7 +392,12 @@ export default function CustomerSatisfactionPage() {
         createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
         updatedAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
         expiresAt: new Date(now.getTime() + 25 * 24 * 60 * 60 * 1000), // 25 days from now
-        questions: []
+        questions: [],
+        responses: [],
+        _count: {
+          questions: 0,
+          responses: 0
+        }
       }
     ]
 
@@ -395,12 +411,20 @@ export default function CustomerSatisfactionPage() {
         complaintType: 'SERVICE',
         priority: 'HIGH',
         status: 'OPEN',
+        subject: 'Delayed delivery and poor communication',
         description: 'Delayed delivery and poor communication',
+        receivedDate: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
         resolution: '',
         createdAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
         updatedAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-        resolvedAt: null,
-        actions: []
+        resolutionDate: undefined,
+        followUpRequired: false,
+        actions: [],
+        logs: [],
+        _count: {
+          actions: 0,
+          logs: 0
+        }
       },
       {
         id: 'complaint-2',
@@ -411,12 +435,20 @@ export default function CustomerSatisfactionPage() {
         complaintType: 'PRODUCT',
         priority: 'MEDIUM',
         status: 'IN_PROGRESS',
+        subject: 'Product defect reported',
         description: 'Product defect reported',
+        receivedDate: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
         resolution: 'Investigating the issue',
         createdAt: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
         updatedAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-        resolvedAt: null,
-        actions: []
+        resolutionDate: undefined,
+        followUpRequired: false,
+        actions: [],
+        logs: [],
+        _count: {
+          actions: 0,
+          logs: 0
+        }
       },
       {
         id: 'complaint-3',
@@ -427,12 +459,20 @@ export default function CustomerSatisfactionPage() {
         complaintType: 'BILLING',
         priority: 'LOW',
         status: 'RESOLVED',
+        subject: 'Billing discrepancy',
         description: 'Billing discrepancy',
+        receivedDate: new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000), // 15 days ago
         resolution: 'Refund processed',
         createdAt: new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000), // 15 days ago
         updatedAt: new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000), // 8 days ago
-        resolvedAt: new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000), // 8 days ago
-        actions: []
+        resolutionDate: new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000), // 8 days ago
+        followUpRequired: false,
+        actions: [],
+        logs: [],
+        _count: {
+          actions: 0,
+          logs: 0
+        }
       }
     ]
 
@@ -448,16 +488,18 @@ export default function CustomerSatisfactionPage() {
         testimonialText: 'Excellent service and great results!',
         rating: 5,
         status: 'PUBLISHED',
-        approvedBy: 'admin',
         approvedByName: 'Admin User',
         approvedAt: new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000), // 6 days ago
         publishedAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
         featured: true,
         tags: '["design", "website"]',
-        attachments: null,
+        attachments: undefined,
         createdAt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
         updatedAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-        projectId: null
+        responses: [],
+        _count: {
+          responses: 0
+        }
       },
       {
         id: 'testimonial-2',
@@ -470,16 +512,18 @@ export default function CustomerSatisfactionPage() {
         testimonialText: 'Outstanding work and professional team.',
         rating: 4,
         status: 'APPROVED',
-        approvedBy: 'admin',
         approvedByName: 'Admin User',
         approvedAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-        publishedAt: null,
+        publishedAt: undefined,
         featured: false,
         tags: '["marketing", "digital"]',
-        attachments: null,
+        attachments: undefined,
         createdAt: new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
         updatedAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-        projectId: null
+        responses: [],
+        _count: {
+          responses: 0
+        }
       }
     ]
 
@@ -530,11 +574,11 @@ export default function CustomerSatisfactionPage() {
         status: complaint.status,
         priority: complaint.priority
       })
-      if (complaint.resolvedAt) {
+      if (complaint.resolutionDate) {
         events.push({
           id: `complaint-resolved-${complaint.id}`,
           title: `${complaint.complaintNumber} (Resolved)`,
-          date: complaint.resolvedAt,
+          date: complaint.resolutionDate,
           type: 'complaint',
           status: 'RESOLVED'
         })
@@ -719,6 +763,17 @@ export default function CustomerSatisfactionPage() {
       if (typeof aValue === 'number' && typeof bValue === 'number') {
         return sort.direction === 'asc' ? aValue - bValue : bValue - aValue
       }
+      
+      // Handle date fields - convert strings to Date objects if needed
+      if (sort.field === 'createdAt' || sort.field === 'updatedAt' || sort.field === 'sentDate' || sort.field === 'expiryDate') {
+        const aDate = aValue ? new Date(aValue as any) : new Date(0)
+        const bDate = bValue ? new Date(bValue as any) : new Date(0)
+        
+        if (!isNaN(aDate.getTime()) && !isNaN(bDate.getTime())) {
+          return sort.direction === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime()
+        }
+      }
+      
       if (aValue instanceof Date && bValue instanceof Date) {
         return sort.direction === 'asc' ? aValue.getTime() - bValue.getTime() : bValue.getTime() - aValue.getTime()
       }
@@ -737,6 +792,17 @@ export default function CustomerSatisfactionPage() {
       if (typeof aValue === 'number' && typeof bValue === 'number') {
         return sort.direction === 'asc' ? aValue - bValue : bValue - aValue
       }
+      
+      // Handle date fields - convert strings to Date objects if needed
+      if (sort.field === 'createdAt' || sort.field === 'updatedAt' || sort.field === 'resolvedAt' || sort.field === 'dueDate') {
+        const aDate = aValue ? new Date(aValue as any) : new Date(0)
+        const bDate = bValue ? new Date(bValue as any) : new Date(0)
+        
+        if (!isNaN(aDate.getTime()) && !isNaN(bDate.getTime())) {
+          return sort.direction === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime()
+        }
+      }
+      
       if (aValue instanceof Date && bValue instanceof Date) {
         return sort.direction === 'asc' ? aValue.getTime() - bValue.getTime() : bValue.getTime() - aValue.getTime()
       }
@@ -755,6 +821,17 @@ export default function CustomerSatisfactionPage() {
       if (typeof aValue === 'number' && typeof bValue === 'number') {
         return sort.direction === 'asc' ? aValue - bValue : bValue - aValue
       }
+      
+      // Handle date fields - convert strings to Date objects if needed
+      if (sort.field === 'createdAt' || sort.field === 'updatedAt' || sort.field === 'approvedAt' || sort.field === 'publishedAt') {
+        const aDate = aValue ? new Date(aValue as any) : new Date(0)
+        const bDate = bValue ? new Date(bValue as any) : new Date(0)
+        
+        if (!isNaN(aDate.getTime()) && !isNaN(bDate.getTime())) {
+          return sort.direction === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime()
+        }
+      }
+      
       if (aValue instanceof Date && bValue instanceof Date) {
         return sort.direction === 'asc' ? aValue.getTime() - bValue.getTime() : bValue.getTime() - aValue.getTime()
       }
@@ -773,6 +850,17 @@ export default function CustomerSatisfactionPage() {
       if (typeof aValue === 'number' && typeof bValue === 'number') {
         return sort.direction === 'asc' ? aValue - bValue : bValue - aValue
       }
+      
+      // Handle date fields - convert strings to Date objects if needed
+      if (sort.field === 'createdAt' || sort.field === 'updatedAt' || sort.field === 'startDate' || sort.field === 'endDate' || sort.field === 'completionDate' || sort.field === 'testimonialSentDate' || sort.field === 'testimonialReceivedDate') {
+        const aDate = aValue ? new Date(aValue as any) : new Date(0)
+        const bDate = bValue ? new Date(bValue as any) : new Date(0)
+        
+        if (!isNaN(aDate.getTime()) && !isNaN(bDate.getTime())) {
+          return sort.direction === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime()
+        }
+      }
+      
       if (aValue instanceof Date && bValue instanceof Date) {
         return sort.direction === 'asc' ? aValue.getTime() - bValue.getTime() : bValue.getTime() - aValue.getTime()
       }
@@ -783,14 +871,7 @@ export default function CustomerSatisfactionPage() {
   // Export functions
   const handleExportSurveys = useCallback(() => {
     try {
-      const csvData = convertToCSV(sortedSurveys, [
-        { key: 'title', label: 'Survey Title' },
-        { key: 'surveyType', label: 'Type' },
-        { key: 'status', label: 'Status' },
-        { key: 'totalResponses', label: 'Responses' },
-        { key: 'averageRating', label: 'Avg Rating' },
-        { key: 'createdAt', label: 'Created' },
-      ])
+      const csvData = convertToCSV(sortedSurveys)
       downloadFile(csvData, 'customer-satisfaction-surveys.csv', 'text/csv')
       toast.success('Survey data exported successfully')
     } catch (error) {
@@ -801,16 +882,7 @@ export default function CustomerSatisfactionPage() {
 
   const handleExportComplaints = useCallback(() => {
     try {
-      const csvData = convertToCSV(sortedComplaints, [
-        { key: 'complaintNumber', label: 'Complaint #' },
-        { key: 'customerName', label: 'Customer' },
-        { key: 'customerCompany', label: 'Company' },
-        { key: 'complaintType', label: 'Type' },
-        { key: 'priority', label: 'Priority' },
-        { key: 'status', label: 'Status' },
-        { key: 'receivedDate', label: 'Received' },
-        { key: 'dueDate', label: 'Due Date' },
-      ])
+      const csvData = convertToCSV(sortedComplaints)
       downloadFile(csvData, 'customer-complaints.csv', 'text/csv')
       toast.success('Complaint data exported successfully')
     } catch (error) {
@@ -821,15 +893,7 @@ export default function CustomerSatisfactionPage() {
 
   const handleExportTestimonials = useCallback(() => {
     try {
-      const csvData = convertToCSV(sortedTestimonials, [
-        { key: 'customerName', label: 'Customer' },
-        { key: 'customerCompany', label: 'Company' },
-        { key: 'projectName', label: 'Project' },
-        { key: 'rating', label: 'Rating' },
-        { key: 'status', label: 'Status' },
-        { key: 'featured', label: 'Featured' },
-        { key: 'createdAt', label: 'Created' },
-      ])
+      const csvData = convertToCSV(sortedTestimonials)
       downloadFile(csvData, 'customer-testimonials.csv', 'text/csv')
       toast.success('Testimonial data exported successfully')
     } catch (error) {
@@ -840,16 +904,7 @@ export default function CustomerSatisfactionPage() {
 
   const handleExportProjects = useCallback(() => {
     try {
-      const csvData = convertToCSV(sortedProjects, [
-        { key: 'projectNumber', label: 'Project #' },
-        { key: 'projectName', label: 'Project Name' },
-        { key: 'customerName', label: 'Customer' },
-        { key: 'customerCompany', label: 'Company' },
-        { key: 'projectType', label: 'Type' },
-        { key: 'status', label: 'Status' },
-        { key: 'value', label: 'Value' },
-        { key: 'createdAt', label: 'Created' },
-      ])
+      const csvData = convertToCSV(sortedProjects)
       downloadFile(csvData, 'customer-projects.csv', 'text/csv')
       toast.success('Project data exported successfully')
     } catch (error) {
@@ -967,7 +1022,7 @@ export default function CustomerSatisfactionPage() {
 
   if (loading) {
     return (
-      <Shell title="Customer Satisfaction" subtitle="Manage surveys and complaints">
+      <Shell>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
@@ -976,7 +1031,7 @@ export default function CustomerSatisfactionPage() {
   }
 
   return (
-    <Shell title="Customer Satisfaction" subtitle="Manage surveys, complaints, and testimonials">
+    <Shell>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -1096,12 +1151,30 @@ export default function CustomerSatisfactionPage() {
               </>
             )}
 
-            <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Status</SelectItem>
+            {viewMode === 'testimonials' && (
+              <>
+                <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
+                  <SelectTrigger className="w-full sm:w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">All Status</SelectItem>
+                    <SelectItem value="DRAFT">Draft</SelectItem>
+                    <SelectItem value="APPROVED">Approved</SelectItem>
+                    <SelectItem value="PUBLISHED">Published</SelectItem>
+                    <SelectItem value="REJECTED">Rejected</SelectItem>
+                  </SelectContent>
+                </Select>
+              </>
+            )}
+
+            {viewMode !== 'testimonials' && (
+              <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Status</SelectItem>
                 {viewMode === 'surveys' ? (
                   <>
                     <SelectItem value="DRAFT">Draft</SelectItem>
@@ -1120,6 +1193,7 @@ export default function CustomerSatisfactionPage() {
                 )}
               </SelectContent>
             </Select>
+            )}
           </div>
         </div>
       </div>
@@ -1341,17 +1415,17 @@ export default function CustomerSatisfactionPage() {
             {displayView === 'list' && (
               <div className="bg-white rounded-lg border overflow-hidden">
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full min-w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title/Number</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Type</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Title/Number</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Customer</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Priority</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Rating</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Date</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -1797,7 +1871,7 @@ export default function CustomerSatisfactionPage() {
       {viewMode === 'surveys' && (
         <div className="bg-white rounded-lg border overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-max">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1878,7 +1952,7 @@ export default function CustomerSatisfactionPage() {
       {viewMode === 'complaints' && (
         <div className="bg-white rounded-lg border overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-max">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1950,6 +2024,242 @@ export default function CustomerSatisfactionPage() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* Testimonials View */}
+      {viewMode === 'testimonials' && (
+        <div className="space-y-6">
+          {displayView === 'list' && (
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-200">
+                <h2 className="text-lg font-semibold text-slate-900">Testimonials</h2>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-full divide-y divide-slate-200">
+                  <thead className="bg-slate-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-1/5">
+                        Customer
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-1/6">
+                        Project
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-1/3">
+                        Testimonial
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-20">
+                        Rating
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-24">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-24">
+                        Created
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-20">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-slate-200">
+                    {sortedTestimonials.map((testimonial) => (
+                      <tr key={testimonial.id} className="hover:bg-slate-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <div className="text-sm font-medium text-slate-900">
+                              {testimonial.customerName}
+                            </div>
+                            <div className="text-sm text-slate-500">
+                              {testimonial.customerCompany}
+                            </div>
+                            {testimonial.customerEmail && (
+                              <div className="text-sm text-slate-500">
+                                {testimonial.customerEmail}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-slate-900">
+                            {testimonial.projectName || 'No project'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-slate-900 max-w-md">
+                            {testimonial.testimonialText || (
+                              <span className="text-slate-400 italic">Pending customer response</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`h-4 w-4 ${
+                                  star <= testimonial.rating
+                                    ? 'text-yellow-400 fill-current'
+                                    : 'text-slate-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <Badge
+                            variant={
+                              testimonial.status === 'APPROVED'
+                                ? 'default'
+                                : testimonial.status === 'PUBLISHED'
+                                ? 'secondary'
+                                : testimonial.status === 'REJECTED'
+                                ? 'destructive'
+                                : 'outline'
+                            }
+                          >
+                            {testimonial.status}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                          {formatDate(testimonial.createdAt)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleItemSelect(testimonial.id)}
+                          >
+                            View
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {displayView === 'grid' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sortedTestimonials.map((testimonial) => (
+                <div key={testimonial.id} className="bg-white rounded-lg shadow p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900">
+                        {testimonial.customerName}
+                      </h3>
+                      <p className="text-sm text-slate-500">
+                        {testimonial.customerCompany}
+                      </p>
+                    </div>
+                    <Badge
+                      variant={
+                        testimonial.status === 'APPROVED'
+                          ? 'default'
+                          : testimonial.status === 'PUBLISHED'
+                          ? 'secondary'
+                          : testimonial.status === 'REJECTED'
+                          ? 'destructive'
+                          : 'outline'
+                      }
+                    >
+                      {testimonial.status}
+                    </Badge>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <div className="flex items-center mb-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`h-4 w-4 ${
+                            star <= testimonial.rating
+                              ? 'text-yellow-400 fill-current'
+                              : 'text-slate-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-sm text-slate-600">
+                      {testimonial.projectName || 'No project specified'}
+                    </p>
+                  </div>
+
+                  <div className="mb-4">
+                    <p className="text-sm text-slate-900">
+                      {testimonial.testimonialText || (
+                        <span className="text-slate-400 italic">Pending customer response</span>
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-slate-500">
+                      {formatDate(testimonial.createdAt)}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleItemSelect(testimonial.id)}
+                    >
+                      View Details
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {displayView === 'board' && (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {['DRAFT', 'APPROVED', 'PUBLISHED', 'REJECTED'].map((status) => (
+                <div key={status} className="bg-slate-50 rounded-lg p-4">
+                  <h3 className="font-semibold text-slate-900 mb-4 capitalize">
+                    {status.toLowerCase()}
+                  </h3>
+                  <div className="space-y-3">
+                    {sortedTestimonials
+                      .filter((testimonial) => testimonial.status === status)
+                      .map((testimonial) => (
+                        <div
+                          key={testimonial.id}
+                          className="bg-white rounded-lg p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                          onClick={() => handleItemSelect(testimonial.id)}
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <h4 className="font-medium text-slate-900 text-sm">
+                              {testimonial.customerName}
+                            </h4>
+                            <div className="flex items-center">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`h-3 w-3 ${
+                                    star <= testimonial.rating
+                                      ? 'text-yellow-400 fill-current'
+                                      : 'text-slate-300'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-xs text-slate-600 mb-2">
+                            {testimonial.projectName || 'No project'}
+                          </p>
+                          <p className="text-xs text-slate-500 line-clamp-3">
+                            {testimonial.testimonialText || (
+                              <span className="text-slate-400 italic">Pending customer response</span>
+                            )}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

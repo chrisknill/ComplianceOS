@@ -13,6 +13,9 @@ interface Employee {
   managerId: string | null
   status: string
   role: string
+  phone: string | null
+  startDate: Date | null
+  location: string | null
 }
 
 interface OrgChartProps {

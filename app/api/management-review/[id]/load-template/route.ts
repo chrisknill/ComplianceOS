@@ -307,7 +307,7 @@ const STANDARDS_TEMPLATES = {
 // POST /api/management-review/[id]/load-template - Load standards template
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -315,12 +315,13 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await request.json()
     const validatedData = loadTemplateSchema.parse(body)
 
     // Check if review exists
     const review = await prisma.managementReview.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!review) {
@@ -340,7 +341,7 @@ export async function POST(
           // Check if input already exists (if not including existing)
           const existingInput = await prisma.managementReviewInput.findFirst({
             where: {
-              reviewId: params.id,
+              reviewId: id,
               standard: inputTemplate.standard,
               clauseRef: inputTemplate.clauseRef,
             },
@@ -349,7 +350,7 @@ export async function POST(
           if (!existingInput || validatedData.includeExisting) {
             const input = await prisma.managementReviewInput.create({
               data: {
-                reviewId: params.id,
+                reviewId: id,
                 standard: inputTemplate.standard,
                 clauseRef: inputTemplate.clauseRef,
                 title: inputTemplate.title,
@@ -366,7 +367,7 @@ export async function POST(
           // Check if output already exists (if not including existing)
           const existingOutput = await prisma.managementReviewOutput.findFirst({
             where: {
-              reviewId: params.id,
+              reviewId: id,
               standard: outputTemplate.standard,
               clauseRef: outputTemplate.clauseRef,
             },
@@ -375,7 +376,7 @@ export async function POST(
           if (!existingOutput || validatedData.includeExisting) {
             const output = await prisma.managementReviewOutput.create({
               data: {
-                reviewId: params.id,
+                reviewId: id,
                 standard: outputTemplate.standard,
                 clauseRef: outputTemplate.clauseRef,
                 decision: outputTemplate.decision,
@@ -391,7 +392,7 @@ export async function POST(
     // Create audit log entry
     await prisma.managementReviewAudit.create({
       data: {
-        reviewId: params.id,
+        reviewId: id,
         actorId: session.user.id,
         event: 'UPDATED',
         details: `Template loaded for standards: ${validatedData.standards.join(', ')}`,

@@ -3,11 +3,12 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const record = await prisma.nonConformance.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         actions: {
           orderBy: { createdAt: 'asc' },
@@ -31,13 +32,14 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await req.json()
     
     const record = await prisma.nonConformance.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...body,
         updatedAt: new Date(),
@@ -68,11 +70,12 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     await prisma.nonConformance.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })

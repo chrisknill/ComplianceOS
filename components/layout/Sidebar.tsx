@@ -122,7 +122,6 @@ const supportNavigation = [
 // Operations Section
 const operationsNavigation = [
   { name: 'Process Map', href: '/operations/process-map', icon: Workflow },
-  { name: 'SOP Library', href: '/operations/sop-library', icon: FileCode },
   { name: 'Design & Development', href: '/operations/design-development', icon: Lightbulb },
   { name: 'Production Control', href: '/operations/production-control', icon: Factory },
   { name: 'Contractor Management', href: '/operations/contractor-management', icon: Users },

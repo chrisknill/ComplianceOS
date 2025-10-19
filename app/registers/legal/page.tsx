@@ -5,11 +5,6 @@ import { PageHeader } from '@/components/PageHeader'
 import { ActionsPanel } from '@/components/ActionsPanel'
 import { DataTable } from '@/components/DataTable'
 
-export const isoMeta = { 
-  qms: ["6.1.3"], 
-  ems: ["6.1.3"], 
-  ohsms: ["6.1.3"] 
-}
 
 export default function LegalRegisterPage() {
   const breadcrumbs = [

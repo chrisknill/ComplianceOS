@@ -407,7 +407,7 @@ export default function EmployeesPage() {
                 <span className="text-sm text-slate-600">Active filters:</span>
                 {searchTerm && (
                   <Badge variant="secondary" className="gap-1">
-                    Search: "{searchTerm}"
+                    Search: &quot;{searchTerm}&quot;
                     <button onClick={() => setSearchTerm('')} className="ml-1 hover:text-slate-900">×</button>
                   </Badge>
                 )}

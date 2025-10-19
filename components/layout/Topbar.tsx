@@ -1,23 +1,77 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
-import { Bell, Search, LogOut } from 'lucide-react'
+import { Bell, Search, LogOut, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function Topbar() {
   const { data: session } = useSession()
+  const router = useRouter()
+  const pathname = usePathname()
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isSearchFocused, setIsSearchFocused] = useState(false)
+
+  // Global search functionality
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchTerm.trim()) {
+      // Navigate to a global search results page
+      router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`)
+    }
+  }
+
+  // Clear search
+  const clearSearch = () => {
+    setSearchTerm('')
+  }
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Focus search on Ctrl/Cmd + K
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault()
+        const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement
+        if (searchInput) {
+          searchInput.focus()
+        }
+      }
+      // Escape to clear search
+      if (e.key === 'Escape' && isSearchFocused) {
+        clearSearch()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isSearchFocused])
 
   return (
     <div className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6">
       <div className="flex items-center flex-1 max-w-2xl">
-        <div className="relative w-full">
+        <form onSubmit={handleSearch} className="relative w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search documents, risks, training..."
-            className="w-full pl-10 pr-4 py-2 border border-slate-700 rounded-lg bg-slate-800 text-white placeholder-slate-400 focus:ring-2 focus:ring-slate-600 focus:border-transparent"
+            placeholder="Search documents, risks, training... (Ctrl+K)"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+            className="w-full pl-10 pr-10 py-2 border border-slate-700 rounded-lg bg-slate-800 text-white placeholder-slate-400 focus:ring-2 focus:ring-slate-600 focus:border-transparent"
           />
-        </div>
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={clearSearch}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </form>
       </div>
 
       <div className="flex items-center gap-4">

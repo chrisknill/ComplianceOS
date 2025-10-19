@@ -6,12 +6,6 @@ import { ActionsPanel } from '@/components/ActionsPanel'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Palette, Upload, Save } from 'lucide-react'
 
-export const isoMeta = { 
-  qms: ["7.1.3"], 
-  ems: ["7.1.3"], 
-  ohsms: ["7.1.3"] 
-}
-
 export default function BrandingPage() {
   const breadcrumbs = [
     { label: 'Admin', href: '/admin' },
@@ -35,7 +29,7 @@ export default function BrandingPage() {
                 <span>Brand Settings</span>
               </CardTitle>
               <CardDescription>
-                Configure your organization's branding elements
+                Configure your organization&apos;s branding elements
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

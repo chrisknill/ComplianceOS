@@ -32,7 +32,7 @@ const updateAuditSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -40,8 +40,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const audit = await prisma.audit.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         auditType: true,
         auditFindings: {
@@ -66,7 +67,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -74,12 +75,13 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await request.json()
     const validatedData = updateAuditSchema.parse(body)
 
     // Get current audit to compare status changes
     const currentAudit = await prisma.audit.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!currentAudit) {
@@ -87,7 +89,7 @@ export async function PUT(
     }
 
     const audit = await prisma.audit.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...validatedData,
         plannedStartDate: validatedData.plannedStartDate ? new Date(validatedData.plannedStartDate) : undefined,
@@ -104,7 +106,7 @@ export async function PUT(
     if (validatedData.status && validatedData.status !== currentAudit.status) {
       await prisma.auditLog.create({
         data: {
-          auditId: params.id,
+          auditId: id,
           action: validatedData.status,
           performedBy: session.user.id,
           comments: `Status changed from ${currentAudit.status} to ${validatedData.status}`,
@@ -124,7 +126,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -132,8 +134,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     await prisma.audit.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })

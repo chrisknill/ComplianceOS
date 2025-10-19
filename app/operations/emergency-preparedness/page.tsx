@@ -5,11 +5,6 @@ import { PageHeader } from '@/components/PageHeader'
 import { ActionsPanel } from '@/components/ActionsPanel'
 import { DataTable } from '@/components/DataTable'
 
-export const isoMeta = { 
-  qms: ["8.2"], 
-  ems: ["8.2"], 
-  ohsms: ["8.2"] 
-}
 
 export default function EmergencyPreparednessPage() {
   const breadcrumbs = [

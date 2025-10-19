@@ -120,7 +120,7 @@ export function Legend() {
             <p>• Click nodes to view details</p>
             <p>• Double-click to open documents</p>
             <p>• Use search and filters to find specific items</p>
-            <p>• Try the "What do I need?" wizard for guidance</p>
+            <p>• Try the &quot;What do I need?&quot; wizard for guidance</p>
           </div>
         </div>
       </div>

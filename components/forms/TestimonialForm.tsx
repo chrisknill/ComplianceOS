@@ -69,10 +69,7 @@ export function TestimonialForm({ onClose, onSubmit, testimonialId, projectId }:
       return
     }
 
-    if (!formData.testimonialText.trim()) {
-      toast.error('Testimonial text is required')
-      return
-    }
+    // Testimonial text is now optional - can be completed by email recipient
 
     if (formData.rating < 1 || formData.rating > 5) {
       toast.error('Rating must be between 1 and 5')
@@ -261,15 +258,17 @@ export function TestimonialForm({ onClose, onSubmit, testimonialId, projectId }:
                   {renderStars()}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="testimonialText">Testimonial Text *</Label>
+                  <Label htmlFor="testimonialText">Testimonial Text (Optional)</Label>
                   <Textarea
                     id="testimonialText"
                     value={formData.testimonialText}
                     onChange={(e) => handleInputChange('testimonialText', e.target.value)}
-                    placeholder="Share your experience with our services..."
+                    placeholder="Leave blank to send to customer for completion..."
                     rows={6}
-                    required
                   />
+                  <p className="text-sm text-gray-600">
+                    💡 Leave this blank to send the form to the customer for completion via email
+                  </p>
                 </div>
               </div>
             </div>

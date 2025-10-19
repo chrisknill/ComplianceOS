@@ -14,11 +14,12 @@ const updateSurveySchema = z.object({
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const survey = await prisma.customerSatisfactionSurvey.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         questions: {
           orderBy: { order: 'asc' }
@@ -55,14 +56,15 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await req.json()
     const validatedData = updateSurveySchema.parse(body)
 
     const survey = await prisma.customerSatisfactionSurvey.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...validatedData,
         startDate: validatedData.startDate ? new Date(validatedData.startDate) : undefined,
@@ -86,11 +88,12 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     await prisma.customerSatisfactionSurvey.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Survey deleted successfully' })

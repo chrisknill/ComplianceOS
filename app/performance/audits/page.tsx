@@ -5,11 +5,6 @@ import { PageHeader } from '@/components/PageHeader'
 import { ActionsPanel } from '@/components/ActionsPanel'
 import { DataTable } from '@/components/DataTable'
 
-export const isoMeta = { 
-  qms: ["9.2"], 
-  ems: ["9.2"], 
-  ohsms: ["9.2"] 
-}
 
 export default function AuditsPage() {
   const breadcrumbs = [

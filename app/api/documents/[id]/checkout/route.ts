@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 // POST - Check out document (lock for editing)
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -14,8 +14,9 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const document = await prisma.document.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!document) {
@@ -28,7 +29,7 @@ export async function POST(
 
     // Update document with checkout info
     await prisma.document.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         lastEditedBy: session.user?.email || 'Unknown',
         lastEditedAt: new Date(),

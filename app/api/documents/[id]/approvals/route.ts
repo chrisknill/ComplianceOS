@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 // GET - Fetch approvals for a document
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -14,8 +14,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const approvals = await prisma.documentApproval.findMany({
-      where: { documentId: params.id },
+      where: { documentId: id },
       orderBy: { level: 'asc' },
     })
 
@@ -32,7 +33,7 @@ export async function GET(
 // POST - Create or update an approval
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -40,13 +41,14 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await req.json()
     const { level, approverRole, approverName, status, comments } = body
 
     // Check if approval already exists for this level
     const existing = await prisma.documentApproval.findFirst({
       where: {
-        documentId: params.id,
+        documentId: id,
         level,
       },
     })
@@ -65,7 +67,7 @@ export async function POST(
 
       // If all required approvals are done, update document status
       const allApprovals = await prisma.documentApproval.findMany({
-        where: { documentId: params.id },
+        where: { documentId: id },
       })
 
       const requiredLevels = [1, 2] // Levels 1 and 2 are required
@@ -76,7 +78,7 @@ export async function POST(
 
       if (allRequiredApproved) {
         await prisma.document.update({
-          where: { id: params.id },
+          where: { id },
           data: { status: 'APPROVED' },
         })
       }
@@ -84,7 +86,7 @@ export async function POST(
       // If any approval is rejected, set document back to draft
       if (status === 'REJECTED') {
         await prisma.document.update({
-          where: { id: params.id },
+          where: { id },
           data: { status: 'DRAFT' },
         })
       }
@@ -94,7 +96,7 @@ export async function POST(
       // Create new approval
       const approval = await prisma.documentApproval.create({
         data: {
-          documentId: params.id,
+          documentId: id,
           level,
           approverRole,
           approverName,

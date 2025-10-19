@@ -7,7 +7,7 @@ import { createInputSchema, updateInputSchema } from '@/lib/validation/managemen
 // GET /api/management-review/[id]/inputs - Get inputs for a review
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -15,10 +15,11 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const { searchParams } = new URL(request.url)
     const standard = searchParams.get('standard')
 
-    const where: any = { reviewId: params.id }
+    const where: any = { reviewId: id }
     if (standard) {
       where.standard = standard
     }
@@ -42,7 +43,7 @@ export async function GET(
 // POST /api/management-review/[id]/inputs - Add input to review
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -50,9 +51,10 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     // Check if review exists
     const review = await prisma.managementReview.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!review) {
@@ -65,7 +67,7 @@ export async function POST(
     const input = await prisma.managementReviewInput.create({
       data: {
         ...validatedData,
-        reviewId: params.id,
+        reviewId: id,
         evidence: validatedData.evidence ? JSON.stringify(validatedData.evidence) : null,
       },
     })
@@ -73,7 +75,7 @@ export async function POST(
     // Create audit log entry
     await prisma.managementReviewAudit.create({
       data: {
-        reviewId: params.id,
+        reviewId: id,
         actorId: session.user.id,
         event: 'UPDATED',
         details: `Input ${validatedData.title} added`,

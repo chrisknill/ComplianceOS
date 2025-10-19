@@ -5,12 +5,6 @@ import { PageHeader } from '@/components/PageHeader'
 import { ActionsPanel } from '@/components/ActionsPanel'
 import { DataTable } from '@/components/DataTable'
 
-export const isoMeta = { 
-  qms: ["7.1.3"], 
-  ems: ["7.1.3"], 
-  ohsms: ["7.1.3"] 
-}
-
 export default function LogsPage() {
   const breadcrumbs = [
     { label: 'Admin', href: '/admin' },

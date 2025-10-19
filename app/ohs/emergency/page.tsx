@@ -94,8 +94,8 @@ export default function EmergencyPage() {
           bVal = b.type
           break
         case 'date':
-          aVal = new Date(a.date).getTime()
-          bVal = new Date(b.date).getTime()
+          aVal = a.date ? new Date(a.date).getTime() : 0
+          bVal = b.date ? new Date(b.date).getTime() : 0
           break
         case 'participants':
           aVal = a.participants || 0
@@ -106,8 +106,8 @@ export default function EmergencyPage() {
           bVal = b.effectiveness || ''
           break
         default:
-          aVal = new Date(a.date).getTime()
-          bVal = new Date(b.date).getTime()
+          aVal = a.date ? new Date(a.date).getTime() : 0
+          bVal = b.date ? new Date(b.date).getTime() : 0
       }
 
       if (sortDirection === 'asc') {

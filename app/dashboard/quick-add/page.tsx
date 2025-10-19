@@ -194,7 +194,7 @@ export default function QuickAddPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">Today's Adds</p>
+                <p className="text-sm font-medium text-slate-600">Today&apos;s Adds</p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">7</p>
                 <p className="text-sm text-slate-500 mt-1">+3 from yesterday</p>
               </div>

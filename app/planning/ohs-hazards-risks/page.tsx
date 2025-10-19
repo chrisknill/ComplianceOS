@@ -5,9 +5,6 @@ import { PageHeader } from '@/components/PageHeader'
 import { ActionsPanel } from '@/components/ActionsPanel'
 import { DataTable } from '@/components/DataTable'
 
-export const isoMeta = { 
-  ohsms: ["6.1.2"] 
-}
 
 export default function OhsHazardsRisksPage() {
   const breadcrumbs = [

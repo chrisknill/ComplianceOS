@@ -6,11 +6,6 @@ import { ActionsPanel } from '@/components/ActionsPanel'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Workflow, ArrowRight } from 'lucide-react'
 
-export const isoMeta = { 
-  qms: ["4.4"], 
-  ems: ["4.4"], 
-  ohsms: ["4.4"] 
-}
 
 export default function ProcessMapPage() {
   const breadcrumbs = [

@@ -13,6 +13,7 @@ import ReactFlow, {
   Node,
   ReactFlowProvider,
   BackgroundVariant,
+  MarkerType,
 } from 'reactflow';
 import { Shell } from '@/components/layout/Shell';
 import { Legend } from '@/components/management-map/Legend';
@@ -226,7 +227,7 @@ const initialEdges: Edge[] = [
     labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
     style: { stroke: '#2563eb', strokeWidth: 3 },
     markerEnd: {
-      type: 'arrowclosed',
+      type: MarkerType.ArrowClosed,
       width: 20,
       height: 20,
       color: '#2563eb',
@@ -243,7 +244,7 @@ const initialEdges: Edge[] = [
     labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
     style: { stroke: '#dc2626', strokeWidth: 3 },
     markerEnd: {
-      type: 'arrowclosed',
+      type: MarkerType.ArrowClosed,
       width: 20,
       height: 20,
       color: '#dc2626',
@@ -260,7 +261,7 @@ const initialEdges: Edge[] = [
     labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
     style: { stroke: '#7c3aed', strokeWidth: 3 },
     markerEnd: {
-      type: 'arrowclosed',
+      type: MarkerType.ArrowClosed,
       width: 20,
       height: 20,
       color: '#7c3aed',
@@ -277,7 +278,7 @@ const initialEdges: Edge[] = [
     labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
     style: { stroke: '#059669', strokeWidth: 2 },
     markerEnd: {
-      type: 'arrowclosed',
+      type: MarkerType.ArrowClosed,
       width: 16,
       height: 16,
       color: '#059669',
@@ -294,7 +295,7 @@ const initialEdges: Edge[] = [
     labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
     style: { stroke: '#6b7280', strokeWidth: 2 },
     markerEnd: {
-      type: 'arrowclosed',
+      type: MarkerType.ArrowClosed,
       width: 16,
       height: 16,
       color: '#6b7280',
@@ -311,7 +312,7 @@ const initialEdges: Edge[] = [
     labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
     style: { stroke: '#d97706', strokeWidth: 2 },
     markerEnd: {
-      type: 'arrowclosed',
+      type: MarkerType.ArrowClosed,
       width: 16,
       height: 16,
       color: '#d97706',
@@ -328,7 +329,7 @@ const initialEdges: Edge[] = [
     labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
     style: { stroke: '#059669', strokeWidth: 2 },
     markerEnd: {
-      type: 'arrowclosed',
+      type: MarkerType.ArrowClosed,
       width: 16,
       height: 16,
       color: '#059669',

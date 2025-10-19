@@ -52,6 +52,10 @@ interface ManagementReview {
   inputs: any[]
   outputs: any[]
   actions: any[]
+  createdAt: string
+  updatedAt: string
+  evidenceLinks: any[]
+  auditLog: any[]
 }
 
 interface OverviewTabProps {

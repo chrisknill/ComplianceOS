@@ -3,14 +3,15 @@ import { prisma } from '@/lib/prisma'
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string; actionId: string } }
+  { params }: { params: Promise<{ id: string; actionId: string }> }
 ) {
   try {
+    const { id, actionId } = await params
     const body = await req.json()
     
     // Update the action
     const action = await prisma.nCAction.update({
-      where: { id: params.actionId },
+      where: { id: actionId },
       data: {
         ...body,
         completedDate: body.status === 'DONE' ? new Date() : null,
@@ -30,7 +31,7 @@ export async function PUT(
 
     // Check if all actions are now complete for auto-closure
     const allActions = await prisma.nCAction.findMany({
-      where: { ncId: params.id },
+      where: { ncId: id },
     })
 
     const allComplete = allActions.every(a => a.status === 'DONE')
@@ -38,13 +39,13 @@ export async function PUT(
     if (allComplete) {
       // Get the NC record
       const nc = await prisma.nonConformance.findUnique({
-        where: { id: params.id },
+        where: { id },
       })
 
       // Auto-update status to pending verification if not already closed
       if (nc && nc.status !== 'CLOSED') {
         await prisma.nonConformance.update({
-          where: { id: params.id },
+          where: { id },
           data: {
             status: 'PENDING_VERIFICATION',
           },
@@ -53,7 +54,7 @@ export async function PUT(
         // Create audit log
         await prisma.nCAuditLog.create({
           data: {
-            ncId: params.id,
+            ncId: id,
             eventType: 'STATUS_CHANGE',
             description: `All actions completed - status changed to Pending Verification`,
             userId: 'System',
@@ -72,12 +73,13 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string; actionId: string } }
+  { params }: { params: Promise<{ id: string; actionId: string }> }
 ) {
   try {
+    const { id, actionId } = await params
     // Get the action to find linked global action
     const action = await prisma.nCAction.findUnique({
-      where: { id: params.actionId },
+      where: { id: actionId },
     })
 
     // Delete linked global action if exists
@@ -89,7 +91,7 @@ export async function DELETE(
 
     // Delete the NC action
     await prisma.nCAction.delete({
-      where: { id: params.actionId },
+      where: { id: actionId },
     })
 
     return NextResponse.json({ success: true })

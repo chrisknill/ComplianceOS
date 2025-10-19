@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 // PUT - Update calibration
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -14,11 +14,12 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await req.json()
     const { dueDate, performedOn, result, certificateUrl } = body
 
     const calibration = await prisma.calibration.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         dueDate: dueDate ? new Date(dueDate) : undefined,
         performedOn: performedOn ? new Date(performedOn) : null,
@@ -43,7 +44,7 @@ export async function PUT(
 // DELETE - Delete calibration
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -51,8 +52,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     await prisma.calibration.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })

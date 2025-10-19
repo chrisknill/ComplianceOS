@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testimonial Webhook Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Testimonial Webhook Tester</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            Test your n8n integration with the ComplianceOS testimonial form
+        </p>
+
+        <form id="testimonialForm">
+            <div class="grid">
+                <div class="form-group">
+                    <label for="customerName">Customer Name *</label>
+                    <input type="text" id="customerName" name="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="customerEmail">Email</label>
+                    <input type="email" id="customerEmail" name="customerEmail">
+                </div>
+                <div class="form-group">
+                    <label for="customerCompany">Company</label>
+                    <input type="text" id="customerCompany" name="customerCompany">
+                </div>
+                <div class="form-group">
+                    <label for="customerTitle">Job Title</label>
+                    <input type="text" id="customerTitle" name="customerTitle">
+                </div>
+                <div class="form-group">
+                    <label for="projectName">Project Name</label>
+                    <input type="text" id="projectName" name="projectName">
+                </div>
+                <div class="form-group">
+                    <label for="projectType">Project Type</label>
+                    <select id="projectType" name="projectType">
+                        <option value="COMPLETED">Completed Project</option>
+                        <option value="ONGOING">Ongoing Project</option>
+                        <option value="MAINTENANCE">Maintenance Service</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="testimonialText">Testimonial Text (Optional)</label>
+                <textarea id="testimonialText" name="testimonialText" placeholder="Leave blank to send to customer for completion via email..."></textarea>
+                <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                    💡 Leave blank to send the form to the customer for completion via email
+                </small>
+            </div>
+
+            <div class="grid">
+                <div class="form-group">
+                    <label for="rating">Rating</label>
+                    <select id="rating" name="rating">
+                        <option value="5">5 Stars - Excellent</option>
+                        <option value="4">4 Stars - Very Good</option>
+                        <option value="3">3 Stars - Good</option>
+                        <option value="2">2 Stars - Fair</option>
+                        <option value="1">1 Star - Poor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status">
+                        <option value="DRAFT">Draft</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="PUBLISHED">Published</option>
+                        <option value="REJECTED">Rejected</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="webhookUrl">n8n Webhook URL (Optional)</label>
+                <input type="url" id="webhookUrl" name="webhookUrl" placeholder="https://chrisknill.app.n8n.cloud/webhook/cursor-testimonial" value="https://chrisknill.app.n8n.cloud/webhook/cursor-testimonial">
+                <small style="color: #666; font-size: 12px;">
+                    💡 Tip: Set N8N_WEBHOOK_URL in .env.local to automatically trigger n8n on all submissions
+                </small>
+            </div>
+
+            <button type="submit">🚀 Submit Testimonial</button>
+        </form>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('testimonialForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Add default values
+            data.rating = parseInt(data.rating);
+            data.featured = true;
+            data.tags = ['test', 'webhook'];
+            data.source = 'n8n';
+            data.metadata = {
+                flowId: 'test-flow-' + Date.now(),
+                trigger: 'form-submission'
+            };
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.innerHTML = '🔄 Submitting testimonial...';
+
+            try {
+                const response = await fetch('/api/customer-satisfaction/testimonials/webhook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h3>✅ Success!</h3>
+                        <p><strong>Message:</strong> ${result.message}</p>
+                        <p><strong>Testimonial ID:</strong> ${result.testimonial.id}</p>
+                        <p><strong>Customer:</strong> ${result.testimonial.customerName}</p>
+                        <p><strong>Rating:</strong> ${result.testimonial.rating} stars</p>
+                        <p><strong>Status:</strong> ${result.testimonial.status}</p>
+                        ${result.metadata.webhookUrl ? '<p><strong>Webhook Triggered:</strong> ✅</p>' : ''}
+                        <details style="margin-top: 10px;">
+                            <summary>Full Response</summary>
+                            <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto;">${JSON.stringify(result, null, 2)}</pre>
+                        </details>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <h3>❌ Error!</h3>
+                        <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                        <p><strong>Message:</strong> ${result.message || 'No message provided'}</p>
+                        <details style="margin-top: 10px;">
+                            <summary>Error Details</summary>
+                            <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto;">${JSON.stringify(result, null, 2)}</pre>
+                        </details>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Network Error!</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p>Make sure your ComplianceOS server is running on localhost:3000</p>
+                `;
+            }
+        });
+
+        // Fill with sample data for quick testing
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('customerName').value = 'John Smith';
+            document.getElementById('customerEmail').value = 'john@testcompany.com';
+            document.getElementById('customerCompany').value = 'Test Company Ltd';
+            document.getElementById('customerTitle').value = 'CEO';
+            document.getElementById('projectName').value = 'Website Development';
+            document.getElementById('testimonialText').value = 'Excellent service and great communication throughout the project. Highly recommended!';
+        });
+    </script>
+</body>
+</html>

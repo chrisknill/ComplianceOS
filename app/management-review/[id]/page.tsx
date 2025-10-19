@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Shell } from '@/components/layout/Shell'
 import { Button } from '@/components/ui/button'
@@ -138,6 +138,10 @@ export default function ManagementReviewDetailPage() {
     })
   }
 
+  const handleReviewUpdate = useCallback((updatedReview: any) => {
+    setReview(updatedReview)
+  }, [])
+
   if (loading) {
     return (
       <Shell>
@@ -158,7 +162,7 @@ export default function ManagementReviewDetailPage() {
           <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">Review not found</h3>
           <p className="text-gray-600 mb-4">
-            The management review you're looking for doesn't exist or has been removed.
+            The management review you&apos;re looking for doesn&apos;t exist or has been removed.
           </p>
           <Link href="/management-review">
             <Button>
@@ -272,31 +276,31 @@ export default function ManagementReviewDetailPage() {
           </TabsList>
 
           <TabsContent value="overview">
-            <OverviewTab review={review} onUpdate={setReview} />
+            <OverviewTab review={review} onUpdate={handleReviewUpdate} />
           </TabsContent>
 
           <TabsContent value="attendees">
-            <AttendeesTab review={review} onUpdate={setReview} />
+            <AttendeesTab review={review} onUpdate={handleReviewUpdate} />
           </TabsContent>
 
           <TabsContent value="inputs">
-            <InputsTab review={review} onUpdate={setReview} />
+            <InputsTab review={review} onUpdate={handleReviewUpdate} />
           </TabsContent>
 
           <TabsContent value="discussion">
-            <DiscussionTab review={review} onUpdate={setReview} />
+            <DiscussionTab review={review} onUpdate={handleReviewUpdate} />
           </TabsContent>
 
           <TabsContent value="outputs">
-            <OutputsTab review={review} onUpdate={setReview} />
+            <OutputsTab review={review} onUpdate={handleReviewUpdate} />
           </TabsContent>
 
           <TabsContent value="actions">
-            <ActionsTab review={review} onUpdate={setReview} />
+            <ActionsTab review={review} onUpdate={handleReviewUpdate} />
           </TabsContent>
 
           <TabsContent value="evidence">
-            <EvidenceTab review={review} onUpdate={setReview} />
+            <EvidenceTab review={review} onUpdate={handleReviewUpdate} />
           </TabsContent>
 
           <TabsContent value="audit">

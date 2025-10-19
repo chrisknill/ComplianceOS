@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
-    const { type, title, auditor, date, area, duration, status, outcome, actionItems, findings } = body
+    const { type, title, auditor, date, location, scope, status, findings } = body
 
     const audit = await prisma.oHSAudit.create({
       data: {
@@ -32,12 +32,11 @@ export async function POST(req: Request) {
         title,
         auditor,
         date: date ? new Date(date) : new Date(),
-        area,
-        duration,
+        location,
+        scope,
         status,
-        outcome,
-        actionItems,
         findings,
+        isoRefs: '[]', // Default empty JSON array
       },
     })
 

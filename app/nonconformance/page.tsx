@@ -238,7 +238,7 @@ export default function NonConformancePage() {
             <p className="text-slate-600 mt-1">OFI, NC, Customer Complaints, Supplier Non-Conformances</p>
           </div>
           <div className="flex items-center gap-2">
-            <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+            <ViewToggle view={viewMode} onViewChange={setViewMode} />
             {viewMode !== 'board' && (
               <Button variant="outline" onClick={handleExportCSV}>
                 <Download className="h-4 w-4 mr-2" />
@@ -940,7 +940,7 @@ export default function NonConformancePage() {
           <div className="text-center py-12 bg-white rounded-lg shadow">
             <AlertCircle className="h-12 w-12 text-slate-300 mx-auto mb-4" />
             <p className="text-slate-500">No cases found</p>
-            <p className="text-sm text-slate-400 mt-2">Click "New Case" to create your first record</p>
+            <p className="text-sm text-slate-400 mt-2">Click &quot;New Case&quot; to create your first record</p>
           </div>
         )}
 

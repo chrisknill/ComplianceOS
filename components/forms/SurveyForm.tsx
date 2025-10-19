@@ -431,7 +431,7 @@ export function SurveyForm({ onClose, onSubmit, surveyId }: SurveyFormProps) {
                   <div className="text-center py-8 text-gray-400">
                     <Plus className="h-8 w-8 mx-auto mb-2" />
                     <p className="text-sm">No questions added yet</p>
-                    <p className="text-xs">Click "Add Question" to get started</p>
+                    <p className="text-xs">Click &quot;Add Question&quot; to get started</p>
                   </div>
                 )}
               </div>

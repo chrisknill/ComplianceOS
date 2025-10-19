@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 // POST - Check in document (unlock and save)
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -14,11 +14,12 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await req.json()
     const { comment } = body
 
     const document = await prisma.document.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!document) {
@@ -32,7 +33,7 @@ export async function POST(
     // Create version record
     await prisma.documentVersion.create({
       data: {
-        documentId: params.id,
+        documentId: id,
         version: document.version,
         changes: comment || 'Document updated',
         changedBy: session.user?.email || 'Unknown',
@@ -41,7 +42,7 @@ export async function POST(
 
     // Update document
     await prisma.document.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         lastEditedBy: session.user?.email || 'Unknown',
         lastEditedAt: new Date(),

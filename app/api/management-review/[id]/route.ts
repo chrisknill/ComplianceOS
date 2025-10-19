@@ -7,7 +7,7 @@ import { updateManagementReviewSchema, statusTransitionSchema } from '@/lib/vali
 // GET /api/management-review/[id] - Get single review
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -15,8 +15,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const review = await prisma.managementReview.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         attendees: {
           orderBy: { createdAt: 'asc' },
@@ -64,7 +65,7 @@ export async function GET(
 // PUT /api/management-review/[id] - Update review
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -72,12 +73,13 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await request.json()
     const validatedData = updateManagementReviewSchema.parse(body)
 
     // Check if review exists
     const existingReview = await prisma.managementReview.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!existingReview) {
@@ -94,7 +96,7 @@ export async function PUT(
 
     // Validate completion requirements if moving to COMPLETED
     if (validatedData.status === 'COMPLETED') {
-      await validateCompletionRequirements(params.id)
+      await validateCompletionRequirements(id)
     }
 
     const updateData: any = {
@@ -111,7 +113,7 @@ export async function PUT(
     }
 
     const review = await prisma.managementReview.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: {
         attendees: true,
@@ -171,7 +173,7 @@ export async function PUT(
 // DELETE /api/management-review/[id] - Delete review
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -179,9 +181,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
     // Check if review exists
     const existingReview = await prisma.managementReview.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!existingReview) {
@@ -197,7 +200,7 @@ export async function DELETE(
     }
 
     await prisma.managementReview.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ message: 'Review deleted successfully' })

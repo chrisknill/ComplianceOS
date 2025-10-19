@@ -1,3 +1,4 @@
+import React from 'react'
 import { ContractReview, ContractStatus, Priority, RiskLevel, Currency } from '@/types/contract-review'
 import { Badge } from '@/components/ui/badge'
 import { 
@@ -15,11 +16,9 @@ export const getStatusBadge = (status: ContractStatus) => {
   }
   const config = statusConfig[status] || statusConfig.DRAFT
   const Icon = config.icon
-  return (
-    <Badge className={config.color}>
-      <Icon className="h-3 w-3 mr-1" />
-      {status.replace('_', ' ')}
-    </Badge>
+  return React.createElement(Badge, { className: config.color },
+    React.createElement(Icon, { className: "h-3 w-3 mr-1" }),
+    status.replace('_', ' ')
   )
 }
 
@@ -31,7 +30,7 @@ export const getPriorityBadge = (priority: Priority) => {
     CRITICAL: { color: 'bg-red-100 text-red-800' },
   }
   const config = priorityConfig[priority] || priorityConfig.MEDIUM
-  return <Badge className={config.color}>{priority}</Badge>
+  return React.createElement(Badge, { className: config.color }, priority)
 }
 
 export const getRiskBadge = (riskLevel: RiskLevel) => {
@@ -42,7 +41,7 @@ export const getRiskBadge = (riskLevel: RiskLevel) => {
     CRITICAL: { color: 'bg-red-100 text-red-800' },
   }
   const config = riskConfig[riskLevel] || riskConfig.MEDIUM
-  return <Badge className={config.color}>{riskLevel}</Badge>
+  return React.createElement(Badge, { className: config.color }, riskLevel)
 }
 
 export const formatCurrency = (value: number, currency: Currency): string => {

@@ -5,11 +5,6 @@ import { PageHeader } from '@/components/PageHeader'
 import { ActionsPanel } from '@/components/ActionsPanel'
 import { DataTable } from '@/components/DataTable'
 
-export const isoMeta = { 
-  qms: ["7.1.5"], 
-  ems: ["7.1.5"], 
-  ohsms: ["7.1.5"] 
-}
 
 export default function CalibrationPage() {
   const breadcrumbs = [

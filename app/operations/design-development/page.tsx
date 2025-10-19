@@ -5,11 +5,6 @@ import { PageHeader } from '@/components/PageHeader'
 import { ActionsPanel } from '@/components/ActionsPanel'
 import { DataTable } from '@/components/DataTable'
 
-export const isoMeta = { 
-  qms: ["8.3"], 
-  ems: ["8.3"], 
-  ohsms: ["8.3"] 
-}
 
 export default function DesignDevelopmentPage() {
   const breadcrumbs = [

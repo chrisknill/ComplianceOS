@@ -22,18 +22,19 @@ interface Document {
   id: string
   type: string
   title: string
-  code: string | null
+  code: string | undefined
   version: string
   status: string
   owner: string | null
   nextReview: Date | null
-  url: string | null
+  url: string | undefined
+  updatedAt: Date
 }
 
 export default function DocumentationPage() {
   const [documents, setDocuments] = useState<Document[]>([])
   const [filter, setFilter] = useState<string>('ALL')
-  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'board'>('list')
+  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'board' | 'calendar'>('list')
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingDoc, setEditingDoc] = useState<Document | undefined>()
@@ -52,7 +53,47 @@ export default function DocumentationPage() {
     fetch('/api/documents')
       .then((res) => res.json())
       .then((data) => {
-        setDocuments(data)
+        // Add some sample SOP data
+        const sampleSOPs = [
+          {
+            id: 'sop-1',
+            type: 'SOP',
+            title: 'Production Line Setup',
+            code: 'SOP-PROD-001',
+            version: '2.1',
+            status: 'APPROVED',
+            owner: 'Operations Manager',
+            nextReview: new Date('2025-04-01'),
+            url: undefined,
+            updatedAt: new Date('2025-01-10')
+          },
+          {
+            id: 'sop-2',
+            type: 'SOP',
+            title: 'Quality Control Procedures',
+            code: 'SOP-QC-002',
+            version: '1.8',
+            status: 'PENDING_APPROVAL',
+            owner: 'Quality Manager',
+            nextReview: new Date('2025-03-15'),
+            url: undefined,
+            updatedAt: new Date('2024-12-15')
+          },
+          {
+            id: 'sop-3',
+            type: 'SOP',
+            title: 'Safety Protocols',
+            code: 'SOP-SAF-003',
+            version: '3.0',
+            status: 'APPROVED',
+            owner: 'Safety Officer',
+            nextReview: new Date('2025-05-05'),
+            url: undefined,
+            updatedAt: new Date('2025-01-05')
+          }
+        ]
+        
+        setDocuments([...data, ...sampleSOPs])
         setLoading(false)
       })
       .catch((err) => {
@@ -133,6 +174,7 @@ export default function DocumentationPage() {
     { key: 'POLICY', label: 'Policies' },
     { key: 'PROCEDURE', label: 'Procedures' },
     { key: 'WORK_INSTRUCTION', label: 'Work Instructions' },
+    { key: 'SOP', label: 'SOP Library' },
     { key: 'REGISTER', label: 'Registers' },
   ]
 
@@ -146,6 +188,7 @@ export default function DocumentationPage() {
     policies: documents.filter(d => d.type === 'POLICY').length,
     procedures: documents.filter(d => d.type === 'PROCEDURE').length,
     wis: documents.filter(d => d.type === 'WORK_INSTRUCTION').length,
+    sops: documents.filter(d => d.type === 'SOP').length,
     registers: documents.filter(d => d.type === 'REGISTER').length,
   }
 
@@ -256,7 +299,7 @@ export default function DocumentationPage() {
             </div>
 
             {/* Document Types */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
               <button
                 onClick={() => setFilter('POLICY')}
                 className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 text-left hover:shadow-lg transition-shadow"
@@ -282,6 +325,15 @@ export default function DocumentationPage() {
                 <p className="text-sm font-medium text-emerald-900">Work Instructions</p>
                 <p className="text-3xl font-bold text-emerald-900 mt-2">{docStats.wis}</p>
                 <p className="text-xs text-emerald-700 mt-1">Click to view →</p>
+              </button>
+
+              <button
+                onClick={() => setFilter('SOP')}
+                className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 text-left hover:shadow-lg transition-shadow"
+              >
+                <p className="text-sm font-medium text-orange-900">SOP Library</p>
+                <p className="text-3xl font-bold text-orange-900 mt-2">{docStats.sops}</p>
+                <p className="text-xs text-orange-700 mt-1">Click to view →</p>
               </button>
 
               <button
@@ -433,6 +485,7 @@ export default function DocumentationPage() {
                     <SelectItem value="POLICY">Policy</SelectItem>
                     <SelectItem value="PROCEDURE">Procedure</SelectItem>
                     <SelectItem value="WORK_INSTRUCTION">Work Instruction</SelectItem>
+                    <SelectItem value="SOP">SOP</SelectItem>
                     <SelectItem value="REGISTER">Register</SelectItem>
                   </SelectContent>
                 </Select>
@@ -446,7 +499,7 @@ export default function DocumentationPage() {
                 <span className="text-sm text-slate-600">Active filters:</span>
                 {searchTerm && (
                   <Badge variant="secondary" className="gap-1">
-                    Search: "{searchTerm}"
+                    Search: &quot;{searchTerm}&quot;
                     <button onClick={() => setSearchTerm('')} className="ml-1 hover:text-slate-900">×</button>
                   </Badge>
                 )}

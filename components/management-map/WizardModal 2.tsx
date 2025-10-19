@@ -113,7 +113,7 @@ export default function WizardModal({ isOpen, onClose }: WizardModalProps) {
           {step === 'form' ? (
             <div className="space-y-6">
               <p className="text-gray-600">
-                Tell us about your role and what you need to do, and we'll show you the exact documents and steps required.
+                Tell us about your role and what you need to do, and we&apos;ll show you the exact documents and steps required.
               </p>
 
               <div className="space-y-4">
@@ -194,7 +194,7 @@ export default function WizardModal({ isOpen, onClose }: WizardModalProps) {
                   Your Compliance Path
                 </h3>
                 <p className="text-gray-600">
-                  Based on your role and activity, here's the minimal compliant path you need to follow:
+                  Based on your role and activity, here&apos;s the minimal compliant path you need to follow:
                 </p>
               </div>
 

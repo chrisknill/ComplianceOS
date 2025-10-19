@@ -19,12 +19,12 @@ const createTestimonialSchema = z.object({
 })
 
 const querySchema = z.object({
-  search: z.string().optional(),
-  status: z.string().optional(),
-  featured: z.string().optional(),
-  projectId: z.string().optional(),
-  page: z.string().optional(),
-  limit: z.string().optional(),
+  search: z.string().nullable().optional(),
+  status: z.string().nullable().optional(),
+  featured: z.string().nullable().optional(),
+  projectId: z.string().nullable().optional(),
+  page: z.string().nullable().optional(),
+  limit: z.string().nullable().optional(),
 })
 
 export async function GET(req: NextRequest) {
@@ -110,9 +110,19 @@ export async function POST(req: NextRequest) {
 
     const testimonial = await prisma.testimonial.create({
       data: {
-        ...validatedData,
-        tags: validatedData.tags ? JSON.parse(validatedData.tags) : null,
-        attachments: validatedData.attachments ? JSON.parse(validatedData.attachments) : null,
+        customerName: validatedData.customerName,
+        customerEmail: validatedData.customerEmail || null,
+        customerCompany: validatedData.customerCompany || null,
+        customerTitle: validatedData.customerTitle || null,
+        projectName: validatedData.projectName || null,
+        projectType: validatedData.projectType || null,
+        testimonialText: validatedData.testimonialText,
+        rating: validatedData.rating,
+        status: validatedData.status,
+        featured: validatedData.featured,
+        tags: validatedData.tags || null,
+        attachments: validatedData.attachments || null,
+        projectId: validatedData.projectId || null,
       },
       include: {
         project: true,

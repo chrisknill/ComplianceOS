@@ -9,7 +9,7 @@ const updateTestimonialSchema = z.object({
   customerTitle: z.string().optional(),
   projectName: z.string().optional(),
   projectType: z.enum(['COMPLETED', 'ONGOING', 'MAINTENANCE']).optional(),
-  testimonialText: z.string().min(1, 'Testimonial text is required').optional(),
+  testimonialText: z.string().optional(),
   rating: z.number().min(1).max(5).optional(),
   status: z.enum(['DRAFT', 'APPROVED', 'PUBLISHED', 'REJECTED']).optional(),
   featured: z.boolean().optional(),
@@ -27,11 +27,12 @@ const sendQuestionnaireSchema = z.object({
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const testimonial = await prisma.testimonial.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         project: true,
         questionnaire: {
@@ -65,20 +66,17 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await req.json()
     const validatedData = updateTestimonialSchema.parse(body)
 
     const updateData: any = { ...validatedData }
     
-    if (validatedData.tags) {
-      updateData.tags = JSON.parse(validatedData.tags)
-    }
-    if (validatedData.attachments) {
-      updateData.attachments = JSON.parse(validatedData.attachments)
-    }
+    // Keep tags and attachments as strings (they're stored as JSON strings in the database)
+    // Don't parse them as JSON since Prisma expects strings
     
     // Handle status changes
     if (validatedData.status === 'APPROVED') {
@@ -89,7 +87,7 @@ export async function PUT(
     }
 
     const testimonial = await prisma.testimonial.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: {
         project: true,
@@ -110,11 +108,12 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     await prisma.testimonial.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Testimonial deleted successfully' })
@@ -127,15 +126,16 @@ export async function DELETE(
 // Send questionnaire endpoint
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await req.json()
     const validatedData = sendQuestionnaireSchema.parse(body)
 
     // Get testimonial details
     const testimonial = await prisma.testimonial.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { project: true }
     })
 
@@ -145,7 +145,7 @@ export async function POST(
 
     // Create or update questionnaire
     const questionnaire = await prisma.testimonialQuestionnaire.upsert({
-      where: { testimonialId: params.id },
+      where: { testimonialId: id },
       update: {
         questionnaireType: validatedData.questionnaireType,
         emailSubject: validatedData.emailSubject,
@@ -155,7 +155,7 @@ export async function POST(
         sentDate: new Date(),
       },
       create: {
-        testimonialId: params.id,
+        testimonialId: id,
         questionnaireType: validatedData.questionnaireType,
         emailSubject: validatedData.emailSubject,
         emailBody: validatedData.emailBody,

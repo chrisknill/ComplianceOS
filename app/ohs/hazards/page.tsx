@@ -398,7 +398,7 @@ export default function OHSHazardsPage() {
                 <>
                   {searchTerm && (
                     <Badge variant="secondary" className="gap-1">
-                      Search: "{searchTerm}"
+                      Search: &quot;{searchTerm}&quot;
                       <button onClick={() => setSearchTerm('')} className="ml-1">×</button>
                     </Badge>
                   )}

@@ -3,14 +3,15 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await req.json()
     
     // Check if all actions are completed
     const actions = await prisma.nCAction.findMany({
-      where: { ncId: params.id },
+      where: { ncId: id },
     })
 
     const allActionsComplete = actions.every(action => action.status === 'DONE')
@@ -24,7 +25,7 @@ export async function POST(
 
     // Update the non-conformance to closed
     const record = await prisma.nonConformance.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status: 'CLOSED',
         closedDate: new Date(),

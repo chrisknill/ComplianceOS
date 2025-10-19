@@ -83,20 +83,7 @@ export default function ContractReviewPage() {
 
   const handleExportCSV = useCallback(() => {
     try {
-      const csvData = convertToCSV(sortedContracts, [
-        { key: 'contractNumber', label: 'Contract Number' },
-        { key: 'contractTitle', label: 'Contract Title' },
-        { key: 'contractType', label: 'Type' },
-        { key: 'supplierName', label: 'Supplier' },
-        { key: 'value', label: 'Value' },
-        { key: 'currency', label: 'Currency' },
-        { key: 'status', label: 'Status' },
-        { key: 'priority', label: 'Priority' },
-        { key: 'riskLevel', label: 'Risk Level' },
-        { key: 'startDate', label: 'Start Date' },
-        { key: 'endDate', label: 'End Date' },
-        { key: 'createdAt', label: 'Created' },
-      ])
+      const csvData = convertToCSV(sortedContracts)
       downloadFile(csvData, 'contract-reviews.csv', 'text/csv')
       toast.success('Contract data exported successfully')
     } catch (error) {
@@ -1084,8 +1071,7 @@ export default function ContractReviewPage() {
           )}
           
           {viewMode === 'grid' && <MatrixView />}
-          {viewMode === 'board' && <BoardView />}
-          {viewMode === 'matrix' && <MatrixView />}
+           {viewMode === 'board' && <BoardView />}
           {viewMode === 'calendar' && <CalendarView />}
         </>
       )}

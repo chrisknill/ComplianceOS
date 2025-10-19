@@ -507,7 +507,7 @@ export default function RegistersPage() {
                     <Filter className="h-4 w-4 text-slate-500" />
                     {searchTerm && (
                       <Badge variant="secondary" className="gap-1">
-                        Search: "{searchTerm}"
+                        Search: &quot;{searchTerm}&quot;
                         <button onClick={() => setSearchTerm('')} className="ml-1 hover:text-slate-900">×</button>
                       </Badge>
                     )}
