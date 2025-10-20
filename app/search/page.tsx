@@ -197,7 +197,7 @@ export default function SearchPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-slate-600">Search Query</p>
-                  <p className="text-lg font-semibold text-slate-900">"{query}"</p>
+                  <p className="text-lg font-semibold text-slate-900">&quot;{query}&quot;</p>
                 </div>
               </div>
               <div className="text-right">
@@ -287,9 +287,9 @@ export default function SearchPage() {
               <div>
                 <p className="font-medium mb-1">Try these search terms:</p>
                 <ul className="space-y-1">
-                  <li>• Policy names (e.g., "Quality Policy")</li>
-                  <li>• Document types (e.g., "risk assessment")</li>
-                  <li>• Categories (e.g., "QMS", "EMS", "OHS")</li>
+                  <li>• Policy names (e.g., &quot;Quality Policy&quot;)</li>
+                  <li>• Document types (e.g., &quot;risk assessment&quot;)</li>
+                  <li>• Categories (e.g., &quot;QMS&quot;, &quot;EMS&quot;, &quot;OHS&quot;)</li>
                 </ul>
               </div>
               <div>

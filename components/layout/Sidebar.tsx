@@ -113,9 +113,7 @@ const supportNavigation = [
   { name: 'Documentation', href: '/documentation', icon: FileText },
   { name: 'Training', href: '/training', icon: GraduationCap },
   { name: 'Communication', href: '/support/communication', icon: MessageSquare },
-  { name: 'Infrastructure', href: '/support/infrastructure', icon: Server },
-  { name: 'Equipment', href: '/equipment', icon: Wrench },
-  { name: 'Calibration', href: '/calibration', icon: Calendar },
+  { name: 'Asset Management', href: '/support/asset-management', icon: Server },
   { name: 'Suppliers', href: '/support/suppliers', icon: Users2 },
 ]
 

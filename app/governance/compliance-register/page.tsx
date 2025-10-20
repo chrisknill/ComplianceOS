@@ -408,7 +408,7 @@ export default function ComplianceRegisterPage() {
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       <StatusBadge 
-                        status={req.status === 'compliant' ? 'green' : req.status === 'under_review' ? 'amber' : req.status === 'non_compliant' ? 'red' : 'blue'} 
+                        status={req.status === 'compliant' ? 'green' : req.status === 'under_review' ? 'amber' : req.status === 'non_compliant' ? 'red' : 'amber'} 
                         label={req.status.replace('_', ' ')} 
                       />
                     </div>

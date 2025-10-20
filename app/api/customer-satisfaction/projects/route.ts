@@ -22,12 +22,12 @@ const createProjectSchema = z.object({
 })
 
 const querySchema = z.object({
-  search: z.string().optional(),
-  status: z.string().optional(),
-  projectType: z.string().optional(),
-  customerName: z.string().optional(),
-  page: z.string().optional(),
-  limit: z.string().optional(),
+  search: z.string().nullable().optional(),
+  status: z.string().nullable().optional(),
+  projectType: z.string().nullable().optional(),
+  customerName: z.string().nullable().optional(),
+  page: z.string().nullable().optional(),
+  limit: z.string().nullable().optional(),
 })
 
 export async function GET(req: NextRequest) {

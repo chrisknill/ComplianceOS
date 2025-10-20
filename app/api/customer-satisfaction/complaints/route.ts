@@ -17,13 +17,13 @@ const createComplaintSchema = z.object({
 })
 
 const querySchema = z.object({
-  search: z.string().optional(),
-  complaintType: z.string().optional(),
-  priority: z.string().optional(),
-  status: z.string().optional(),
-  assignedTo: z.string().optional(),
-  page: z.string().optional(),
-  limit: z.string().optional(),
+  search: z.string().nullable().optional(),
+  complaintType: z.string().nullable().optional(),
+  priority: z.string().nullable().optional(),
+  status: z.string().nullable().optional(),
+  assignedTo: z.string().nullable().optional(),
+  page: z.string().nullable().optional(),
+  limit: z.string().nullable().optional(),
 })
 
 export async function GET(req: NextRequest) {

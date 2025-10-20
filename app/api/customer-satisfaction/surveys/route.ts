@@ -13,11 +13,11 @@ const createSurveySchema = z.object({
 })
 
 const querySchema = z.object({
-  search: z.string().optional(),
-  surveyType: z.string().optional(),
-  status: z.string().optional(),
-  page: z.string().optional(),
-  limit: z.string().optional(),
+  search: z.string().nullable().optional(),
+  surveyType: z.string().nullable().optional(),
+  status: z.string().nullable().optional(),
+  page: z.string().nullable().optional(),
+  limit: z.string().nullable().optional(),
 })
 
 export async function GET(req: NextRequest) {

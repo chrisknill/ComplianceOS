@@ -423,7 +423,7 @@ export default function PoliciesPage() {
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       <StatusBadge 
-                        status={policy.status === 'active' ? 'green' : policy.status === 'under_review' ? 'amber' : policy.status === 'draft' ? 'blue' : 'red'} 
+                        status={policy.status === 'active' ? 'green' : policy.status === 'under_review' ? 'amber' : policy.status === 'draft' ? 'amber' : 'red'} 
                         label={policy.status.replace('_', ' ')} 
                       />
                     </div>

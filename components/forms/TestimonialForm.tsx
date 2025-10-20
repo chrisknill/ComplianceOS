@@ -69,8 +69,6 @@ export function TestimonialForm({ onClose, onSubmit, testimonialId, projectId }:
       return
     }
 
-    // Testimonial text is now optional - can be completed by email recipient
-
     if (formData.rating < 1 || formData.rating > 5) {
       toast.error('Rating must be between 1 and 5')
       return
@@ -79,7 +77,10 @@ export function TestimonialForm({ onClose, onSubmit, testimonialId, projectId }:
     setLoading(true)
     
     try {
-      const url = testimonialId ? `/api/customer-satisfaction/testimonials/${testimonialId}` : '/api/customer-satisfaction/testimonials'
+      // Use webhook endpoint for new testimonials, regular API for edits
+      const url = testimonialId 
+        ? `/api/customer-satisfaction/testimonials/${testimonialId}` 
+        : '/api/customer-satisfaction/testimonials/webhook'
       const method = testimonialId ? 'PUT' : 'POST'
       
       const payload = {
@@ -98,11 +99,17 @@ export function TestimonialForm({ onClose, onSubmit, testimonialId, projectId }:
       })
 
       if (response.ok) {
-        toast.success(testimonialId ? 'Testimonial updated successfully' : 'Testimonial created successfully')
+        const result = await response.json()
+        
+        if (testimonialId) {
+          toast.success('Testimonial updated successfully')
+        } else {
+          toast.success('Testimonial form submitted successfully! It will be sent to the customer via email.')
+        }
         onSubmit()
       } else {
         const error = await response.json()
-        toast.error(error.error || 'Failed to save testimonial')
+        toast.error(error.error || 'Failed to submit testimonial')
       }
     } catch (error) {
       console.error('Form submission error:', error)
@@ -344,12 +351,12 @@ export function TestimonialForm({ onClose, onSubmit, testimonialId, projectId }:
                 {loading ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Saving...
+                    {testimonialId ? 'Updating...' : 'Sending...'}
                   </>
                 ) : (
                   <>
                     <Save className="h-4 w-4 mr-2" />
-                    {testimonialId ? 'Update Testimonial' : 'Create Testimonial'}
+                    {testimonialId ? 'Update Testimonial' : 'Send to Customer'}
                   </>
                 )}
               </Button>

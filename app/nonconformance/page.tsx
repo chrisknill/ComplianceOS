@@ -37,7 +37,7 @@ export default function NonConformancePage() {
   const [records, setRecords] = useState<NonConformance[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('DASHBOARD')
-  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'board'>('list')
+  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'board' | 'calendar'>('list')
   const [showForm, setShowForm] = useState(false)
   const [showDetailView, setShowDetailView] = useState(false)
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null)
