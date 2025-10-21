@@ -11,8 +11,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <Sidebar />
         <div className="flex-1 ml-64 flex flex-col">
           <Topbar />
-          <main className="flex-1 overflow-y-auto p-6 max-w-full">
-            <div className="max-w-7xl mx-auto w-full">
+          <main className="flex-1 overflow-y-auto px-6 py-6 max-w-full">
+            <div className="w-full">
               {children}
             </div>
           </main>

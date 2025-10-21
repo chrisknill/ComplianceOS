@@ -1,14 +1,25 @@
-import { Shell } from '@/components/layout/Shell'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { redirect } from 'next/navigation'
-import { Settings as SettingsIcon, Building, Bell, Shield, Database } from 'lucide-react'
+'use client'
 
-export default async function SettingsPage() {
-  const session = await getServerSession(authOptions)
-  
-  if (!session?.user) {
-    redirect('/signin')
+import { useState, useEffect } from 'react'
+import { Shell } from '@/components/layout/Shell'
+import { Settings as SettingsIcon, Building, Bell, Shield, Database, FileText } from 'lucide-react'
+import { useDocumentPrefix } from '@/lib/document-prefix'
+
+export default function SettingsPage() {
+  const { prefix, updatePrefix } = useDocumentPrefix()
+  const [localPrefix, setLocalPrefix] = useState(prefix)
+  const [nextDocNumber, setNextDocNumber] = useState(1)
+  const [autoGenerate, setAutoGenerate] = useState(true)
+
+  // Update local prefix when global prefix changes
+  useEffect(() => {
+    setLocalPrefix(prefix)
+  }, [prefix])
+
+  // Handle prefix change
+  const handlePrefixChange = (newPrefix: string) => {
+    setLocalPrefix(newPrefix)
+    updatePrefix(newPrefix)
   }
 
   return (
@@ -49,6 +60,55 @@ export default async function SettingsPage() {
                 <option>Technology</option>
                 <option>Other</option>
               </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Documentation Settings */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-6 border-b border-slate-200">
+            <div className="flex items-center gap-3">
+              <FileText className="h-6 w-6 text-slate-600" />
+              <h2 className="text-lg font-semibold text-slate-900">Documentation</h2>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Document Code Prefix
+              </label>
+              <input
+                type="text"
+                placeholder="MET"
+                value={localPrefix}
+                onChange={(e) => handlePrefixChange(e.target.value)}
+                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-transparent"
+              />
+              <p className="text-xs text-slate-500 mt-1">Prefix for all document codes (e.g., {localPrefix}-PROC-001)</p>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-slate-900">Auto-generate Document Codes</p>
+                <p className="text-sm text-slate-500">Automatically generate sequential document codes</p>
+              </div>
+              <input 
+                type="checkbox" 
+                checked={autoGenerate}
+                onChange={(e) => setAutoGenerate(e.target.checked)}
+                className="h-5 w-5 text-slate-900 rounded" 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Next Document Number
+              </label>
+              <input
+                type="number"
+                value={nextDocNumber}
+                onChange={(e) => setNextDocNumber(parseInt(e.target.value) || 1)}
+                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-slate-900 focus:border-transparent"
+              />
+              <p className="text-xs text-slate-500 mt-1">Starting number for new document codes</p>
             </div>
           </div>
         </div>
@@ -184,4 +244,3 @@ export default async function SettingsPage() {
     </Shell>
   )
 }
-

@@ -17,9 +17,10 @@ export async function PUT(
 
     const { id } = await params
     const body = await req.json()
-    const { name, jobTitle, department, managerId, phone, startDate, location, status, role, password } = body
+    const { email, name, jobTitle, department, managerId, phone, startDate, location, status, role, password } = body
 
     const data: any = {
+      email,
       name,
       jobTitle,
       department,

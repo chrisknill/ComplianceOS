@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,8 +14,18 @@ interface NCIntakeFormProps {
   onSave: () => void
 }
 
+interface Employee {
+  id: string
+  name: string
+  email: string
+  jobTitle: string
+  department: string
+}
+
 export function NCIntakeForm({ open, onClose, onSave }: NCIntakeFormProps) {
   const [caseType, setCaseType] = useState<string>('NC')
+  const [employees, setEmployees] = useState<Employee[]>([])
+  const [employeesLoading, setEmployeesLoading] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     raisedBy: 'Current User',
@@ -51,13 +61,45 @@ export function NCIntakeForm({ open, onClose, onSave }: NCIntakeFormProps) {
     expectedBenefit: '',
     effortEstimate: 'M',
     suggestedOwner: '',
+    
+    // Assignment
+    assignedTo: '',
   })
 
   const [loading, setLoading] = useState(false)
 
+  // Load employees when form opens
+  useEffect(() => {
+    if (open) {
+      loadEmployees()
+    }
+  }, [open])
+
+  const loadEmployees = async () => {
+    setEmployeesLoading(true)
+    try {
+      const response = await fetch('/api/employees')
+      if (response.ok) {
+        const data = await response.json()
+        setEmployees(data)
+      }
+    } catch (error) {
+      console.error('Failed to load employees:', error)
+    } finally {
+      setEmployeesLoading(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+
+    // Validate required fields
+    if (!formData.assignedTo) {
+      alert('Please select an employee to assign this case to. This person will receive an email notification about the new case.')
+      setLoading(false)
+      return
+    }
 
     try {
       const response = await fetch('/api/nonconformance', {
@@ -70,7 +112,10 @@ export function NCIntakeForm({ open, onClose, onSave }: NCIntakeFormProps) {
         }),
       })
 
-      if (!response.ok) throw new Error('Failed to save')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save')
+      }
 
       onSave()
       onClose()
@@ -104,10 +149,12 @@ export function NCIntakeForm({ open, onClose, onSave }: NCIntakeFormProps) {
         expectedBenefit: '',
         effortEstimate: 'M',
         suggestedOwner: '',
+        assignedTo: '',
       })
     } catch (error) {
       console.error('Failed to save:', error)
-      alert('Failed to create case. Please try again.')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create case. Please try again.'
+      alert(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -257,6 +304,36 @@ export function NCIntakeForm({ open, onClose, onSave }: NCIntakeFormProps) {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div>
+            <Label htmlFor="assignedTo" className="text-red-600 font-semibold">Assign To *</Label>
+            <Select
+              value={formData.assignedTo}
+              onValueChange={(value) => setFormData({ ...formData, assignedTo: value })}
+              disabled={employeesLoading}
+              required
+            >
+              <SelectTrigger className={!formData.assignedTo ? 'border-red-300' : ''}>
+                <SelectValue placeholder={employeesLoading ? "Loading employees..." : "Select employee"} />
+              </SelectTrigger>
+              <SelectContent>
+                {employees.map((employee) => (
+                  <SelectItem key={employee.id} value={employee.id}>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{employee.name}</span>
+                      <span className="text-sm text-slate-500">{employee.jobTitle} - {employee.department}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-slate-500 mt-1">
+              This person will receive an email notification about the new case
+            </p>
+            {!formData.assignedTo && (
+              <p className="text-xs text-red-500 mt-1">Please select an employee to assign this case to</p>
+            )}
           </div>
 
           <div>

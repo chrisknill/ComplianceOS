@@ -1,0 +1,118 @@
+{
+  "name": "n8n-action-integration",
+  "displayName": "n8n Action Integration",
+  "description": "Execute n8n actions directly from Cursor",
+  "version": "1.0.0",
+  "publisher": "complianceos",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:n8n-action.execute"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "n8n-action.execute",
+        "title": "Execute n8n Action",
+        "category": "n8n"
+      },
+      {
+        "command": "n8n-action.nc",
+        "title": "Create Non-Conformance Case",
+        "category": "n8n"
+      },
+      {
+        "command": "n8n-action.risk",
+        "title": "Create Risk Assessment",
+        "category": "n8n"
+      },
+      {
+        "command": "n8n-action.training",
+        "title": "Create Training Assignment",
+        "category": "n8n"
+      },
+      {
+        "command": "n8n-action.review",
+        "title": "Create Document Review",
+        "category": "n8n"
+      },
+      {
+        "command": "n8n-action.custom",
+        "title": "Create Custom Action",
+        "category": "n8n"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "n8n-action.execute",
+          "when": "true"
+        },
+        {
+          "command": "n8n-action.nc",
+          "when": "true"
+        },
+        {
+          "command": "n8n-action.risk",
+          "when": "true"
+        },
+        {
+          "command": "n8n-action.training",
+          "when": "true"
+        },
+        {
+          "command": "n8n-action.review",
+          "when": "true"
+        },
+        {
+          "command": "n8n-action.custom",
+          "when": "true"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "n8n-action.execute",
+        "key": "ctrl+shift+n",
+        "mac": "cmd+shift+n",
+        "when": "editorTextFocus"
+      }
+    ],
+    "configuration": {
+      "title": "n8n Action Integration",
+      "properties": {
+        "n8n-action.apiUrl": {
+          "type": "string",
+          "default": "http://localhost:3000",
+          "description": "API URL for n8n action service"
+        },
+        "n8n-action.defaultAssignee": {
+          "type": "string",
+          "default": "",
+          "description": "Default assignee email for actions"
+        },
+        "n8n-action.defaultPriority": {
+          "type": "string",
+          "default": "Medium",
+          "enum": ["Low", "Medium", "High", "Critical"],
+          "description": "Default priority for actions"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.60.0",
+    "@types/node": "16.x",
+    "typescript": "^4.4.3"
+  }
+}

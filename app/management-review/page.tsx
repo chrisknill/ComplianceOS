@@ -47,6 +47,7 @@ import {
   Settings,
 } from 'lucide-react'
 import Link from 'next/link'
+import { CalendarEventForm } from '@/components/forms/CalendarEventForm'
 
 interface ManagementReview {
   id: string
@@ -176,13 +177,30 @@ export default function ManagementReviewPage() {
               ISO 9001, 14001, and 45001 Management Review Meetings
             </p>
           </div>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Review
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-3">
+            <CalendarEventForm 
+              trigger={
+                <Button variant="outline">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Schedule Meeting
+                </Button>
+              }
+              defaultTitle="Management Review Meeting"
+              defaultDescription="ISO Management Review Meeting"
+              defaultAttendees={[
+                { email: "christopher.knill@gmail.com", name: "Chris Knill" }
+              ]}
+              onSuccess={() => {
+                console.log('Calendar event created successfully!')
+              }}
+            />
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Review
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Create New Management Review</DialogTitle>
@@ -249,6 +267,7 @@ export default function ManagementReviewPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {/* Filters */}

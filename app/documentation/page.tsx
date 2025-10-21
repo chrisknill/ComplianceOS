@@ -17,6 +17,7 @@ import { getDocumentRAG } from '@/lib/rag'
 import { LayoutDashboard, FileCheck, Clock, AlertCircle, FileSignature, Search, Filter, ArrowUpDown, ArrowUp, ArrowDown, FileEdit } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useDocumentPrefix } from '@/lib/document-prefix'
 
 interface Document {
   id: string
@@ -32,9 +33,11 @@ interface Document {
 }
 
 export default function DocumentationPage() {
+  const { prefix, generateDocumentCode, updateDocumentCode } = useDocumentPrefix()
   const [documents, setDocuments] = useState<Document[]>([])
   const [filter, setFilter] = useState<string>('ALL')
   const [viewMode, setViewMode] = useState<'list' | 'grid' | 'board' | 'calendar'>('list')
+  const [calendarView, setCalendarView] = useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('monthly')
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingDoc, setEditingDoc] = useState<Document | undefined>()
@@ -53,13 +56,504 @@ export default function DocumentationPage() {
     fetch('/api/documents')
       .then((res) => res.json())
       .then((data) => {
+        // Add comprehensive ISO 9001/14001/45001 procedures
+        const isoProcedures = [
+          // Core Management System Procedures
+          {
+            id: 'proc-doc-control',
+            type: 'PROCEDURE',
+            title: 'Document Control',
+            code: generateDocumentCode('PROC', '001'),
+            version: '3.2',
+            status: 'APPROVED',
+            owner: 'Quality Manager',
+            nextReview: new Date('2025-06-30'),
+            url: undefined,
+            updatedAt: new Date('2025-01-15')
+          },
+          {
+            id: 'proc-records-mgmt',
+            type: 'PROCEDURE',
+            title: 'Records Management',
+            code: generateDocumentCode('PROC', '002'),
+            version: '2.1',
+            status: 'APPROVED',
+            owner: 'Quality Manager',
+            nextReview: new Date('2025-07-15'),
+            url: undefined,
+            updatedAt: new Date('2025-01-10')
+          },
+          {
+            id: 'proc-info-control',
+            type: 'PROCEDURE',
+            title: 'Control of Information (Internal + External)',
+            code: generateDocumentCode('PROC', '003'),
+            version: '1.8',
+            status: 'APPROVED',
+            owner: 'IT Manager',
+            nextReview: new Date('2025-08-20'),
+            url: undefined,
+            updatedAt: new Date('2025-01-05')
+          },
+          {
+            id: 'proc-mgmt-review',
+            type: 'PROCEDURE',
+            title: 'Management Review',
+            code: generateDocumentCode('PROC', '004'),
+            version: '2.5',
+            status: 'APPROVED',
+            owner: 'CEO',
+            nextReview: new Date('2025-09-30'),
+            url: undefined,
+            updatedAt: new Date('2025-01-20')
+          },
+          {
+            id: 'proc-internal-audit',
+            type: 'PROCEDURE',
+            title: 'Internal Audit',
+            code: generateDocumentCode('PROC', '005'),
+            version: '2.3',
+            status: 'APPROVED',
+            owner: 'Quality Manager',
+            nextReview: new Date('2025-10-15'),
+            url: undefined,
+            updatedAt: new Date('2025-01-12')
+          },
+          {
+            id: 'proc-capa',
+            type: 'PROCEDURE',
+            title: 'Corrective and Preventive Action',
+            code: generateDocumentCode('PROC', '006'),
+            version: '1.9',
+            status: 'APPROVED',
+            owner: 'Quality Manager',
+            nextReview: new Date('2025-11-30'),
+            url: undefined,
+            updatedAt: new Date('2025-01-08')
+          },
+          {
+            id: 'proc-nonconformance',
+            type: 'PROCEDURE',
+            title: 'Non-Conformance Management',
+            code: generateDocumentCode('PROC', '007'),
+            version: '2.0',
+            status: 'APPROVED',
+            owner: 'Quality Manager',
+            nextReview: new Date('2025-12-15'),
+            url: undefined,
+            updatedAt: new Date('2025-01-18')
+          },
+          {
+            id: 'proc-risk-opportunity',
+            type: 'PROCEDURE',
+            title: 'Risk & Opportunity Assessment',
+            code: generateDocumentCode('PROC', '008'),
+            version: '1.7',
+            status: 'APPROVED',
+            owner: 'Risk Manager',
+            nextReview: new Date('2026-01-20'),
+            url: undefined,
+            updatedAt: new Date('2025-01-14')
+          },
+          {
+            id: 'proc-context-org',
+            type: 'PROCEDURE',
+            title: 'Context of the Organisation',
+            code: generateDocumentCode('PROC', '009'),
+            version: '1.5',
+            status: 'APPROVED',
+            owner: 'CEO',
+            nextReview: new Date('2026-02-28'),
+            url: undefined,
+            updatedAt: new Date('2025-01-16')
+          },
+          {
+            id: 'proc-interested-parties',
+            type: 'PROCEDURE',
+            title: 'Interested Parties and Legal / Compliance Register',
+            code: generateDocumentCode('PROC', '010'),
+            version: '1.6',
+            status: 'APPROVED',
+            owner: 'Compliance Manager',
+            nextReview: new Date('2026-03-15'),
+            url: undefined,
+            updatedAt: new Date('2025-01-22')
+          },
+          // Operational Procedures
+          {
+            id: 'proc-operational-control',
+            type: 'PROCEDURE',
+            title: 'Operational Control',
+            code: generateDocumentCode('PROC', '011'),
+            version: '2.2',
+            status: 'APPROVED',
+            owner: 'Operations Manager',
+            nextReview: new Date('2026-04-10'),
+            url: undefined,
+            updatedAt: new Date('2025-01-25')
+          },
+          {
+            id: 'proc-change-mgmt',
+            type: 'PROCEDURE',
+            title: 'Change Management',
+            code: generateDocumentCode('PROC', '012'),
+            version: '1.8',
+            status: 'APPROVED',
+            owner: 'Change Manager',
+            nextReview: new Date('2026-05-20'),
+            url: undefined,
+            updatedAt: new Date('2025-01-28')
+          },
+          {
+            id: 'proc-procurement',
+            type: 'PROCEDURE',
+            title: 'Procurement / Supplier Evaluation',
+            code: generateDocumentCode('PROC', '013'),
+            version: '2.4',
+            status: 'APPROVED',
+            owner: 'Procurement Manager',
+            nextReview: new Date('2026-06-15'),
+            url: undefined,
+            updatedAt: new Date('2025-01-30')
+          },
+          {
+            id: 'proc-contract-service',
+            type: 'PROCEDURE',
+            title: 'Contract & Service Delivery Control',
+            code: generateDocumentCode('PROC', '014'),
+            version: '1.9',
+            status: 'APPROVED',
+            owner: 'Contract Manager',
+            nextReview: new Date('2026-07-30'),
+            url: undefined,
+            updatedAt: new Date('2025-02-02')
+          },
+          {
+            id: 'proc-outsourced-processes',
+            type: 'PROCEDURE',
+            title: 'Control of Outsourced Processes',
+            code: generateDocumentCode('PROC', '015'),
+            version: '1.7',
+            status: 'APPROVED',
+            owner: 'Operations Manager',
+            nextReview: new Date('2026-08-25'),
+            url: undefined,
+            updatedAt: new Date('2025-02-05')
+          },
+          {
+            id: 'proc-design-development',
+            type: 'PROCEDURE',
+            title: 'Design & Development Control',
+            code: generateDocumentCode('PROC', '016'),
+            version: '2.1',
+            status: 'APPROVED',
+            owner: 'Design Manager',
+            nextReview: new Date('2026-09-20'),
+            url: undefined,
+            updatedAt: new Date('2025-02-08')
+          },
+          {
+            id: 'proc-monitoring-measurement',
+            type: 'PROCEDURE',
+            title: 'Monitoring & Measurement Control',
+            code: generateDocumentCode('PROC', '017'),
+            version: '1.8',
+            status: 'APPROVED',
+            owner: 'Quality Manager',
+            nextReview: new Date('2026-10-15'),
+            url: undefined,
+            updatedAt: new Date('2025-02-10')
+          },
+          {
+            id: 'proc-calibration-equipment',
+            type: 'PROCEDURE',
+            title: 'Calibration / Equipment Maintenance',
+            code: generateDocumentCode('PROC', '018'),
+            version: '2.3',
+            status: 'APPROVED',
+            owner: 'Maintenance Manager',
+            nextReview: new Date('2026-11-30'),
+            url: undefined,
+            updatedAt: new Date('2025-02-12')
+          },
+          // Quality-Specific Procedures (ISO 9001)
+          {
+            id: 'proc-product-service-realisation',
+            type: 'PROCEDURE',
+            title: 'Product / Service Realisation',
+            code: generateDocumentCode('PROC', '019'),
+            version: '2.0',
+            status: 'APPROVED',
+            owner: 'Operations Manager',
+            nextReview: new Date('2026-12-20'),
+            url: undefined,
+            updatedAt: new Date('2025-02-15')
+          },
+          {
+            id: 'proc-customer-requirements',
+            type: 'PROCEDURE',
+            title: 'Customer Requirements & Feedback',
+            code: generateDocumentCode('PROC', '020'),
+            version: '1.9',
+            status: 'APPROVED',
+            owner: 'Customer Service Manager',
+            nextReview: new Date('2027-01-15'),
+            url: undefined,
+            updatedAt: new Date('2025-02-18')
+          },
+          {
+            id: 'proc-nonconforming-product',
+            type: 'PROCEDURE',
+            title: 'Nonconforming Product / Service Control',
+            code: generateDocumentCode('PROC', '021'),
+            version: '2.2',
+            status: 'APPROVED',
+            owner: 'Quality Manager',
+            nextReview: new Date('2027-02-28'),
+            url: undefined,
+            updatedAt: new Date('2025-02-20')
+          },
+          // Environmental-Specific Procedures (ISO 14001)
+          {
+            id: 'proc-env-aspects-impacts',
+            type: 'PROCEDURE',
+            title: 'Environmental Aspects & Impacts Assessment',
+            code: generateDocumentCode('PROC', '022'),
+            version: '1.8',
+            status: 'APPROVED',
+            owner: 'Environmental Manager',
+            nextReview: new Date('2027-03-20'),
+            url: undefined,
+            updatedAt: new Date('2025-02-22')
+          },
+          {
+            id: 'proc-compliance-obligations',
+            type: 'PROCEDURE',
+            title: 'Compliance Obligations Review',
+            code: generateDocumentCode('PROC', '023'),
+            version: '1.7',
+            status: 'APPROVED',
+            owner: 'Compliance Manager',
+            nextReview: new Date('2027-04-15'),
+            url: undefined,
+            updatedAt: new Date('2025-02-25')
+          },
+          {
+            id: 'proc-waste-mgmt',
+            type: 'PROCEDURE',
+            title: 'Waste Management',
+            code: generateDocumentCode('PROC', '024'),
+            version: '2.1',
+            status: 'APPROVED',
+            owner: 'Environmental Manager',
+            nextReview: new Date('2027-05-30'),
+            url: undefined,
+            updatedAt: new Date('2025-02-28')
+          },
+          {
+            id: 'proc-resource-efficiency',
+            type: 'PROCEDURE',
+            title: 'Resource Efficiency & Energy Use',
+            code: generateDocumentCode('PROC', '025'),
+            version: '1.9',
+            status: 'APPROVED',
+            owner: 'Environmental Manager',
+            nextReview: new Date('2027-06-20'),
+            url: undefined,
+            updatedAt: new Date('2025-03-02')
+          },
+          {
+            id: 'proc-pollution-prevention',
+            type: 'PROCEDURE',
+            title: 'Pollution Prevention & Spill Control',
+            code: generateDocumentCode('PROC', '026'),
+            version: '2.0',
+            status: 'APPROVED',
+            owner: 'Environmental Manager',
+            nextReview: new Date('2027-07-15'),
+            url: undefined,
+            updatedAt: new Date('2025-03-05')
+          },
+          {
+            id: 'proc-emergency-prep-env',
+            type: 'PROCEDURE',
+            title: 'Emergency Preparedness & Response (Environmental)',
+            code: generateDocumentCode('PROC', '027'),
+            version: '1.8',
+            status: 'APPROVED',
+            owner: 'Environmental Manager',
+            nextReview: new Date('2027-08-30'),
+            url: undefined,
+            updatedAt: new Date('2025-03-08')
+          },
+          // Health & Safety-Specific Procedures (ISO 45001)
+          {
+            id: 'proc-hazard-risk-assessment',
+            type: 'PROCEDURE',
+            title: 'Hazard Identification & Risk Assessment',
+            code: generateDocumentCode('PROC', '028'),
+            version: '2.3',
+            status: 'APPROVED',
+            owner: 'H&S Manager',
+            nextReview: new Date('2027-09-20'),
+            url: undefined,
+            updatedAt: new Date('2025-03-10')
+          },
+          {
+            id: 'proc-legal-compliance-hs',
+            type: 'PROCEDURE',
+            title: 'Legal Compliance Evaluation (H&S)',
+            code: generateDocumentCode('PROC', '029'),
+            version: '1.9',
+            status: 'APPROVED',
+            owner: 'H&S Manager',
+            nextReview: new Date('2027-10-15'),
+            url: undefined,
+            updatedAt: new Date('2025-03-12')
+          },
+          {
+            id: 'proc-incident-accident',
+            type: 'PROCEDURE',
+            title: 'Incident & Accident Investigation',
+            code: generateDocumentCode('PROC', '030'),
+            version: '2.1',
+            status: 'APPROVED',
+            owner: 'H&S Manager',
+            nextReview: new Date('2027-11-30'),
+            url: undefined,
+            updatedAt: new Date('2025-03-15')
+          },
+          {
+            id: 'proc-emergency-prep-safety',
+            type: 'PROCEDURE',
+            title: 'Emergency Preparedness & Response (Safety)',
+            code: generateDocumentCode('PROC', '031'),
+            version: '2.0',
+            status: 'APPROVED',
+            owner: 'H&S Manager',
+            nextReview: new Date('2027-12-20'),
+            url: undefined,
+            updatedAt: new Date('2025-03-18')
+          },
+          {
+            id: 'proc-consultation-worker',
+            type: 'PROCEDURE',
+            title: 'Consultation & Worker Participation',
+            code: generateDocumentCode('PROC', '032'),
+            version: '1.8',
+            status: 'APPROVED',
+            owner: 'H&S Manager',
+            nextReview: new Date('2028-01-15'),
+            url: undefined,
+            updatedAt: new Date('2025-03-20')
+          },
+          {
+            id: 'proc-ppe-work-activities',
+            type: 'PROCEDURE',
+            title: 'PPE & Control of Work Activities',
+            code: generateDocumentCode('PROC', '033'),
+            version: '2.2',
+            status: 'APPROVED',
+            owner: 'H&S Manager',
+            nextReview: new Date('2028-02-28'),
+            url: undefined,
+            updatedAt: new Date('2025-03-22')
+          },
+          {
+            id: 'proc-contractor-mgmt',
+            type: 'PROCEDURE',
+            title: 'Contractor Management',
+            code: generateDocumentCode('PROC', '034'),
+            version: '1.9',
+            status: 'APPROVED',
+            owner: 'H&S Manager',
+            nextReview: new Date('2028-03-20'),
+            url: undefined,
+            updatedAt: new Date('2025-03-25')
+          },
+          {
+            id: 'proc-first-aid-welfare',
+            type: 'PROCEDURE',
+            title: 'First Aid & Welfare',
+            code: generateDocumentCode('PROC', '035'),
+            version: '1.7',
+            status: 'APPROVED',
+            owner: 'H&S Manager',
+            nextReview: new Date('2028-04-15'),
+            url: undefined,
+            updatedAt: new Date('2025-03-28')
+          },
+          {
+            id: 'proc-health-surveillance',
+            type: 'PROCEDURE',
+            title: 'Health Surveillance & Monitoring',
+            code: generateDocumentCode('PROC', '036'),
+            version: '1.8',
+            status: 'APPROVED',
+            owner: 'H&S Manager',
+            nextReview: new Date('2028-05-30'),
+            url: undefined,
+            updatedAt: new Date('2025-03-30')
+          },
+          // Support & Awareness
+          {
+            id: 'proc-training-competence',
+            type: 'PROCEDURE',
+            title: 'Training & Competence',
+            code: generateDocumentCode('PROC', '037'),
+            version: '2.1',
+            status: 'APPROVED',
+            owner: 'HR Manager',
+            nextReview: new Date('2028-06-20'),
+            url: undefined,
+            updatedAt: new Date('2025-04-02')
+          },
+          {
+            id: 'proc-communication-awareness',
+            type: 'PROCEDURE',
+            title: 'Communication & Awareness',
+            code: generateDocumentCode('PROC', '038'),
+            version: '1.9',
+            status: 'APPROVED',
+            owner: 'HR Manager',
+            nextReview: new Date('2028-07-15'),
+            url: undefined,
+            updatedAt: new Date('2025-04-05')
+          },
+          {
+            id: 'proc-visitor-site-access',
+            type: 'PROCEDURE',
+            title: 'Visitor & Site Access Control',
+            code: generateDocumentCode('PROC', '039'),
+            version: '1.8',
+            status: 'APPROVED',
+            owner: 'Security Manager',
+            nextReview: new Date('2028-08-30'),
+            url: undefined,
+            updatedAt: new Date('2025-04-08')
+          },
+          // Performance Evaluation & Reporting
+          {
+            id: 'proc-continuous-improvement',
+            type: 'PROCEDURE',
+            title: 'Continuous Improvement',
+            code: generateDocumentCode('PROC', '040'),
+            version: '2.0',
+            status: 'APPROVED',
+            owner: 'Quality Manager',
+            nextReview: new Date('2028-09-20'),
+            url: undefined,
+            updatedAt: new Date('2025-04-10')
+          }
+        ]
+
         // Add some sample SOP data
         const sampleSOPs = [
           {
             id: 'sop-1',
             type: 'SOP',
             title: 'Production Line Setup',
-            code: 'SOP-PROD-001',
+            code: generateDocumentCode('SOP-PROD', '001'),
             version: '2.1',
             status: 'APPROVED',
             owner: 'Operations Manager',
@@ -71,7 +565,7 @@ export default function DocumentationPage() {
             id: 'sop-2',
             type: 'SOP',
             title: 'Quality Control Procedures',
-            code: 'SOP-QC-002',
+            code: generateDocumentCode('SOP-QC', '002'),
             version: '1.8',
             status: 'PENDING_APPROVAL',
             owner: 'Quality Manager',
@@ -83,7 +577,7 @@ export default function DocumentationPage() {
             id: 'sop-3',
             type: 'SOP',
             title: 'Safety Protocols',
-            code: 'SOP-SAF-003',
+            code: generateDocumentCode('SOP-SAF', '003'),
             version: '3.0',
             status: 'APPROVED',
             owner: 'Safety Officer',
@@ -92,8 +586,262 @@ export default function DocumentationPage() {
             updatedAt: new Date('2025-01-05')
           }
         ]
+
+        // Add comprehensive Essential Company Policies
+        const essentialPolicies = [
+          {
+            id: 'policy-quality',
+            type: 'POLICY',
+            title: 'Quality Policy',
+            code: generateDocumentCode('POL', '001'),
+            version: '2.0',
+            status: 'APPROVED',
+            owner: 'CEO',
+            nextReview: new Date('2025-12-31'),
+            url: undefined,
+            updatedAt: new Date('2025-01-01')
+          },
+          {
+            id: 'policy-environmental',
+            type: 'POLICY',
+            title: 'Environmental Policy',
+            code: generateDocumentCode('POL', '002'),
+            version: '1.5',
+            status: 'APPROVED',
+            owner: 'Environmental Manager',
+            nextReview: new Date('2025-11-30'),
+            url: undefined,
+            updatedAt: new Date('2024-12-15')
+          },
+          {
+            id: 'policy-health-safety',
+            type: 'POLICY',
+            title: 'Health & Safety Policy',
+            code: generateDocumentCode('POL', '003'),
+            version: '3.1',
+            status: 'APPROVED',
+            owner: 'H&S Manager',
+            nextReview: new Date('2025-10-15'),
+            url: undefined,
+            updatedAt: new Date('2024-11-20')
+          },
+          {
+            id: 'policy-info-security',
+            type: 'POLICY',
+            title: 'Information Security / Data Protection Policy',
+            code: generateDocumentCode('POL', '004'),
+            version: '2.2',
+            status: 'APPROVED',
+            owner: 'IT Manager',
+            nextReview: new Date('2025-09-30'),
+            url: undefined,
+            updatedAt: new Date('2024-10-25')
+          },
+          {
+            id: 'policy-risk-management',
+            type: 'POLICY',
+            title: 'Risk Management Policy',
+            code: generateDocumentCode('POL', '005'),
+            version: '1.8',
+            status: 'APPROVED',
+            owner: 'Risk Manager',
+            nextReview: new Date('2025-08-20'),
+            url: undefined,
+            updatedAt: new Date('2024-09-15')
+          },
+          {
+            id: 'policy-anti-bribery',
+            type: 'POLICY',
+            title: 'Anti-Bribery & Corruption Policy',
+            code: generateDocumentCode('POL', '006'),
+            version: '1.4',
+            status: 'APPROVED',
+            owner: 'Compliance Manager',
+            nextReview: new Date('2025-07-15'),
+            url: undefined,
+            updatedAt: new Date('2024-08-10')
+          },
+          {
+            id: 'policy-equality-diversity',
+            type: 'POLICY',
+            title: 'Equality, Diversity & Inclusion Policy',
+            code: generateDocumentCode('POL', '007'),
+            version: '2.1',
+            status: 'APPROVED',
+            owner: 'HR Manager',
+            nextReview: new Date('2025-06-30'),
+            url: undefined,
+            updatedAt: new Date('2024-07-05')
+          },
+          {
+            id: 'policy-csr',
+            type: 'POLICY',
+            title: 'Corporate Social Responsibility (CSR) Policy',
+            code: generateDocumentCode('POL', '008'),
+            version: '1.7',
+            status: 'APPROVED',
+            owner: 'CEO',
+            nextReview: new Date('2025-05-25'),
+            url: undefined,
+            updatedAt: new Date('2024-06-20')
+          },
+          {
+            id: 'policy-whistleblowing',
+            type: 'POLICY',
+            title: 'Whistleblowing & Ethics Policy',
+            code: generateDocumentCode('POL', '009'),
+            version: '1.9',
+            status: 'APPROVED',
+            owner: 'Compliance Manager',
+            nextReview: new Date('2025-04-20'),
+            url: undefined,
+            updatedAt: new Date('2024-05-15')
+          },
+          {
+            id: 'policy-supplier-procurement',
+            type: 'POLICY',
+            title: 'Supplier & Procurement Policy',
+            code: generateDocumentCode('POL', '010'),
+            version: '2.3',
+            status: 'APPROVED',
+            owner: 'Procurement Manager',
+            nextReview: new Date('2025-03-15'),
+            url: undefined,
+            updatedAt: new Date('2024-04-10')
+          },
+          {
+            id: 'policy-business-continuity',
+            type: 'POLICY',
+            title: 'Business Continuity / Disaster Recovery Policy',
+            code: generateDocumentCode('POL', '011'),
+            version: '1.6',
+            status: 'APPROVED',
+            owner: 'Operations Manager',
+            nextReview: new Date('2025-02-28'),
+            url: undefined,
+            updatedAt: new Date('2024-03-25')
+          },
+          {
+            id: 'policy-document-control',
+            type: 'POLICY',
+            title: 'Document Control & Records Retention Policy',
+            code: generateDocumentCode('POL', '012'),
+            version: '2.4',
+            status: 'APPROVED',
+            owner: 'Document Controller',
+            nextReview: new Date('2025-01-31'),
+            url: undefined,
+            updatedAt: new Date('2024-02-20')
+          },
+          {
+            id: 'policy-complaints-feedback',
+            type: 'POLICY',
+            title: 'Complaints & Feedback Policy',
+            code: generateDocumentCode('POL', '013'),
+            version: '1.8',
+            status: 'APPROVED',
+            owner: 'Customer Service Manager',
+            nextReview: new Date('2024-12-31'),
+            url: undefined,
+            updatedAt: new Date('2024-01-15')
+          },
+          {
+            id: 'policy-continuous-improvement',
+            type: 'POLICY',
+            title: 'Continuous Improvement Policy',
+            code: generateDocumentCode('POL', '014'),
+            version: '2.0',
+            status: 'APPROVED',
+            owner: 'Quality Manager',
+            nextReview: new Date('2024-11-30'),
+            url: undefined,
+            updatedAt: new Date('2023-12-10')
+          }
+        ]
+
+        // Add sample Work Instructions
+        const sampleWorkInstructions = [
+          {
+            id: 'wi-1',
+            type: 'WORK_INSTRUCTION',
+            title: 'Document Creation Process',
+            code: generateDocumentCode('WI', '001'),
+            version: '1.2',
+            status: 'APPROVED',
+            owner: 'Document Controller',
+            nextReview: new Date('2025-08-15'),
+            url: undefined,
+            updatedAt: new Date('2025-01-05')
+          },
+          {
+            id: 'wi-2',
+            type: 'WORK_INSTRUCTION',
+            title: 'Internal Audit Process',
+            code: generateDocumentCode('WI', '002'),
+            version: '2.0',
+            status: 'APPROVED',
+            owner: 'Quality Manager',
+            nextReview: new Date('2025-09-20'),
+            url: undefined,
+            updatedAt: new Date('2024-12-10')
+          },
+          {
+            id: 'wi-3',
+            type: 'WORK_INSTRUCTION',
+            title: 'Supplier Evaluation Process',
+            code: generateDocumentCode('WI', '003'),
+            version: '1.8',
+            status: 'APPROVED',
+            owner: 'Procurement Manager',
+            nextReview: new Date('2025-07-30'),
+            url: undefined,
+            updatedAt: new Date('2024-11-25')
+          }
+        ]
+
+        // Add sample Registers
+        const sampleRegisters = [
+          {
+            id: 'reg-1',
+            type: 'REGISTER',
+            title: 'Document Register',
+            code: generateDocumentCode('REG', '001'),
+            version: '1.0',
+            status: 'APPROVED',
+            owner: 'Document Controller',
+            nextReview: new Date('2025-06-30'),
+            url: undefined,
+            updatedAt: new Date('2025-01-10')
+          },
+          {
+            id: 'reg-2',
+            type: 'REGISTER',
+            title: 'Training Register',
+            code: generateDocumentCode('REG', '002'),
+            version: '2.1',
+            status: 'APPROVED',
+            owner: 'HR Manager',
+            nextReview: new Date('2025-05-15'),
+            url: undefined,
+            updatedAt: new Date('2024-12-20')
+          },
+          {
+            id: 'reg-3',
+            type: 'REGISTER',
+            title: 'Non-Conformance Register',
+            code: generateDocumentCode('REG', '003'),
+            version: '1.5',
+            status: 'APPROVED',
+            owner: 'Quality Manager',
+            nextReview: new Date('2025-04-20'),
+            url: undefined,
+            updatedAt: new Date('2024-11-30')
+          }
+        ]
         
-        setDocuments([...data, ...sampleSOPs])
+        // Filter out any existing policies, procedures, work instructions, and registers from API data to avoid duplicates
+        const filteredApiData = data.filter(doc => doc.type !== 'POLICY' && doc.type !== 'PROCEDURE' && doc.type !== 'WORK_INSTRUCTION' && doc.type !== 'REGISTER')
+        setDocuments([...filteredApiData, ...isoProcedures, ...sampleSOPs, ...essentialPolicies, ...sampleWorkInstructions, ...sampleRegisters])
         setLoading(false)
       })
       .catch((err) => {
@@ -102,9 +850,25 @@ export default function DocumentationPage() {
       })
   }
 
+  // RAG system helper function for document status
+  const getRAGStatus = (status: string) => {
+    switch (status) {
+      case 'APPROVED':
+        return 'green'
+      case 'DRAFT':
+        return 'red'
+      case 'PENDING_APPROVAL':
+        return 'amber'
+      case 'ARCHIVED':
+        return 'navy'
+      default:
+        return 'green'
+    }
+  }
+
   useEffect(() => {
     loadDocuments()
-  }, [])
+  }, [prefix]) // Reload when prefix changes
 
   // Filter and sort logic
   const handleSort = (field: keyof Document) => {
@@ -142,7 +906,31 @@ export default function DocumentationPage() {
       if (aVal === null || aVal === undefined) return 1
       if (bVal === null || bVal === undefined) return -1
       
-      // Convert to string for comparison
+      // Handle date fields specially
+      if (sortField === 'nextReview' || sortField === 'updatedAt') {
+        const aDate = aVal instanceof Date ? aVal : new Date(aVal as string)
+        const bDate = bVal instanceof Date ? bVal : new Date(bVal as string)
+        
+        if (sortDirection === 'asc') {
+          return aDate.getTime() - bDate.getTime()
+        } else {
+          return bDate.getTime() - aDate.getTime()
+        }
+      }
+      
+      // Handle numeric fields
+      if (sortField === 'version') {
+        const aNum = parseFloat(String(aVal))
+        const bNum = parseFloat(String(bVal))
+        
+        if (sortDirection === 'asc') {
+          return aNum - bNum
+        } else {
+          return bNum - aNum
+        }
+      }
+      
+      // Convert to string for comparison (for text fields)
       aVal = String(aVal).toLowerCase()
       bVal = String(bVal).toLowerCase()
       
@@ -174,7 +962,7 @@ export default function DocumentationPage() {
     { key: 'POLICY', label: 'Policies' },
     { key: 'PROCEDURE', label: 'Procedures' },
     { key: 'WORK_INSTRUCTION', label: 'Work Instructions' },
-    { key: 'SOP', label: 'SOP Library' },
+    { key: 'SOP', label: 'SOP' },
     { key: 'REGISTER', label: 'Registers' },
   ]
 
@@ -211,7 +999,11 @@ export default function DocumentationPage() {
             <p className="text-slate-600 mt-1">Policies, procedures, work instructions, and registers</p>
           </div>
           <div className="flex items-center gap-2">
-            {filter !== 'DASHBOARD' && <ViewToggle view={viewMode} onViewChange={setViewMode} />}
+            {filter !== 'DASHBOARD' && (
+              <div className="flex items-center gap-4">
+                <ViewToggle view={viewMode} onViewChange={setViewMode} />
+              </div>
+            )}
             <Button variant="outline" onClick={handleExport}>
               <Download className="h-4 w-4 mr-2" />
               CSV
@@ -323,7 +1115,7 @@ export default function DocumentationPage() {
                 className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-6 text-left hover:shadow-lg transition-shadow"
               >
                 <p className="text-sm font-medium text-emerald-900">Work Instructions</p>
-                <p className="text-3xl font-bold text-emerald-900 mt-2">{docStats.wis}</p>
+                <p className="text-3xl font-bold text-emerald-900 mt-2">{docStats.workInstructions}</p>
                 <p className="text-xs text-emerald-700 mt-1">Click to view →</p>
               </button>
 
@@ -331,7 +1123,7 @@ export default function DocumentationPage() {
                 onClick={() => setFilter('SOP')}
                 className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 text-left hover:shadow-lg transition-shadow"
               >
-                <p className="text-sm font-medium text-orange-900">SOP Library</p>
+                <p className="text-sm font-medium text-orange-900">SOP</p>
                 <p className="text-3xl font-bold text-orange-900 mt-2">{docStats.sops}</p>
                 <p className="text-xs text-orange-700 mt-1">Click to view →</p>
               </button>
@@ -442,6 +1234,35 @@ export default function DocumentationPage() {
           </div>
         )}
 
+        {/* Calendar View Controls */}
+        {filter !== 'DASHBOARD' && viewMode === 'calendar' && (
+          <div className="flex justify-end mb-6">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-slate-600">View:</span>
+              <div className="flex gap-1">
+                {[
+                  { key: 'daily', label: 'Daily' },
+                  { key: 'weekly', label: 'Weekly' },
+                  { key: 'monthly', label: 'Monthly' },
+                  { key: 'yearly', label: 'Yearly' }
+                ].map((view) => (
+                  <button
+                    key={view.key}
+                    onClick={() => setCalendarView(view.key as 'daily' | 'weekly' | 'monthly' | 'yearly')}
+                    className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                      calendarView === view.key
+                        ? 'bg-slate-900 text-white'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    {view.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Search and Filters (List View Only) */}
         {filter !== 'DASHBOARD' && viewMode === 'list' && (
           <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -536,8 +1357,7 @@ export default function DocumentationPage() {
         )}
 
         {/* Document Grid/List View */}
-        {filter !== 'DASHBOARD' && (
-          viewMode === 'grid' ? (
+        {filter !== 'DASHBOARD' && viewMode === 'grid' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDocs.map((doc) => (
               <div 
@@ -622,13 +1442,16 @@ export default function DocumentationPage() {
               </div>
             ))}
           </div>
-        ) : (
+        )}
+
+        {/* Document Table View */}
+        {filter !== 'DASHBOARD' && viewMode === 'list' && (
           <div className="bg-white rounded-lg shadow overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-full table-fixed">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                    className="w-48 px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
                     onClick={() => handleSort('code')}
                   >
                     <div className="flex items-center gap-2">
@@ -641,7 +1464,7 @@ export default function DocumentationPage() {
                     </div>
                   </th>
                   <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                    className="w-1/4 px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
                     onClick={() => handleSort('title')}
                   >
                     <div className="flex items-center gap-2">
@@ -654,7 +1477,7 @@ export default function DocumentationPage() {
                     </div>
                   </th>
                   <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                    className="w-24 px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
                     onClick={() => handleSort('type')}
                   >
                     <div className="flex items-center gap-2">
@@ -667,7 +1490,7 @@ export default function DocumentationPage() {
                     </div>
                   </th>
                   <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                    className="w-20 px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
                     onClick={() => handleSort('version')}
                   >
                     <div className="flex items-center gap-2">
@@ -680,7 +1503,7 @@ export default function DocumentationPage() {
                     </div>
                   </th>
                   <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                    className="w-40 px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
                     onClick={() => handleSort('owner')}
                   >
                     <div className="flex items-center gap-2">
@@ -693,7 +1516,7 @@ export default function DocumentationPage() {
                     </div>
                   </th>
                   <th 
-                    className="px-6 py-3 text-center text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                    className="w-32 px-6 py-3 text-center text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
                     onClick={() => handleSort('status')}
                   >
                     <div className="flex items-center justify-center gap-2">
@@ -706,7 +1529,17 @@ export default function DocumentationPage() {
                     </div>
                   </th>
                   <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                    className="w-16 px-3 py-3 text-center text-xs font-medium text-slate-700 uppercase"
+                  >
+                    Edit
+                  </th>
+                  <th 
+                    className="w-16 px-3 py-3 text-center text-xs font-medium text-slate-700 uppercase"
+                  >
+                    Approvals
+                  </th>
+                  <th 
+                    className="w-32 px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
                     onClick={() => handleSort('nextReview')}
                   >
                     <div className="flex items-center gap-2">
@@ -727,85 +1560,107 @@ export default function DocumentationPage() {
                     className="hover:bg-slate-50"
                   >
                     <td 
-                      className="px-6 py-4 cursor-pointer"
+                      className="w-48 px-6 py-4 cursor-pointer"
                       onClick={() => { setEditingDoc(doc); setShowForm(true); }}
                     >
                       <div className="flex items-center gap-3">
-                        <FileText className="h-5 w-5 text-slate-400" />
-                        <span className="font-mono text-sm font-semibold text-slate-900">{doc.code || '-'}</span>
+                        <FileText className="h-5 w-5 text-slate-400 flex-shrink-0" />
+                        <span className="font-mono text-sm font-semibold text-slate-900 truncate">{doc.code || '-'}</span>
                       </div>
                     </td>
                     <td 
-                      className="px-6 py-4 cursor-pointer"
+                      className="w-1/4 px-6 py-4 cursor-pointer"
                       onClick={() => { setEditingDoc(doc); setShowForm(true); }}
                     >
-                      <span className="font-medium text-slate-900">{doc.title}</span>
+                      <span className="font-medium text-slate-900 truncate block">{doc.title}</span>
                     </td>
                     <td 
-                      className="px-6 py-4 cursor-pointer"
+                      className="w-24 px-6 py-4 cursor-pointer"
                       onClick={() => { setEditingDoc(doc); setShowForm(true); }}
                     >
-                      <Badge variant="outline">{doc.type.replace('_', ' ')}</Badge>
+                      <Badge variant="outline" className="truncate">{doc.type.replace('_', ' ')}</Badge>
                     </td>
                     <td 
-                      className="px-6 py-4 text-sm text-slate-600 cursor-pointer"
+                      className="w-20 px-6 py-4 text-sm text-slate-600 cursor-pointer"
                       onClick={() => { setEditingDoc(doc); setShowForm(true); }}
                     >
-                      {doc.version}
+                      <span className="truncate block">{doc.version}</span>
                     </td>
                     <td 
-                      className="px-6 py-4 text-sm text-slate-600 cursor-pointer"
+                      className="w-40 px-6 py-4 text-sm text-slate-600 cursor-pointer"
                       onClick={() => { setEditingDoc(doc); setShowForm(true); }}
                     >
-                      {doc.owner || '-'}
+                      <span className="truncate block">{doc.owner || '-'}</span>
                     </td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Badge variant={doc.status === 'APPROVED' ? 'default' : 'secondary'}>
-                          {doc.status.replace('_', ' ')}
-                        </Badge>
+                    <td className="w-32 px-6 py-4 text-center">
+                      <Badge 
+                        variant={doc.status === 'APPROVED' ? 'default' : 'secondary'} 
+                        className={`truncate text-xs ${
+                          getRAGStatus(doc.status) === 'red' 
+                            ? 'bg-red-100 text-red-800 border-red-200' 
+                            : getRAGStatus(doc.status) === 'amber' 
+                            ? 'bg-amber-100 text-amber-800 border-amber-200' 
+                            : getRAGStatus(doc.status) === 'navy'
+                            ? 'bg-slate-800 text-white border-slate-800'
+                            : 'bg-green-100 text-green-800 border-green-200'
+                        }`}
+                      >
+                        {doc.status.replace('_', ' ')}
+                      </Badge>
+                    </td>
+                    <td className="w-16 px-3 py-4 text-center">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setEditorDoc(doc)
+                          setShowWordEditor(true)
+                        }}
+                        className="h-7 w-7 p-0"
+                        title="Edit in Word"
+                      >
+                        <FileEdit className="h-4 w-4" />
+                      </Button>
+                    </td>
+                    <td className="w-16 px-3 py-4 text-center">
+                      {(doc.status === 'PENDING_APPROVAL' || doc.status === 'APPROVED') ? (
                         <Button
                           size="sm"
                           variant="ghost"
                           onClick={(e) => {
                             e.stopPropagation()
-                            setEditorDoc(doc)
-                            setShowWordEditor(true)
+                            setApprovalDoc(doc)
+                            setShowApprovalWorkflow(true)
                           }}
-                          className="h-7 px-2"
-                          title="Edit in Word"
+                          className="h-7 w-7 p-0"
+                          title="View Approvals"
                         >
-                          <FileEdit className="h-4 w-4" />
+                          <FileSignature className="h-4 w-4" />
                         </Button>
-                        {(doc.status === 'PENDING_APPROVAL' || doc.status === 'APPROVED') && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setApprovalDoc(doc)
-                              setShowApprovalWorkflow(true)
-                            }}
-                            className="h-7 px-2"
-                            title="View Approvals"
-                          >
-                            <FileSignature className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
+                      ) : (
+                        <span className="text-slate-300">-</span>
+                      )}
                     </td>
                     <td 
-                      className="px-6 py-4 text-sm text-slate-600 cursor-pointer"
+                      className="w-32 px-6 py-4 text-sm cursor-pointer"
                       onClick={() => { setEditingDoc(doc); setShowForm(true); }}
                     >
-                      {formatDate(doc.nextReview)}
+                      <span className={`truncate block px-2 py-1 rounded-md ${
+                        getRAGStatus(doc.nextReview) === 'red' 
+                          ? 'bg-red-100 text-red-800' 
+                          : getRAGStatus(doc.nextReview) === 'amber' 
+                          ? 'bg-amber-100 text-amber-800' 
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {formatDate(doc.nextReview)}
+                      </span>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          )
         )}
 
         {/* Board View (Kanban) - Approval Workflow */}
@@ -983,6 +1838,244 @@ export default function DocumentationPage() {
             documentTitle={approvalDoc.title}
             currentApprovals={[]}
           />
+        )}
+
+        {/* Calendar View */}
+        {filter !== 'DASHBOARD' && viewMode === 'calendar' && (
+          <div className="space-y-6">
+            {/* Calendar Header */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-slate-900">
+                Document Review Calendar - {calendarView.charAt(0).toUpperCase() + calendarView.slice(1)} View
+              </h3>
+            <div className="text-sm text-slate-600">
+              <span className="inline-block w-3 h-3 bg-red-100 rounded-full mr-2"></span>
+              Draft (Review Due)
+              <span className="inline-block w-3 h-3 bg-amber-100 rounded-full mr-2 ml-4"></span>
+              Pending Approval (Review Due)
+              <span className="inline-block w-3 h-3 bg-green-100 rounded-full mr-2 ml-4"></span>
+              Approved (Review Due)
+              <span className="inline-block w-3 h-3 bg-slate-800 rounded-full mr-2 ml-4"></span>
+              Archived (Review Due)
+            </div>
+            </div>
+
+            {/* Calendar Content */}
+            {calendarView === 'daily' && (
+              <div className="bg-white rounded-lg border p-6">
+                <h4 className="font-semibold mb-4">Today's Review Schedule</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredDocs
+                    .filter(doc => {
+                      if (!doc.nextReview) return false
+                      const today = new Date()
+                      const reviewDate = new Date(doc.nextReview)
+                      return reviewDate.toDateString() === today.toDateString()
+                    })
+                    .map(doc => (
+                      <div key={doc.id} className={`p-4 rounded-lg border-2 ${
+                        getRAGStatus(doc.status) === 'red' 
+                          ? 'border-red-200 bg-red-50' 
+                          : getRAGStatus(doc.status) === 'amber' 
+                          ? 'border-amber-200 bg-amber-50' 
+                          : getRAGStatus(doc.status) === 'navy'
+                          ? 'border-slate-800 bg-slate-100'
+                          : 'border-green-200 bg-green-50'
+                      }`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium text-sm">{doc.title}</span>
+                          <Badge variant={getRAGStatus(doc.status) === 'red' ? 'destructive' : 'secondary'} className="text-xs">
+                            {doc.status.replace('_', ' ')}
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-slate-600">{doc.code}</div>
+                        <div className="text-xs text-slate-500 mt-1">
+                          Review due: {formatDate(doc.nextReview)}
+                        </div>
+                      </div>
+                    ))}
+                  {filteredDocs.filter(doc => {
+                    if (!doc.nextReview) return false
+                    const today = new Date()
+                    const reviewDate = new Date(doc.nextReview)
+                    return reviewDate.toDateString() === today.toDateString()
+                  }).length === 0 && (
+                    <div className="col-span-full text-center py-8 text-slate-500">No reviews scheduled for today</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {calendarView === 'weekly' && (
+              <div className="bg-white rounded-lg border p-6">
+                <h4 className="font-semibold mb-4">This Week's Review Schedule</h4>
+                <div className="grid grid-cols-7 gap-2">
+                  {/* Day headers */}
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                    <div key={day} className="text-center text-sm font-medium text-slate-600 py-2 border-b">
+                      {day}
+                    </div>
+                  ))}
+                  
+                  {/* Calendar cells */}
+                  {Array.from({ length: 7 }, (_, i) => {
+                    const today = new Date()
+                    const startOfWeek = new Date(today)
+                    startOfWeek.setDate(today.getDate() - today.getDay() + 1) // Monday
+                    const dayDate = new Date(startOfWeek)
+                    dayDate.setDate(startOfWeek.getDate() + i)
+                    
+                    const docsForDay = filteredDocs.filter(doc => {
+                      if (!doc.nextReview) return false
+                      const reviewDate = new Date(doc.nextReview)
+                      return reviewDate.toDateString() === dayDate.toDateString()
+                    })
+                    
+                    return (
+                      <div key={i} className="min-h-32 border border-slate-200 p-2">
+                        <div className="text-xs text-slate-500 mb-1">
+                          {dayDate.getDate()}/{dayDate.getMonth() + 1}
+                        </div>
+                        <div className="space-y-1">
+                          {docsForDay.map(doc => (
+                            <div key={doc.id} className={`text-xs p-1 rounded ${
+                              getRAGStatus(doc.status) === 'red' 
+                                ? 'bg-red-100 text-red-800' 
+                                : getRAGStatus(doc.status) === 'amber' 
+                                ? 'bg-amber-100 text-amber-800' 
+                                : getRAGStatus(doc.status) === 'navy'
+                                ? 'bg-slate-800 text-white'
+                                : 'bg-green-100 text-green-800'
+                            }`}>
+                              <div className="truncate font-medium">{doc.title}</div>
+                              <div className="truncate text-xs opacity-75">{doc.code}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {calendarView === 'monthly' && (
+              <div className="bg-white rounded-lg border p-6">
+                <h4 className="font-semibold mb-4">This Month's Review Schedule</h4>
+                <div className="grid grid-cols-7 gap-1">
+                  {/* Day headers */}
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                    <div key={day} className="text-center text-sm font-medium text-slate-600 py-2 border-b">
+                      {day}
+                    </div>
+                  ))}
+                  
+                  {/* Calendar cells - 6 weeks x 7 days = 42 cells */}
+                  {Array.from({ length: 42 }, (_, i) => {
+                    const today = new Date()
+                    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+                    const startOfCalendar = new Date(firstDayOfMonth)
+                    startOfCalendar.setDate(firstDayOfMonth.getDate() - firstDayOfMonth.getDay() + 1) // Monday
+                    
+                    const dayDate = new Date(startOfCalendar)
+                    dayDate.setDate(startOfCalendar.getDate() + i)
+                    
+                    const docsForDay = filteredDocs.filter(doc => {
+                      if (!doc.nextReview) return false
+                      const reviewDate = new Date(doc.nextReview)
+                      return reviewDate.toDateString() === dayDate.toDateString()
+                    })
+                    
+                    return (
+                      <div key={i} className={`min-h-20 border border-slate-200 p-1 ${
+                        dayDate.getMonth() !== today.getMonth() ? 'bg-slate-50' : ''
+                      }`}>
+                        <div className="text-xs text-slate-500 mb-1">
+                          {dayDate.getDate()}
+                        </div>
+                        <div className="space-y-1">
+                          {docsForDay.slice(0, 2).map(doc => (
+                            <div key={doc.id} className={`text-xs p-1 rounded ${
+                              getRAGStatus(doc.status) === 'red' 
+                                ? 'bg-red-100 text-red-800' 
+                                : getRAGStatus(doc.status) === 'amber' 
+                                ? 'bg-amber-100 text-amber-800' 
+                                : getRAGStatus(doc.status) === 'navy'
+                                ? 'bg-slate-800 text-white'
+                                : 'bg-green-100 text-green-800'
+                            }`}>
+                              <div className="truncate font-medium">{doc.title}</div>
+                            </div>
+                          ))}
+                          {docsForDay.length > 2 && (
+                            <div className="text-xs text-slate-500 text-center">
+                              +{docsForDay.length - 2} more
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {calendarView === 'yearly' && (
+              <div className="bg-white rounded-lg border p-6">
+                <h4 className="font-semibold mb-4">This Year's Review Schedule by Month</h4>
+                <div className="grid grid-cols-4 gap-4">
+                  {[
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                  ].map(month => {
+                    const monthIndex = [
+                      'January', 'February', 'March', 'April', 'May', 'June',
+                      'July', 'August', 'September', 'October', 'November', 'December'
+                    ].indexOf(month)
+                    
+                    const monthDocs = filteredDocs.filter(doc => {
+                      if (!doc.nextReview) return false
+                      const reviewDate = new Date(doc.nextReview)
+                      return reviewDate.getMonth() === monthIndex && reviewDate.getFullYear() === new Date().getFullYear()
+                    })
+                    
+                    return (
+                      <div key={month} className="border rounded-lg p-4">
+                        <h5 className="font-medium mb-3 text-center">{month}</h5>
+                        <div className="space-y-2">
+                          {monthDocs.slice(0, 4).map(doc => (
+                            <div key={doc.id} className={`text-sm p-2 rounded ${
+                              getRAGStatus(doc.status) === 'red' 
+                                ? 'bg-red-100 text-red-800' 
+                                : getRAGStatus(doc.status) === 'amber' 
+                                ? 'bg-amber-100 text-amber-800' 
+                                : getRAGStatus(doc.status) === 'navy'
+                                ? 'bg-slate-800 text-white'
+                                : 'bg-green-100 text-green-800'
+                            }`}>
+                              <div className="font-medium truncate">{doc.title}</div>
+                              <div className="text-xs opacity-75">{doc.code}</div>
+                              <div className="text-xs opacity-75">
+                                Due: {formatDate(doc.nextReview)}
+                              </div>
+                            </div>
+                          ))}
+                          {monthDocs.length > 4 && (
+                            <div className="text-xs text-slate-500 text-center">
+                              +{monthDocs.length - 4} more reviews
+                            </div>
+                          )}
+                          {monthDocs.length === 0 && (
+                            <div className="text-xs text-slate-400 text-center py-4">No reviews due</div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
         {editorDoc && (

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { ActionNotificationService } from '@/lib/action-notifications'
 
 export async function GET() {
   try {
@@ -18,19 +21,41 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions)
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await req.json()
     
-    // Generate reference number
+    // Get assigned employee details
+    let assignedEmployee = null
+    if (body.assignedTo) {
+      assignedEmployee = await prisma.user.findUnique({
+        where: { id: body.assignedTo },
+        select: { id: true, name: true, email: true, jobTitle: true, department: true }
+      })
+      
+      if (!assignedEmployee) {
+        console.error('Assigned employee not found:', body.assignedTo)
+        return NextResponse.json({ error: 'Assigned employee not found' }, { status: 400 })
+      }
+    } else {
+      return NextResponse.json({ error: 'No employee assigned to this case' }, { status: 400 })
+    }
+    
+    // Generate reference number with MET prefix
     const year = new Date().getFullYear()
-    const prefix = body.caseType
+    const prefix = 'MET' // Use MET as default prefix for server-side
+    const caseType = body.caseType
     const count = await prisma.nonConformance.count({
       where: {
         refNumber: {
-          startsWith: `${prefix}-${year}-`
+          startsWith: `${prefix}-${caseType}-${year}-`
         }
       }
     })
-    const refNumber = `${prefix}-${year}-${String(count + 1).padStart(4, '0')}`
+    const refNumber = `${prefix}-${caseType}-${year}-${String(count + 1).padStart(3, '0')}`
     
     // Auto-assign owner and due date based on severity
     let dueDate = new Date()
@@ -64,7 +89,7 @@ export async function POST(req: NextRequest) {
         evidence: body.evidence || null,
         linkedItems: body.linkedItems || null,
         problemStatement: body.problemStatement,
-        owner: body.owner || body.raisedBy,
+        owner: assignedEmployee ? assignedEmployee.name : (body.owner || body.raisedBy),
         approver: body.approver || 'Quality Manager',
         dueDate,
         
@@ -137,6 +162,44 @@ export async function POST(req: NextRequest) {
         userName: body.raisedBy,
       },
     })
+
+    // Send action assignment notification via centralized service
+    if (assignedEmployee && assignedEmployee.email) {
+      try {
+        const notificationService = new ActionNotificationService()
+        
+        const actionData = ActionNotificationService.createNonConformanceAction(
+          refNumber,
+          body.title,
+          body.caseType,
+          body.severity,
+          dueDate,
+          {
+            name: assignedEmployee.name,
+            email: assignedEmployee.email,
+            teamsUserId: null
+          },
+          {
+            name: body.raisedBy,
+            email: 'christopher.knill@gmail.com'
+          },
+          body.problemStatement,
+          `${process.env.NEXTAUTH_URL}/nonconformance?tab=${body.caseType}&id=${record.id}`
+        )
+
+        const result = await notificationService.assignAction(actionData)
+        
+        if (!result.success) {
+          console.error('Failed to send action assignment notification:', result.message)
+          // Don't fail the request if notification fails - just log it
+        } else {
+          console.log('Action assignment notification sent successfully')
+        }
+      } catch (notificationError) {
+        console.error('Failed to send action assignment notification:', notificationError)
+        // Don't fail the request if notification fails - just log it
+      }
+    }
 
     return NextResponse.json(record, { status: 201 })
   } catch (error) {

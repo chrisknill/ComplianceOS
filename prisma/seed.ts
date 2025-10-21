@@ -1576,7 +1576,7 @@ async function main() {
   // Non-Conformances with Actions
   const nc1 = await prisma.nonConformance.create({
     data: {
-      refNumber: 'NC-2025-0001',
+      refNumber: 'MET-NC-2025-001',
       caseType: 'NC',
       title: 'Incorrect torque specification on assembly line',
       raisedBy: 'John Smith',
@@ -1653,7 +1653,7 @@ async function main() {
 
   const nc2 = await prisma.nonConformance.create({
     data: {
-      refNumber: 'CC-2025-0001',
+      refNumber: 'MET-CC-2025-001',
       caseType: 'CC',
       title: 'Customer complaint - Late delivery and incomplete documentation',
       raisedBy: 'Sarah Jones',
@@ -1716,7 +1716,7 @@ async function main() {
 
   const nc3 = await prisma.nonConformance.create({
     data: {
-      refNumber: 'SNC-2025-0001',
+      refNumber: 'MET-SNC-2025-001',
       caseType: 'SNC',
       title: 'Supplier delivered non-conforming raw material',
       raisedBy: 'Mike Brown',
@@ -1779,7 +1779,7 @@ async function main() {
 
   const nc4 = await prisma.nonConformance.create({
     data: {
-      refNumber: 'OFI-2025-0001',
+      refNumber: 'MET-OFI-2025-001',
       caseType: 'OFI',
       title: 'Opportunity to reduce packaging waste and costs',
       raisedBy: 'Emma Wilson',
@@ -1834,7 +1834,7 @@ async function main() {
 
   const nc5 = await prisma.nonConformance.create({
     data: {
-      refNumber: 'NC-2025-0002',
+      refNumber: 'MET-NC-2025-002',
       caseType: 'NC',
       title: 'Inadequate work instruction causing assembly errors',
       raisedBy: 'David Taylor',

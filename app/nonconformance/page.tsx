@@ -534,57 +534,58 @@ export default function NonConformancePage() {
 
         {/* List View */}
         {filter !== 'DASHBOARD' && viewMode === 'list' && (
-          <div className="bg-white rounded-lg shadow overflow-x-auto">
-            <table className="w-full">
+          <div className="bg-white rounded-lg shadow">
+            <div className="overflow-x-auto">
+              <table className="w-full table-fixed min-w-0">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                    className="w-32 px-2 py-2 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
                     onClick={() => handleSort('refNumber')}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       Ref
                       <SortIcon field="refNumber" />
                     </div>
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-slate-700 uppercase">
+                  <th className="w-16 px-2 py-2 text-center text-xs font-medium text-slate-700 uppercase">
                     Type
                   </th>
                   <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                    className="w-1/3 px-2 py-2 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
                     onClick={() => handleSort('title')}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       Title
                       <SortIcon field="title" />
                     </div>
                   </th>
                   <th 
-                    className="px-6 py-3 text-center text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                    className="w-24 px-2 py-2 text-center text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
                     onClick={() => handleSort('dateRaised')}
                   >
-                    <div className="flex items-center justify-center gap-2">
-                      Date Raised
+                    <div className="flex items-center justify-center gap-1">
+                      Date
                       <SortIcon field="dateRaised" />
                     </div>
                   </th>
                   <th 
-                    className="px-6 py-3 text-center text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                    className="w-20 px-2 py-2 text-center text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
                     onClick={() => handleSort('severity')}
                   >
-                    <div className="flex items-center justify-center gap-2">
-                      Severity
+                    <div className="flex items-center justify-center gap-1">
+                      Sev
                       <SortIcon field="severity" />
                     </div>
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">
+                  <th className="w-28 px-2 py-2 text-left text-xs font-medium text-slate-700 uppercase">
                     Owner
                   </th>
                   <th 
-                    className="px-6 py-3 text-center text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                    className="w-28 px-2 py-2 text-center text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
                     onClick={() => handleSort('status')}
                   >
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-1">
                       Status
                       <SortIcon field="status" />
                     </div>
@@ -603,26 +604,26 @@ export default function NonConformancePage() {
                         setShowDetailView(true)
                       }}
                     >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <AlertCircle className="h-5 w-5 text-slate-400" />
-                          <span className="font-medium text-slate-900">{record.refNumber}</span>
+                      <td className="w-32 px-2 py-3">
+                        <div className="flex items-center gap-1">
+                          <AlertCircle className="h-3 w-3 text-slate-400" />
+                          <span className="text-xs text-slate-900 truncate">{record.refNumber}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`px-2 py-1 rounded-md text-xs font-medium border ${getCaseTypeColor(record.caseType)}`}>
+                      <td className="w-16 px-2 py-3 text-center">
+                        <span className={`px-1 py-0.5 rounded text-xs font-medium border ${getCaseTypeColor(record.caseType)}`}>
                           {record.caseType}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-900">{record.title}</td>
-                      <td className="px-6 py-4 text-center text-sm text-slate-600">{formatDate(record.dateRaised)}</td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`px-2 py-1 rounded-md text-xs font-medium ${getSeverityColor(record.severity)}`}>
+                      <td className="w-1/3 px-2 py-3 text-sm text-slate-900 truncate" title={record.title}>{record.title}</td>
+                      <td className="w-24 px-2 py-3 text-center text-xs text-slate-600">{formatDate(record.dateRaised)}</td>
+                      <td className="w-20 px-2 py-3 text-center">
+                        <span className={`px-1 py-0.5 rounded text-xs font-medium ${getSeverityColor(record.severity)}`}>
                           {record.severity}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">{record.owner || 'Unassigned'}</td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="w-28 px-2 py-3 text-xs text-slate-600 truncate" title={record.owner || 'Unassigned'}>{record.owner || 'Unassigned'}</td>
+                      <td className="w-28 px-2 py-3 text-center">
                         <StatusBadge status={rag} label={record.status.replace(/_/g, ' ')} />
                       </td>
                     </tr>
@@ -630,6 +631,7 @@ export default function NonConformancePage() {
                 })}
               </tbody>
             </table>
+            </div>
           </div>
         )}
 

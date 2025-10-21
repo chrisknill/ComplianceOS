@@ -155,7 +155,6 @@ export function EmployeeForm({ open, onClose, employee, employees, onSave }: Emp
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
                 placeholder="john.doe@company.com"
-                disabled={!!employee?.id}
               />
             </div>
           </div>
