@@ -124,6 +124,7 @@ const operationsNavigation = [
   { name: 'Production Control', href: '/operations/production-control', icon: Factory },
   { name: 'Contractor Management', href: '/operations/contractor-management', icon: Users },
   { name: 'Contract Review', href: '/contract-review', icon: FileSignature },
+  { name: 'Work Progress', href: '/work-progress', icon: TrendingUp },
   { name: 'Emergency Prep', href: '/operations/emergency-preparedness', icon: Siren },
   { name: 'Waste Management', href: '/waste-management', icon: Recycle },
 ]

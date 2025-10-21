@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import ReactFlow, {
   Controls,
   MiniMap,
@@ -753,11 +753,20 @@ export default function ManagementSystemMapPage() {
     type: [],
     status: [],
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
+
+  // Initialize the map
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleToggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
@@ -806,6 +815,16 @@ export default function ManagementSystemMapPage() {
     console.log('Wizard opened');
   };
 
+  if (isLoading) {
+    return (
+      <Shell>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+        </div>
+      </Shell>
+    );
+  }
+
   return (
     <Shell>
       <div className={`${isFullscreen ? 'fixed inset-0 z-50 ml-0' : 'h-full'} flex flex-col bg-gray-50 -m-6`}>
@@ -828,7 +847,7 @@ export default function ManagementSystemMapPage() {
         <div className="flex-1 flex flex-col">
           <div className="flex-1 flex">
             {/* React Flow Map */}
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <ReactFlowProvider>
                 <ReactFlow
                   nodes={nodes}
@@ -839,10 +858,17 @@ export default function ManagementSystemMapPage() {
                   onNodeClick={handleNodeClick}
                   nodeTypes={nodeTypes}
                   fitView
+                  fitViewOptions={{ 
+                    padding: 0.2, 
+                    minZoom: 0.3, 
+                    maxZoom: 1.2,
+                    includeHiddenNodes: false
+                  }}
                   attributionPosition="bottom-left"
                   minZoom={0.1}
                   maxZoom={2}
-                  defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
+                  defaultViewport={{ x: 0, y: 0, zoom: 0.6 }}
+                  proOptions={{ hideAttribution: true }}
                 >
                   <Controls 
                     position="top-right"
@@ -851,7 +877,7 @@ export default function ManagementSystemMapPage() {
                   <MiniMap 
                     position="bottom-left"
                     nodeColor={(node) => {
-                      switch (node.data.type) {
+                      switch (node.data?.type) {
                         case 'policy': return '#3b82f6';
                         case 'procedure': return '#10b981';
                         case 'riskAssessment': return '#ef4444';

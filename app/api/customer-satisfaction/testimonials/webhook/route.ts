@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Send to n8n webhook
-    const n8nWebhookUrl = 'https://chrisknill.app.n8n.cloud/webhook-test/client-form-submit'
+    const n8nWebhookUrl = 'https://chrisknill.app.n8n.cloud/webhook-test/cursor-testimonial'
     
     const webhookResponse = await fetch(n8nWebhookUrl, {
       method: 'POST',
