@@ -28,6 +28,7 @@ interface Employee {
   status: string
   location: string | null
   role: string
+  groups: string | null
 }
 
 type ViewMode = 'dashboard' | 'list' | 'orgchart'
@@ -148,6 +149,7 @@ export default function EmployeesPage() {
       'Email': e.email,
       'Job Title': e.jobTitle || '-',
       'Department': e.department || '-',
+      'Groups': e.groups ? JSON.parse(e.groups).join(', ') : '-',
       'Phone': e.phone || '-',
       'Location': e.location || '-',
       'Start Date': e.startDate ? new Date(e.startDate).toLocaleDateString() : '-',
@@ -346,9 +348,13 @@ export default function EmployeesPage() {
 
         {/* Org Chart View */}
         {viewMode === 'orgchart' && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-6">Organizational Chart</h2>
-            <OrgChart employees={employees} onEmployeeClick={(emp) => { setEditingEmployee(emp); setShowForm(true); }} />
+          <div className="bg-white rounded-lg shadow">
+            <div className="px-6 py-4 border-b border-slate-200">
+              <h2 className="text-lg font-semibold text-slate-900">Organizational Chart</h2>
+            </div>
+            <div className="p-4">
+              <OrgChart employees={employees} onEmployeeClick={(emp) => { setEditingEmployee(emp); setShowForm(true); }} />
+            </div>
           </div>
         )}
 
@@ -445,53 +451,57 @@ export default function EmployeesPage() {
         {/* List View */}
         {viewMode === 'list' && (
           <div className="bg-white rounded-lg shadow overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-50 border-b border-slate-200">
-                <tr>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
-                    onClick={() => handleSort('name')}
-                  >
-                    <div className="flex items-center gap-2">
-                      Employee
-                      <SortIcon field="name" />
-                    </div>
-                  </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
-                    onClick={() => handleSort('jobTitle')}
-                  >
-                    <div className="flex items-center gap-2">
-                      Job Title
-                      <SortIcon field="jobTitle" />
-                    </div>
-                  </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
-                    onClick={() => handleSort('department')}
-                  >
-                    <div className="flex items-center gap-2">
-                      Department
-                      <SortIcon field="department" />
-                    </div>
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">
-                    Contact
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">
-                    Location
-                  </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
-                    onClick={() => handleSort('startDate')}
-                  >
-                    <div className="flex items-center gap-2">
-                      Start Date
-                      <SortIcon field="startDate" />
-                    </div>
-                  </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-slate-700 uppercase">
-                    Status
+            <div className="overflow-x-auto">
+              <table className="w-full table-fixed min-w-0">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th 
+                      className="w-48 px-3 py-2 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                      onClick={() => handleSort('name')}
+                    >
+                      <div className="flex items-center gap-1">
+                        Employee
+                        <SortIcon field="name" />
+                      </div>
+                    </th>
+                    <th 
+                      className="w-32 px-3 py-2 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                      onClick={() => handleSort('jobTitle')}
+                    >
+                      <div className="flex items-center gap-1">
+                        Job Title
+                        <SortIcon field="jobTitle" />
+                      </div>
+                    </th>
+                    <th 
+                      className="w-24 px-3 py-2 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                      onClick={() => handleSort('department')}
+                    >
+                      <div className="flex items-center gap-1">
+                        Dept
+                        <SortIcon field="department" />
+                      </div>
+                    </th>
+                    <th className="w-32 px-3 py-2 text-left text-xs font-medium text-slate-700 uppercase">
+                      Groups
+                    </th>
+                    <th className="w-24 px-3 py-2 text-left text-xs font-medium text-slate-700 uppercase">
+                      Contact
+                    </th>
+                    <th className="w-20 px-3 py-2 text-left text-xs font-medium text-slate-700 uppercase">
+                      Location
+                    </th>
+                    <th 
+                      className="w-20 px-3 py-2 text-left text-xs font-medium text-slate-700 uppercase cursor-pointer hover:bg-slate-100"
+                      onClick={() => handleSort('startDate')}
+                    >
+                      <div className="flex items-center gap-1">
+                        Start
+                        <SortIcon field="startDate" />
+                      </div>
+                    </th>
+                    <th className="w-20 px-3 py-2 text-center text-xs font-medium text-slate-700 uppercase">
+                      Status
                   </th>
                 </tr>
               </thead>
@@ -502,56 +512,58 @@ export default function EmployeesPage() {
                     className="hover:bg-slate-50 cursor-pointer"
                     onClick={() => { setEditingEmployee(employee); setShowForm(true); }}
                   >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-medium text-slate-700">
+                    <td className="w-48 px-3 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs font-medium text-slate-700">
                             {employee.name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?'}
                           </span>
                         </div>
-                        <div>
-                          <p className="font-medium text-slate-900">{employee.name || 'Unknown'}</p>
-                          <p className="text-xs text-slate-500">{employee.email}</p>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-slate-900 truncate">{employee.name || 'Unknown'}</p>
+                          <p className="text-xs text-slate-500 truncate">{employee.email}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-900">{employee.jobTitle || '-'}</td>
-                    <td className="px-6 py-4">
+                    <td className="w-32 px-3 py-3 text-sm text-slate-900 truncate" title={employee.jobTitle || '-'}>
+                      {employee.jobTitle || '-'}
+                    </td>
+                    <td className="w-24 px-3 py-3">
                       {employee.department && (
-                        <Badge variant="outline">{employee.department}</Badge>
+                        <Badge variant="outline" className="text-xs">{employee.department}</Badge>
                       )}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="space-y-1">
-                        {employee.phone && (
-                          <div className="flex items-center gap-1 text-xs text-slate-600">
-                            <Phone className="h-3 w-3" />
-                            {employee.phone}
-                          </div>
+                    <td className="w-32 px-3 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {employee.groups ? JSON.parse(employee.groups).slice(0, 2).map((group: string) => (
+                          <Badge key={group} variant="secondary" className="text-xs">
+                            {group}
+                          </Badge>
+                        )) : (
+                          <span className="text-xs text-slate-400">No groups</span>
                         )}
-                        <div className="flex items-center gap-1 text-xs text-slate-600">
-                          <Mail className="h-3 w-3" />
-                          {employee.email}
-                        </div>
+                        {employee.groups && JSON.parse(employee.groups).length > 2 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{JSON.parse(employee.groups).length - 2}
+                          </Badge>
+                        )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      {employee.location && (
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {employee.location}
+                    <td className="w-24 px-3 py-3">
+                      {employee.phone && (
+                        <div className="flex items-center gap-1 text-xs text-slate-600">
+                          <Phone className="h-3 w-3" />
+                          <span className="truncate">{employee.phone}</span>
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      {employee.startDate ? (
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {new Date(employee.startDate).toLocaleDateString()}
-                        </div>
-                      ) : '-'}
+                    <td className="w-20 px-3 py-3 text-xs text-slate-600 truncate" title={employee.location || '-'}>
+                      {employee.location || '-'}
                     </td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="w-20 px-3 py-3 text-xs text-slate-600">
+                      {employee.startDate ? new Date(employee.startDate).toLocaleDateString('en-GB') : '-'}
+                    </td>
+                    <td className="w-20 px-3 py-3 text-center">
                       <Badge 
                         variant={
                           employee.status === 'ACTIVE' ? 'default' : 
@@ -566,6 +578,7 @@ export default function EmployeesPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         )}
 
@@ -587,4 +600,5 @@ export default function EmployeesPage() {
     </Shell>
   )
 }
+
 

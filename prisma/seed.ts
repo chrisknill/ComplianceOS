@@ -34,61 +34,289 @@ async function main() {
   await prisma.document.deleteMany()
   await prisma.user.deleteMany()
 
-  // Create users
+  // Create users with comprehensive data including groups and departments
   const hashedPassword = await bcrypt.hash('password123', 10)
   
+  // Create Chris Knill as CEO first (for n8n testing)
+  const chrisKnill = await prisma.user.create({
+    data: {
+      email: 'christopher.knill@gmail.com',
+      password: hashedPassword,
+      name: 'Chris Knill',
+      role: 'ADMIN',
+      jobTitle: 'Chief Executive Officer',
+      department: 'Executive',
+      phone: '+44 7700 900000',
+      startDate: new Date('2020-01-01'),
+      location: 'Head Office',
+      status: 'ACTIVE',
+      groups: JSON.stringify(['Management', 'Directors', 'Compliance']),
+    },
+  })
+
+  // Create managers first
+  const adminUser = await prisma.user.create({
+    data: {
+      email: 'admin@complianceos.com',
+      password: hashedPassword,
+      name: 'Admin User',
+      role: 'ADMIN',
+      jobTitle: 'System Administrator',
+      department: 'IT',
+      phone: '+44 7700 900001',
+      startDate: new Date('2021-03-15'),
+      location: 'Head Office',
+      status: 'ACTIVE',
+      groups: JSON.stringify(['Admin', 'IT']),
+    },
+  })
+
+  const johnSmith = await prisma.user.create({
+    data: {
+      email: 'john.smith@complianceos.com',
+      password: hashedPassword,
+      name: 'John Smith',
+      role: 'USER',
+      jobTitle: 'Quality Manager',
+      department: 'Quality',
+      phone: '+44 7700 900002',
+      startDate: new Date('2019-06-01'),
+      location: 'Head Office',
+      status: 'ACTIVE',
+      groups: JSON.stringify(['Management', 'Quality', 'Compliance']),
+      managerId: chrisKnill.id,
+    },
+  })
+
+  const sarahJones = await prisma.user.create({
+    data: {
+      email: 'sarah.jones@complianceos.com',
+      password: hashedPassword,
+      name: 'Sarah Jones',
+      role: 'USER',
+      jobTitle: 'HSE Manager',
+      department: 'HSE',
+      phone: '+44 7700 900003',
+      startDate: new Date('2018-09-15'),
+      location: 'Head Office',
+      status: 'ACTIVE',
+      groups: JSON.stringify(['Management', 'HSE', 'Compliance']),
+      managerId: chrisKnill.id,
+    },
+  })
+
+  const mikeBrown = await prisma.user.create({
+    data: {
+      email: 'mike.brown@complianceos.com',
+      password: hashedPassword,
+      name: 'Mike Brown',
+      role: 'USER',
+      jobTitle: 'Operations Manager',
+      department: 'Operations',
+      phone: '+44 7700 900004',
+      startDate: new Date('2020-02-01'),
+      location: 'Head Office',
+      status: 'ACTIVE',
+      groups: JSON.stringify(['Management', 'Operations']),
+      managerId: chrisKnill.id,
+    },
+  })
+
+  const emmaWilson = await prisma.user.create({
+    data: {
+      email: 'emma.wilson@complianceos.com',
+      password: hashedPassword,
+      name: 'Emma Wilson',
+      role: 'USER',
+      jobTitle: 'HR Manager',
+      department: 'HR',
+      phone: '+44 7700 900005',
+      startDate: new Date('2019-11-01'),
+      location: 'Head Office',
+      status: 'ACTIVE',
+      groups: JSON.stringify(['Management', 'HR', 'Admin']),
+      managerId: chrisKnill.id,
+    },
+  })
+
+  const davidTaylor = await prisma.user.create({
+    data: {
+      email: 'david.taylor@complianceos.com',
+      password: hashedPassword,
+      name: 'David Taylor',
+      role: 'USER',
+      jobTitle: 'Finance Manager',
+      department: 'Accounts',
+      phone: '+44 7700 900006',
+      startDate: new Date('2021-01-15'),
+      location: 'Head Office',
+      status: 'ACTIVE',
+      groups: JSON.stringify(['Management', 'Accounts']),
+      managerId: chrisKnill.id,
+    },
+  })
+
+  // Now create subordinates
   const users = await Promise.all([
+    // Quality Inspector
     prisma.user.create({
       data: {
-        email: 'admin@complianceos.com',
+        email: 'lisa.garcia@complianceos.com',
         password: hashedPassword,
-        name: 'Admin User',
-        role: 'ADMIN',
+        name: 'Lisa Garcia',
+        role: 'USER',
+        jobTitle: 'Quality Inspector',
+        department: 'Quality',
+        phone: '+44 7700 900007',
+        startDate: new Date('2022-03-01'),
+        location: 'Head Office',
+        status: 'ACTIVE',
+        groups: JSON.stringify(['Quality']),
+        managerId: johnSmith.id,
       },
     }),
+    // HSE Officer
     prisma.user.create({
       data: {
-        email: 'john.smith@complianceos.com',
+        email: 'james.miller@complianceos.com',
         password: hashedPassword,
-        name: 'John Smith',
+        name: 'James Miller',
         role: 'USER',
+        jobTitle: 'HSE Officer',
+        department: 'HSE',
+        phone: '+44 7700 900008',
+        startDate: new Date('2021-08-15'),
+        location: 'Head Office',
+        status: 'ACTIVE',
+        groups: JSON.stringify(['HSE']),
+        managerId: sarahJones.id,
       },
     }),
+    // Operations Supervisor
     prisma.user.create({
       data: {
-        email: 'sarah.jones@complianceos.com',
+        email: 'anna.davis@complianceos.com',
         password: hashedPassword,
-        name: 'Sarah Jones',
+        name: 'Anna Davis',
         role: 'USER',
+        jobTitle: 'Operations Supervisor',
+        department: 'Operations',
+        phone: '+44 7700 900009',
+        startDate: new Date('2020-07-01'),
+        location: 'Head Office',
+        status: 'ACTIVE',
+        groups: JSON.stringify(['Operations']),
+        managerId: mikeBrown.id,
       },
     }),
+    // HR Coordinator
     prisma.user.create({
       data: {
-        email: 'mike.brown@complianceos.com',
+        email: 'robert.clark@complianceos.com',
         password: hashedPassword,
-        name: 'Mike Brown',
+        name: 'Robert Clark',
         role: 'USER',
+        jobTitle: 'HR Coordinator',
+        department: 'HR',
+        phone: '+44 7700 900010',
+        startDate: new Date('2022-01-15'),
+        location: 'Head Office',
+        status: 'ACTIVE',
+        groups: JSON.stringify(['HR', 'Admin']),
+        managerId: emmaWilson.id,
       },
     }),
+    // Accounts Assistant
     prisma.user.create({
       data: {
-        email: 'emma.wilson@complianceos.com',
+        email: 'sophie.white@complianceos.com',
         password: hashedPassword,
-        name: 'Emma Wilson',
+        name: 'Sophie White',
         role: 'USER',
+        jobTitle: 'Accounts Assistant',
+        department: 'Accounts',
+        phone: '+44 7700 900011',
+        startDate: new Date('2021-05-01'),
+        location: 'Head Office',
+        status: 'ACTIVE',
+        groups: JSON.stringify(['Accounts']),
+        managerId: davidTaylor.id,
       },
     }),
+    // IT Support Technician
     prisma.user.create({
       data: {
-        email: 'david.taylor@complianceos.com',
+        email: 'alex.moore@complianceos.com',
         password: hashedPassword,
-        name: 'David Taylor',
+        name: 'Alex Moore',
         role: 'USER',
+        jobTitle: 'IT Support Technician',
+        department: 'IT',
+        phone: '+44 7700 900012',
+        startDate: new Date('2022-06-01'),
+        location: 'Head Office',
+        status: 'ACTIVE',
+        groups: JSON.stringify(['IT']),
+        managerId: adminUser.id,
+      },
+    }),
+    // Compliance Officer
+    prisma.user.create({
+      data: {
+        email: 'jessica.thompson@complianceos.com',
+        password: hashedPassword,
+        name: 'Jessica Thompson',
+        role: 'USER',
+        jobTitle: 'Compliance Officer',
+        department: 'Compliance',
+        phone: '+44 7700 900013',
+        startDate: new Date('2021-09-01'),
+        location: 'Head Office',
+        status: 'ACTIVE',
+        groups: JSON.stringify(['Compliance', 'Quality']),
+        managerId: chrisKnill.id,
+      },
+    }),
+    // Director of Operations
+    prisma.user.create({
+      data: {
+        email: 'michael.anderson@complianceos.com',
+        password: hashedPassword,
+        name: 'Michael Anderson',
+        role: 'USER',
+        jobTitle: 'Director of Operations',
+        department: 'Operations',
+        phone: '+44 7700 900014',
+        startDate: new Date('2018-01-01'),
+        location: 'Head Office',
+        status: 'ACTIVE',
+        groups: JSON.stringify(['Directors', 'Management', 'Operations']),
+        managerId: chrisKnill.id,
+      },
+    }),
+    // Employee on Leave
+    prisma.user.create({
+      data: {
+        email: 'jennifer.lee@complianceos.com',
+        password: hashedPassword,
+        name: 'Jennifer Lee',
+        role: 'USER',
+        jobTitle: 'Quality Analyst',
+        department: 'Quality',
+        phone: '+44 7700 900015',
+        startDate: new Date('2020-04-01'),
+        location: 'Head Office',
+        status: 'ON_LEAVE',
+        groups: JSON.stringify(['Quality']),
+        managerId: johnSmith.id,
       },
     }),
   ])
 
-  console.log(`✅ Created ${users.length} users`)
+  // Combine all users
+  const allUsers = [chrisKnill, adminUser, johnSmith, sarahJones, mikeBrown, emmaWilson, davidTaylor, ...users]
+
+  console.log(`✅ Created ${allUsers.length} users`)
 
   // Create documents
   const documents = await Promise.all([

@@ -17,7 +17,7 @@ export async function PUT(
 
     const { id } = await params
     const body = await req.json()
-    const { email, name, jobTitle, department, managerId, phone, startDate, location, status, role, password } = body
+    const { email, name, jobTitle, department, managerId, phone, startDate, location, status, role, password, groups } = body
 
     const data: any = {
       email,
@@ -30,6 +30,7 @@ export async function PUT(
       location,
       status,
       role,
+      groups: groups ? JSON.stringify(groups) : null,
     }
 
     // Only update password if provided

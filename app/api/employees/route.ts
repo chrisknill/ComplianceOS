@@ -24,6 +24,7 @@ export async function GET() {
       startDate: true,
       status: true,
       location: true,
+      groups: true,
       createdAt: true,
     },
   })
@@ -39,7 +40,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
-    const { email, password, name, jobTitle, department, managerId, phone, startDate, location, status, role } = body
+    const { email, password, name, jobTitle, department, managerId, phone, startDate, location, status, role, groups } = body
 
     // Hash password
     const hashedPassword = await hash(password, 10)
@@ -57,6 +58,7 @@ export async function POST(req: Request) {
         location,
         status,
         role,
+        groups: groups ? JSON.stringify(groups) : null,
       },
     })
 

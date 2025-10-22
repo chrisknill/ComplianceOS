@@ -24,11 +24,24 @@ model User {
   hasCompletedSetup Boolean  @default(false)
   companyId         String?
   company           Company? @relation(fields: [companyId], references: [id])
+  groups            String?  // JSON array of group names
+  microsoftId       String?  @unique // Microsoft Graph user ID
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   trainings         TrainingRecord[]
   manager           User?    @relation("ManagerSubordinates", fields: [managerId], references: [id], onDelete: SetNull)
   subordinates      User[]   @relation("ManagerSubordinates")
+}
+
+model Group {
+  id          String   @id @default(cuid())
+  microsoftId String   @unique // Microsoft Graph group ID
+  name        String
+  description String?
+  email       String?
+  type        String   @default("distribution") // distribution, security
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Company {

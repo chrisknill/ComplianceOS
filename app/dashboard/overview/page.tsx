@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Shell } from '@/components/layout/Shell'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -11,9 +12,14 @@ import {
 } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { StatusBadge } from '@/components/rag/StatusBadge'
+import { NCIntakeForm } from '@/components/forms/NCIntakeForm'
+import { CalendarEventForm } from '@/components/forms/CalendarEventForm'
 
 export default function OverviewPage() {
   const [loading, setLoading] = useState(true)
+  const [showNCForm, setShowNCForm] = useState(false)
+  const [showCalendarForm, setShowCalendarForm] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     // Simulate loading
@@ -40,11 +46,23 @@ export default function OverviewPage() {
             <p className="text-slate-600 mt-1">Comprehensive view of your ISO management system performance</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline">
-              <Calendar className="h-4 w-4 mr-2" />
-              Schedule Review
-            </Button>
-            <Button>
+            <CalendarEventForm 
+              trigger={
+                <Button variant="outline">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Schedule Review
+                </Button>
+              }
+              defaultTitle="Management Review Meeting"
+              defaultDescription="ISO Management Review Meeting"
+              defaultAttendees={[
+                { email: "christopher.knill@gmail.com", name: "Chris Knill" }
+              ]}
+              onSuccess={() => {
+                console.log('Management review meeting scheduled!')
+              }}
+            />
+            <Button onClick={() => router.push('/audits')}>
               <FileText className="h-4 w-4 mr-2" />
               Generate Report
             </Button>
@@ -159,24 +177,64 @@ export default function OverviewPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button variant="outline" className="h-20 flex-col">
+            <Button 
+              variant="outline" 
+              className="h-20 flex-col"
+              onClick={() => router.push('/documentation?openForm=true')}
+            >
               <FileText className="h-6 w-6 mb-2" />
               <span className="text-sm">New Document</span>
             </Button>
-            <Button variant="outline" className="h-20 flex-col">
+            <Button 
+              variant="outline" 
+              className="h-20 flex-col"
+              onClick={() => setShowNCForm(true)}
+            >
               <AlertTriangle className="h-6 w-6 mb-2" />
               <span className="text-sm">Report Issue</span>
             </Button>
-            <Button variant="outline" className="h-20 flex-col">
+            <Button 
+              variant="outline" 
+              className="h-20 flex-col"
+              onClick={() => setShowCalendarForm(true)}
+            >
               <Calendar className="h-6 w-6 mb-2" />
               <span className="text-sm">Schedule Audit</span>
             </Button>
-            <Button variant="outline" className="h-20 flex-col">
+            <Button 
+              variant="outline" 
+              className="h-20 flex-col"
+              onClick={() => router.push('/audits')}
+            >
               <BarChart3 className="h-6 w-6 mb-2" />
               <span className="text-sm">View Reports</span>
             </Button>
           </div>
         </div>
+
+        {/* Forms */}
+        <NCIntakeForm
+          open={showNCForm}
+          onClose={() => setShowNCForm(false)}
+          onSave={() => {
+            setShowNCForm(false)
+            console.log('Non-conformance case created successfully!')
+          }}
+        />
+
+        <CalendarEventForm
+          open={showCalendarForm}
+          onClose={() => setShowCalendarForm(false)}
+          defaultTitle="Audit Schedule"
+          defaultDescription="ISO Audit Scheduling"
+          defaultAttendees={[
+            { email: "christopher.knill@gmail.com", name: "Chris Knill" }
+          ]}
+          onSuccess={() => {
+            setShowCalendarForm(false)
+            console.log('Audit scheduled successfully!')
+          }}
+        />
       </div>
     </Shell>
   )

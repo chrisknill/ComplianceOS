@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 
 interface EmployeeFormProps {
   open: boolean
@@ -28,6 +29,7 @@ export function EmployeeForm({ open, onClose, employee, employees, onSave }: Emp
     location: employee?.location || '',
     status: employee?.status || 'ACTIVE',
     role: employee?.role || 'USER',
+    groups: employee?.groups ? JSON.parse(employee.groups) : [],
   })
 
   const [loading, setLoading] = useState(false)
@@ -46,6 +48,7 @@ export function EmployeeForm({ open, onClose, employee, employees, onSave }: Emp
         location: employee.location || '',
         status: employee.status || 'ACTIVE',
         role: employee.role || 'USER',
+        groups: employee.groups ? JSON.parse(employee.groups) : [],
       })
     } else {
       setFormData({
@@ -60,6 +63,7 @@ export function EmployeeForm({ open, onClose, employee, employees, onSave }: Emp
         location: '',
         status: 'ACTIVE',
         role: 'USER',
+        groups: [],
       })
     }
   }, [employee, open])
@@ -90,6 +94,25 @@ export function EmployeeForm({ open, onClose, employee, employees, onSave }: Emp
       })
 
       if (!response.ok) throw new Error('Failed to save employee')
+
+      const savedEmployee = await response.json()
+
+      // Sync groups with Microsoft Graph if employee was updated/created
+      if (formData.groups.length > 0) {
+        try {
+          await fetch('/api/microsoft-graph/sync-employee', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              employeeId: savedEmployee.id || employee?.id,
+              groups: formData.groups
+            }),
+          })
+        } catch (error) {
+          console.error('Failed to sync groups with Outlook:', error)
+          // Don't fail the entire operation if sync fails
+        }
+      }
 
       onSave()
       onClose()
@@ -284,6 +307,150 @@ export function EmployeeForm({ open, onClose, employee, employees, onSave }: Emp
               </Select>
             </div>
           </div>
+
+          <div>
+            <Label>Email Groups</Label>
+            <p className="text-sm text-gray-600 mb-3">
+              Select which email groups this employee should be part of. Changes will sync with Outlook.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                'Management',
+                'Admin', 
+                'Directors',
+                'Accounts',
+                'HSE',
+                'Quality',
+                'Compliance',
+                'Operations',
+                'HR',
+                'IT'
+              ].map((group) => (
+                <div key={group} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={group}
+                    checked={formData.groups.includes(group)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setFormData({
+                          ...formData,
+                          groups: [...formData.groups, group]
+                        })
+                      } else {
+                        setFormData({
+                          ...formData,
+                          groups: formData.groups.filter(g => g !== group)
+                        })
+                      }
+                    }}
+                  />
+                  <Label htmlFor={group} className="text-sm font-normal">
+                    {group}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Organizational Relationships */}
+          {employee?.id && (
+            <div className="border-t pt-4">
+              <Label className="text-base font-semibold">Organizational Structure</Label>
+              <div className="mt-3 space-y-4">
+                {/* Manager Information */}
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <h4 className="font-medium text-slate-900 mb-2">Reports To:</h4>
+                  {(() => {
+                    const manager = employees.find(e => e.id === employee.managerId)
+                    return manager ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-sm font-medium text-blue-700">
+                            {manager.name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?'}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-slate-900">{manager.name || 'Unknown'}</p>
+                          <p className="text-sm text-slate-600">{manager.jobTitle || 'No title'} - {manager.department || 'No department'}</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-slate-500 italic">No manager assigned (Top level)</p>
+                    )
+                  })()}
+                </div>
+
+                {/* Direct Reports */}
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-slate-900">Direct Reports:</h4>
+                    {(() => {
+                      const directReports = employees.filter(e => e.managerId === employee.id)
+                      return directReports.length > 6 && (
+                        <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-semibold animate-pulse">
+                          ⚠ Warning: {directReports.length} reports (recommended max: 6)
+                        </span>
+                      )
+                    })()}
+                  </div>
+                  {(() => {
+                    const directReports = employees.filter(e => e.managerId === employee.id)
+                    return directReports.length > 0 ? (
+                      <div className="space-y-2">
+                        {directReports.map((report) => (
+                          <div key={report.id} className="flex items-center gap-2">
+                            <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                              <span className="text-xs font-medium text-green-700">
+                                {report.name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?'}
+                              </span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-slate-900">{report.name || 'Unknown'}</p>
+                              <p className="text-xs text-slate-600">{report.jobTitle || 'No title'}</p>
+                            </div>
+                            <span className="text-xs text-slate-500">{report.department || 'No dept'}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-slate-500 italic">No direct reports</p>
+                    )
+                  })()}
+                </div>
+
+                {/* Organizational Level */}
+                <div className="bg-slate-50 p-3 rounded-lg">
+                  <h4 className="font-medium text-slate-900 mb-2">Organizational Level:</h4>
+                  {(() => {
+                    const getOrgLevel = (empId: string, visited = new Set()): number => {
+                      if (visited.has(empId)) return 0 // Prevent infinite loops
+                      visited.add(empId)
+                      
+                      const emp = employees.find(e => e.id === empId)
+                      if (!emp || !emp.managerId) return 0
+                      
+                      return 1 + getOrgLevel(emp.managerId, visited)
+                    }
+                    
+                    const level = getOrgLevel(employee.id)
+                    const levelNames = ['Top Level (CEO/Directors)', 'Level 1 (Managers)', 'Level 2 (Team Leads)', 'Level 3+ (Team Members)']
+                    const levelName = levelNames[Math.min(level, levelNames.length - 1)]
+                    
+                    return (
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded ${
+                          level === 0 ? 'bg-blue-50 border-2 border-blue-300' :
+                          level === 1 ? 'bg-purple-50 border-2 border-purple-200' :
+                          'bg-slate-50 border-2 border-slate-200'
+                        }`}></div>
+                        <span className="text-sm text-slate-700">{levelName}</span>
+                      </div>
+                    )
+                  })()}
+                </div>
+              </div>
+            </div>
+          )}
 
           <DialogFooter className="flex justify-between">
             <div>

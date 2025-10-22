@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Shell } from '@/components/layout/Shell'
 import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/lib/utils'
@@ -34,6 +35,7 @@ interface Document {
 
 export default function DocumentationPage() {
   const { prefix, generateDocumentCode, updateDocumentCode } = useDocumentPrefix()
+  const searchParams = useSearchParams()
   const [documents, setDocuments] = useState<Document[]>([])
   const [filter, setFilter] = useState<string>('ALL')
   const [viewMode, setViewMode] = useState<'list' | 'grid' | 'board' | 'calendar'>('list')
@@ -868,7 +870,12 @@ export default function DocumentationPage() {
 
   useEffect(() => {
     loadDocuments()
-  }, [prefix]) // Reload when prefix changes
+    
+    // Check if form should auto-open from query parameter
+    if (searchParams.get('openForm') === 'true') {
+      setShowForm(true)
+    }
+  }, [prefix, searchParams]) // Reload when prefix or search params change
 
   // Filter and sort logic
   const handleSort = (field: keyof Document) => {
