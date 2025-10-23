@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   LayoutDashboard,
   FileText,
@@ -182,6 +182,7 @@ const bottomNavigation = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const navRef = useRef<HTMLElement>(null)
   
   // State for collapsed sections
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
@@ -195,6 +196,30 @@ export function Sidebar() {
     ohs: false,
     admin: false,
   })
+
+  // Save scroll position on scroll
+  useEffect(() => {
+    const navElement = navRef.current
+    if (!navElement) return
+
+    const handleScroll = () => {
+      sessionStorage.setItem('sidebar-scroll-position', navElement.scrollTop.toString())
+    }
+
+    navElement.addEventListener('scroll', handleScroll)
+    return () => navElement.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Restore scroll position on mount
+  useEffect(() => {
+    const navElement = navRef.current
+    if (!navElement) return
+
+    const savedScrollPosition = sessionStorage.getItem('sidebar-scroll-position')
+    if (savedScrollPosition) {
+      navElement.scrollTop = parseInt(savedScrollPosition, 10)
+    }
+  }, [pathname]) // Re-run when pathname changes to restore position
 
   const toggleSection = (section: string) => {
     setCollapsedSections(prev => ({
@@ -213,7 +238,7 @@ export function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 px-4 py-6 space-y-4 overflow-y-auto">
+      <nav ref={navRef} className="flex-1 px-4 py-6 space-y-4 overflow-y-auto">
         {/* Dashboard Section */}
         <div>
           <button

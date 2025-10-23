@@ -27,7 +27,13 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  List,
+  Grid3X3,
+  Kanban,
+  ChevronLeft,
+  ChevronRight,
+  CalendarDays
 } from 'lucide-react'
 
 interface WorkProgress {
@@ -61,6 +67,9 @@ export default function WorkProgressPage() {
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [editingItem, setEditingItem] = useState<WorkProgress | null>(null)
   const [activeTab, setActiveTab] = useState('DASHBOARD')
+  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'board' | 'calendar'>('list')
+  const [calendarView, setCalendarView] = useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('monthly')
+  const [currentDate, setCurrentDate] = useState(new Date())
 
   const tabs = [
     { key: 'DASHBOARD', label: 'Dashboard' },
@@ -507,6 +516,81 @@ export default function WorkProgressPage() {
         {/* All Other Tabs */}
         {activeTab !== 'DASHBOARD' && (
           <div className="space-y-4">
+            {/* View Mode Selector */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-slate-600">View:</span>
+                <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`px-3 py-1.5 text-sm font-medium rounded ${
+                      viewMode === 'list'
+                        ? 'bg-white text-slate-900 shadow'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <List className="h-4 w-4 mr-1 inline" />
+                    List
+                  </button>
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`px-3 py-1.5 text-sm font-medium rounded ${
+                      viewMode === 'grid'
+                        ? 'bg-white text-slate-900 shadow'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Grid3X3 className="h-4 w-4 mr-1 inline" />
+                    Grid
+                  </button>
+                  <button
+                    onClick={() => setViewMode('board')}
+                    className={`px-3 py-1.5 text-sm font-medium rounded ${
+                      viewMode === 'board'
+                        ? 'bg-white text-slate-900 shadow'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Kanban className="h-4 w-4 mr-1 inline" />
+                    Board
+                  </button>
+                  <button
+                    onClick={() => setViewMode('calendar')}
+                    className={`px-3 py-1.5 text-sm font-medium rounded ${
+                      viewMode === 'calendar'
+                        ? 'bg-white text-slate-900 shadow'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Calendar className="h-4 w-4 mr-1 inline" />
+                    Calendar
+                  </button>
+                </div>
+              </div>
+              
+              {/* Calendar View Controls */}
+              {viewMode === 'calendar' && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-slate-600">Period:</span>
+                  <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+                    {(['daily', 'weekly', 'monthly', 'yearly'] as const).map((period) => (
+                      <button
+                        key={period}
+                        onClick={() => setCalendarView(period)}
+                        className={`px-3 py-1.5 text-sm font-medium rounded ${
+                          calendarView === period
+                            ? 'bg-white text-slate-900 shadow'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        {period.charAt(0).toUpperCase() + period.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Filters */}
             <div className="flex items-center gap-4">
               <div className="relative flex-1 max-w-md">
@@ -544,7 +628,7 @@ export default function WorkProgressPage() {
               </Select>
             </div>
 
-            {/* Work Items Table */}
+            {/* Work Items Display */}
             <Card>
               <CardHeader>
                 <CardTitle>
@@ -555,86 +639,434 @@ export default function WorkProgressPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-3 px-4 font-medium text-slate-600 w-48">Company</th>
-                        <th className="text-left py-3 px-4 font-medium text-slate-600 w-32">Owner</th>
-                        <th className="text-left py-3 px-4 font-medium text-slate-600 w-32">Date Received</th>
-                        <th className="text-left py-3 px-4 font-medium text-slate-600 w-40">Service Type</th>
-                        <th className="text-left py-3 px-4 font-medium text-slate-600 w-24">Cost</th>
-                        <th className="text-left py-3 px-4 font-medium text-slate-600 w-32">Status</th>
-                        <th className="text-left py-3 px-4 font-medium text-slate-600 w-32">Expected Completion</th>
-                        <th className="text-left py-3 px-4 font-medium text-slate-600 w-24">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredWorkItems.map((item) => (
-                        <tr key={item.id} className="border-b hover:bg-slate-50">
-                          <td className="py-4 px-4">
+                {/* List View */}
+                {viewMode === 'list' && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-full">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-3 px-4 font-medium text-slate-600 w-48">Company</th>
+                          <th className="text-left py-3 px-4 font-medium text-slate-600 w-32">Owner</th>
+                          <th className="text-left py-3 px-4 font-medium text-slate-600 w-32">Date Received</th>
+                          <th className="text-left py-3 px-4 font-medium text-slate-600 w-40">Service Type</th>
+                          <th className="text-left py-3 px-4 font-medium text-slate-600 w-24">Cost</th>
+                          <th className="text-left py-3 px-4 font-medium text-slate-600 w-32">Status</th>
+                          <th className="text-left py-3 px-4 font-medium text-slate-600 w-32">Expected Completion</th>
+                          <th className="text-left py-3 px-4 font-medium text-slate-600 w-24">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredWorkItems.map((item) => (
+                          <tr key={item.id} className="border-b hover:bg-slate-50">
+                            <td className="py-4 px-4">
+                              <div className="flex items-center gap-2">
+                                <Building2 className="h-4 w-4 text-slate-400" />
+                                <div>
+                                  <div className="font-medium text-slate-900">{item.companyName}</div>
+                                  {item.clientContact && (
+                                    <div className="text-sm text-slate-500">{item.clientContact}</div>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-4 px-4">
+                              <div className="flex items-center gap-2">
+                                <User className="h-4 w-4 text-slate-400" />
+                                <span className="text-sm">{item.owner}</span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-4 text-sm">
+                              {item.dateReceived.toLocaleDateString()}
+                            </td>
+                            <td className="py-4 px-4">
+                              <Badge variant="outline">{item.serviceType}</Badge>
+                            </td>
+                            <td className="py-4 px-4">
+                              <div className="flex items-center gap-1">
+                                <DollarSign className="h-4 w-4 text-slate-400" />
+                                <span className="font-medium">£{item.costOfSale.toLocaleString()}</span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-4">
+                              <Badge className={getStatusColor(item.status)}>
+                                <div className="flex items-center gap-1">
+                                  {getStatusIcon(item.status)}
+                                  {item.status}
+                                </div>
+                              </Badge>
+                            </td>
+                            <td className="py-4 px-4 text-sm">
+                              {item.expectedCompletion ? item.expectedCompletion.toLocaleDateString() : '-'}
+                            </td>
+                            <td className="py-4 px-4">
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setEditingItem(item)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDeleteWorkItem(item.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Grid View */}
+                {viewMode === 'grid' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredWorkItems.map((item) => (
+                      <Card key={item.id} className="hover:shadow-lg transition-shadow">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between">
                             <div className="flex items-center gap-2">
-                              <Building2 className="h-4 w-4 text-slate-400" />
+                              <Building2 className="h-5 w-5 text-slate-400" />
                               <div>
-                                <div className="font-medium text-slate-900">{item.companyName}</div>
-                                {item.clientContact && (
-                                  <div className="text-sm text-slate-500">{item.clientContact}</div>
-                                )}
+                                <CardTitle className="text-sm font-medium">{item.companyName}</CardTitle>
+                                <CardDescription className="text-xs">{item.serviceType}</CardDescription>
                               </div>
                             </div>
-                          </td>
-                          <td className="py-4 px-4">
-                            <div className="flex items-center gap-2">
-                              <User className="h-4 w-4 text-slate-400" />
-                              <span className="text-sm">{item.owner}</span>
-                            </div>
-                          </td>
-                          <td className="py-4 px-4 text-sm">
-                            {item.dateReceived.toLocaleDateString()}
-                          </td>
-                          <td className="py-4 px-4">
-                            <Badge variant="outline">{item.serviceType}</Badge>
-                          </td>
-                          <td className="py-4 px-4">
-                            <div className="flex items-center gap-1">
-                              <DollarSign className="h-4 w-4 text-slate-400" />
-                              <span className="font-medium">£{item.costOfSale.toLocaleString()}</span>
-                            </div>
-                          </td>
-                          <td className="py-4 px-4">
                             <Badge className={getStatusColor(item.status)}>
                               <div className="flex items-center gap-1">
                                 {getStatusIcon(item.status)}
-                                {item.status}
+                                <span className="text-xs">{item.status}</span>
                               </div>
                             </Badge>
-                          </td>
-                          <td className="py-4 px-4 text-sm">
-                            {item.expectedCompletion ? item.expectedCompletion.toLocaleDateString() : '-'}
-                          </td>
-                          <td className="py-4 px-4">
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setEditingItem(item)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDeleteWorkItem(item.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-600">Owner:</span>
+                              <span className="font-medium">{item.owner}</span>
                             </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-600">Cost:</span>
+                              <span className="font-medium">£{item.costOfSale.toLocaleString()}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-600">Received:</span>
+                              <span className="font-medium">{item.dateReceived.toLocaleDateString()}</span>
+                            </div>
+                            {item.expectedCompletion && (
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-slate-600">Expected:</span>
+                                <span className="font-medium">{item.expectedCompletion.toLocaleDateString()}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 pt-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => setEditingItem(item)}
+                            >
+                              <Edit className="h-3 w-3 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteWorkItem(item.id)}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Board View */}
+                {viewMode === 'board' && (
+                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                    {['Not Started', 'WIP', 'Client Sign', 'Invoiced', 'Moved to Next Month'].map((status) => {
+                      const statusItems = filteredWorkItems.filter(item => item.status === status)
+                      return (
+                        <div key={status} className="bg-slate-50 rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-medium text-slate-900">{status}</h3>
+                            <span className="text-sm text-slate-500 bg-slate-200 px-2 py-1 rounded-full">
+                              {statusItems.length}
+                            </span>
+                          </div>
+                          <div className="space-y-3">
+                            {statusItems.map((item) => (
+                              <Card key={item.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                                <CardContent className="p-3">
+                                  <div className="space-y-2">
+                                    <div className="font-medium text-sm">{item.companyName}</div>
+                                    <div className="text-xs text-slate-600">{item.serviceType}</div>
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span>{item.owner}</span>
+                                      <span className="font-medium">£{item.costOfSale.toLocaleString()}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 pt-1">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-6 px-2 text-xs"
+                                        onClick={() => setEditingItem(item)}
+                                      >
+                                        <Edit className="h-3 w-3" />
+                                      </Button>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-6 px-2 text-xs"
+                                        onClick={() => handleDeleteWorkItem(item.id)}
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                            {statusItems.length === 0 && (
+                              <div className="text-center py-8 text-slate-400">
+                                <FileText className="h-8 w-8 mx-auto mb-2" />
+                                <p className="text-sm">No items</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* Calendar View */}
+                {viewMode === 'calendar' && (
+                  <div className="space-y-4">
+                    {/* Calendar Navigation */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newDate = new Date(currentDate)
+                            if (calendarView === 'monthly') {
+                              newDate.setMonth(newDate.getMonth() - 1)
+                            } else if (calendarView === 'weekly') {
+                              newDate.setDate(newDate.getDate() - 7)
+                            } else if (calendarView === 'daily') {
+                              newDate.setDate(newDate.getDate() - 1)
+                            } else if (calendarView === 'yearly') {
+                              newDate.setFullYear(newDate.getFullYear() - 1)
+                            }
+                            setCurrentDate(newDate)
+                          }}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <h3 className="text-lg font-semibold">
+                          {calendarView === 'monthly' && currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                          {calendarView === 'weekly' && `Week of ${currentDate.toLocaleDateString()}`}
+                          {calendarView === 'daily' && currentDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                          {calendarView === 'yearly' && currentDate.getFullYear().toString()}
+                        </h3>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newDate = new Date(currentDate)
+                            if (calendarView === 'monthly') {
+                              newDate.setMonth(newDate.getMonth() + 1)
+                            } else if (calendarView === 'weekly') {
+                              newDate.setDate(newDate.getDate() + 7)
+                            } else if (calendarView === 'daily') {
+                              newDate.setDate(newDate.getDate() + 1)
+                            } else if (calendarView === 'yearly') {
+                              newDate.setFullYear(newDate.getFullYear() + 1)
+                            }
+                            setCurrentDate(newDate)
+                          }}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentDate(new Date())}
+                      >
+                        Today
+                      </Button>
+                    </div>
+
+                    {/* Calendar Display */}
+                    <div className="bg-white rounded-lg border">
+                      {calendarView === 'monthly' && (
+                        <div className="p-4">
+                          <div className="grid grid-cols-7 gap-1 mb-4">
+                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                              <div key={day} className="p-2 text-center text-sm font-medium text-slate-500">
+                                {day}
+                              </div>
+                            ))}
+                          </div>
+                          <div className="grid grid-cols-7 gap-1">
+                            {Array.from({ length: new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate() }, (_, i) => {
+                              const day = i + 1
+                              const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
+                              const dayItems = filteredWorkItems.filter(item => {
+                                const itemDate = new Date(item.dateReceived)
+                                return itemDate.getDate() === day && 
+                                       itemDate.getMonth() === currentDate.getMonth() && 
+                                       itemDate.getFullYear() === currentDate.getFullYear()
+                              })
+                              return (
+                                <div key={day} className="h-24 border border-slate-200 p-1">
+                                  <div className="text-sm font-medium text-slate-900 mb-1">{day}</div>
+                                  <div className="space-y-1">
+                                    {dayItems.slice(0, 2).map(item => (
+                                      <div
+                                        key={item.id}
+                                        className="text-xs p-1 bg-blue-100 text-blue-800 rounded cursor-pointer hover:bg-blue-200"
+                                        onClick={() => setEditingItem(item)}
+                                        title={`${item.companyName} - ${item.serviceType}`}
+                                      >
+                                        {item.companyName}
+                                      </div>
+                                    ))}
+                                    {dayItems.length > 2 && (
+                                      <div className="text-xs text-slate-500">
+                                        +{dayItems.length - 2} more
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {calendarView === 'weekly' && (
+                        <div className="p-4">
+                          <div className="grid grid-cols-7 gap-4">
+                            {Array.from({ length: 7 }, (_, i) => {
+                              const date = new Date(currentDate)
+                              date.setDate(currentDate.getDate() - currentDate.getDay() + i)
+                              const dayItems = filteredWorkItems.filter(item => {
+                                const itemDate = new Date(item.dateReceived)
+                                return itemDate.toDateString() === date.toDateString()
+                              })
+                              return (
+                                <div key={i} className="border border-slate-200 rounded-lg p-3">
+                                  <div className="text-sm font-medium text-slate-900 mb-2">
+                                    {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                                  </div>
+                                  <div className="space-y-2">
+                                    {dayItems.map(item => (
+                                      <div
+                                        key={item.id}
+                                        className="text-xs p-2 bg-blue-100 text-blue-800 rounded cursor-pointer hover:bg-blue-200"
+                                        onClick={() => setEditingItem(item)}
+                                      >
+                                        <div className="font-medium">{item.companyName}</div>
+                                        <div className="text-xs opacity-75">{item.serviceType}</div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {calendarView === 'daily' && (
+                        <div className="p-4">
+                          <div className="space-y-4">
+                            {filteredWorkItems.filter(item => {
+                              const itemDate = new Date(item.dateReceived)
+                              return itemDate.toDateString() === currentDate.toDateString()
+                            }).map(item => (
+                              <Card key={item.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                                <CardContent className="p-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <Building2 className="h-5 w-5 text-slate-400" />
+                                      <div>
+                                        <div className="font-medium text-slate-900">{item.companyName}</div>
+                                        <div className="text-sm text-slate-500">{item.serviceType} • {item.owner}</div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                      <Badge className={getStatusColor(item.status)}>
+                                        <div className="flex items-center gap-1">
+                                          {getStatusIcon(item.status)}
+                                          {item.status}
+                                        </div>
+                                      </Badge>
+                                      <div className="text-right">
+                                        <div className="font-medium text-slate-900">£{item.costOfSale.toLocaleString()}</div>
+                                        <div className="text-sm text-slate-500">{item.dateReceived.toLocaleTimeString()}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {calendarView === 'yearly' && (
+                        <div className="p-4">
+                          <div className="grid grid-cols-4 gap-4">
+                            {Array.from({ length: 12 }, (_, i) => {
+                              const month = new Date(currentDate.getFullYear(), i, 1)
+                              const monthItems = filteredWorkItems.filter(item => {
+                                const itemDate = new Date(item.dateReceived)
+                                return itemDate.getMonth() === i && itemDate.getFullYear() === currentDate.getFullYear()
+                              })
+                              return (
+                                <div key={i} className="border border-slate-200 rounded-lg p-3">
+                                  <div className="text-sm font-medium text-slate-900 mb-2">
+                                    {month.toLocaleDateString('en-US', { month: 'long' })}
+                                  </div>
+                                  <div className="space-y-1">
+                                    {monthItems.slice(0, 3).map(item => (
+                                      <div
+                                        key={item.id}
+                                        className="text-xs p-1 bg-blue-100 text-blue-800 rounded cursor-pointer hover:bg-blue-200"
+                                        onClick={() => setEditingItem(item)}
+                                      >
+                                        {item.companyName}
+                                      </div>
+                                    ))}
+                                    {monthItems.length > 3 && (
+                                      <div className="text-xs text-slate-500">
+                                        +{monthItems.length - 3} more
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
