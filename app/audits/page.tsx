@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Shell } from '@/components/layout/Shell'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -93,6 +94,7 @@ interface Audit {
 }
 
 export default function AuditsPage() {
+  const searchParams = useSearchParams()
   const [filter, setFilter] = useState('INTERNAL')
   const [viewMode, setViewMode] = useState<'list' | 'matrix' | 'calendar'>('list')
   const [audits, setAudits] = useState<Audit[]>([])
@@ -166,6 +168,14 @@ export default function AuditsPage() {
     }
     loadData()
   }, [statusFilter, ragFilter, standardFilter, yearFilter])
+
+  // Handle URL parameters for view mode
+  useEffect(() => {
+    const viewParam = searchParams.get('view')
+    if (viewParam && ['list', 'matrix', 'calendar'].includes(viewParam)) {
+      setViewMode(viewParam as 'list' | 'matrix' | 'calendar')
+    }
+  }, [searchParams])
 
   // Calculate statistics based on active tab
   const getTabAudits = () => {

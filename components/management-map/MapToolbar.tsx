@@ -52,6 +52,9 @@ interface MapToolbarProps {
   };
   onFiltersChange: (filters: Partial<MapToolbarProps['filters']>) => void;
   onClearFilters: () => void;
+  nodeCount: number;
+  edgeCount: number;
+  onLegendOpen: () => void;
 }
 
 export function MapToolbar({
@@ -64,6 +67,9 @@ export function MapToolbar({
   filters,
   onFiltersChange,
   onClearFilters,
+  nodeCount,
+  edgeCount,
+  onLegendOpen,
 }: MapToolbarProps) {
   const [showFilters, setShowFilters] = useState(false);
 
@@ -233,6 +239,12 @@ export function MapToolbar({
         <Button onClick={onChecklistOpen} variant="outline" size="sm">
           <List className="h-4 w-4 mr-2" />
           Checklist
+        </Button>
+
+        {/* Legend Button */}
+        <Button onClick={onLegendOpen} variant="outline" size="sm">
+          <HelpCircle className="h-4 w-4 mr-2" />
+          Map Key
         </Button>
 
         {/* Export Menu */}

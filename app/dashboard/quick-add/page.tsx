@@ -12,15 +12,53 @@ import {
 } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { StatusBadge } from '@/components/rag/StatusBadge'
+import { NCIntakeForm } from '@/components/forms/NCIntakeForm'
+import { DocumentForm } from '@/components/forms/DocumentForm'
+import { AuditForm } from '@/components/forms/AuditForm'
+import { TrainingForm } from '@/components/forms/TrainingForm'
+import { IncidentForm } from '@/components/forms/IncidentForm'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 
 export default function QuickAddPage() {
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<string>('')
+  
+  // Form states
+  const [showNCForm, setShowNCForm] = useState(false)
+  const [showDocumentForm, setShowDocumentForm] = useState(false)
+  const [showAuditForm, setShowAuditForm] = useState(false)
+  const [showTrainingForm, setShowTrainingForm] = useState(false)
+  const [showIncidentForm, setShowIncidentForm] = useState(false)
 
   useEffect(() => {
     // Simulate loading
     setTimeout(() => setLoading(false), 1000)
   }, [])
+
+  const handleCreateClick = (categoryId: string) => {
+    switch (categoryId) {
+      case 'incident':
+        setShowIncidentForm(true)
+        break
+      case 'nonconformity':
+        setShowNCForm(true)
+        break
+      case 'improvement':
+        setShowNCForm(true) // OFI uses the same form
+        break
+      case 'document':
+        setShowDocumentForm(true)
+        break
+      case 'audit':
+        setShowAuditForm(true)
+        break
+      case 'training':
+        setShowTrainingForm(true)
+        break
+      default:
+        console.log(`Creating ${categoryId}`)
+    }
+  }
 
   if (loading) {
     return (
@@ -117,10 +155,10 @@ export default function QuickAddPage() {
             return (
               <Card 
                 key={category.id}
-                className={`cursor-pointer hover:shadow-lg transition-shadow ${category.borderColor} ${category.bgColor}`}
+                className={`cursor-pointer hover:shadow-lg transition-shadow ${category.borderColor} ${category.bgColor} h-full flex flex-col`}
                 onClick={() => setSelectedCategory(category.id)}
               >
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-3 flex-shrink-0">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${category.bgColor}`}>
                       <IconComponent className={`h-6 w-6 ${category.color}`} />
@@ -130,17 +168,17 @@ export default function QuickAddPage() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1 flex flex-col justify-between">
                   <CardDescription className="text-sm mb-4">
                     {category.description}
                   </CardDescription>
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full"
+                    className="w-full mt-auto"
                     onClick={(e) => {
                       e.stopPropagation()
-                      console.log(`Creating ${category.title}`)
+                      handleCreateClick(category.id)
                     }}
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -235,6 +273,64 @@ export default function QuickAddPage() {
             </div>
           </div>
         </div>
+
+        {/* Forms */}
+        <NCIntakeForm
+          open={showNCForm}
+          onClose={() => setShowNCForm(false)}
+          onSave={() => {
+            setShowNCForm(false)
+            console.log('Non-conformance case created successfully!')
+          }}
+          defaultCaseType={selectedCategory === 'improvement' ? 'OFI' : 'NC'}
+        />
+
+        <DocumentForm
+          open={showDocumentForm}
+          onClose={() => setShowDocumentForm(false)}
+          onSave={() => {
+            setShowDocumentForm(false)
+            console.log('Document created successfully!')
+          }}
+        />
+
+        <Dialog open={showAuditForm} onOpenChange={setShowAuditForm}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>New Audit</DialogTitle>
+              <DialogDescription>Create a new audit</DialogDescription>
+            </DialogHeader>
+            <AuditForm
+              audit={undefined}
+              auditTypes={[]}
+              onSubmit={() => {
+                setShowAuditForm(false)
+                console.log('Audit created successfully!')
+              }}
+              onCancel={() => setShowAuditForm(false)}
+            />
+          </DialogContent>
+        </Dialog>
+
+        <TrainingForm
+          open={showTrainingForm}
+          onClose={() => setShowTrainingForm(false)}
+          users={[]}
+          courses={[]}
+          onSave={() => {
+            setShowTrainingForm(false)
+            console.log('Training record created successfully!')
+          }}
+        />
+
+        <IncidentForm
+          open={showIncidentForm}
+          onClose={() => setShowIncidentForm(false)}
+          onSave={() => {
+            setShowIncidentForm(false)
+            console.log('Incident report created successfully!')
+          }}
+        />
       </div>
     </Shell>
   )

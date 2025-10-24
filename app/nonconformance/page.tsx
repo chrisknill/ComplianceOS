@@ -15,6 +15,7 @@ import { StatusBadge } from '@/components/rag/StatusBadge'
 import { NCIntakeForm } from '@/components/forms/NCIntakeForm'
 import { NCDetailView } from '@/components/forms/NCDetailView'
 import { ViewToggle } from '@/components/ui/view-toggle'
+import { ParetoAnalysis } from '@/components/analysis/ParetoAnalysis'
 import { formatDate } from '@/lib/utils'
 import { convertToCSV, downloadFile } from '@/lib/export'
 
@@ -86,6 +87,7 @@ export default function NonConformancePage() {
 
   const tabs = [
     { key: 'DASHBOARD', label: 'Dashboard' },
+    { key: 'PARETO', label: 'Pareto Analysis' },
     { key: 'ALL', label: 'All Cases' },
     { key: 'NC', label: 'Non-Conformance' },
     { key: 'OFI', label: 'OFI' },
@@ -96,7 +98,7 @@ export default function NonConformancePage() {
 
   const filteredAndSortedRecords = records
     // Filter by tab
-    .filter(r => filter === 'ALL' || filter === 'DASHBOARD' || r.caseType === filter)
+    .filter(r => filter === 'ALL' || filter === 'DASHBOARD' || filter === 'PARETO' || r.caseType === filter)
     // Filter by search
     .filter(r => {
       if (searchTerm) {
@@ -399,6 +401,48 @@ export default function NonConformancePage() {
               </div>
             </div>
 
+            {/* Pareto Analysis Tile */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-slate-900">Pareto Analysis</h3>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setFilter('PARETO')}
+                >
+                  View Full Analysis →
+                </Button>
+              </div>
+              <div className="space-y-3">
+                <p className="text-sm text-slate-600 mb-4">
+                  Identify the 80/20 rule - which issues are causing most problems?
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center p-3 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {records.length > 0 ? Math.round((records.filter(r => r.category === records.reduce((acc, curr) => {
+                        const categoryCount = records.filter(r2 => r2.category === curr.category).length
+                        return categoryCount > acc.count ? { category: curr.category, count: categoryCount } : acc
+                      }, { category: '', count: 0 }).category).length / records.length) * 100) : 0}%
+                    </div>
+                    <div className="text-xs text-blue-700">Top Category</div>
+                  </div>
+                  <div className="text-center p-3 bg-emerald-50 rounded-lg">
+                    <div className="text-2xl font-bold text-emerald-600">
+                      {records.filter(r => r.caseType === 'NC').length}
+                    </div>
+                    <div className="text-xs text-emerald-700">Non-Conformances</div>
+                  </div>
+                  <div className="text-center p-3 bg-orange-50 rounded-lg">
+                    <div className="text-2xl font-bold text-orange-600">
+                      {records.filter(r => r.severity === 'CRITICAL').length}
+                    </div>
+                    <div className="text-xs text-orange-700">Critical Issues</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Alert Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {stats.critical > 0 && (
@@ -448,8 +492,42 @@ export default function NonConformancePage() {
           </div>
         )}
 
+        {/* Pareto Analysis Tab */}
+        {filter === 'PARETO' && (
+          <ParetoAnalysis 
+            records={records} 
+            onFilterChange={(filterType, value) => {
+              // Set the appropriate filter and switch to ALL cases tab
+              switch (filterType) {
+                case 'category':
+                  // Note: We don't have a category filter in the current implementation
+                  // This would need to be added to the filtering logic
+                  break
+                case 'caseType':
+                  setCaseTypeFilter(value)
+                  setFilter('ALL')
+                  setViewMode('list')
+                  break
+                case 'severity':
+                  setSeverityFilter(value)
+                  setFilter('ALL')
+                  setViewMode('list')
+                  break
+                case 'owner':
+                  // Note: We don't have an owner filter in the current implementation
+                  // This would need to be added to the filtering logic
+                  break
+                case 'department':
+                  // Note: We don't have a department filter in the current implementation
+                  // This would need to be added to the filtering logic
+                  break
+              }
+            }}
+          />
+        )}
+
         {/* Filters (List/Grid View) */}
-        {filter !== 'DASHBOARD' && (viewMode === 'list' || viewMode === 'grid') && (
+        {filter !== 'DASHBOARD' && filter !== 'PARETO' && (viewMode === 'list' || viewMode === 'grid') && (
           <div className="bg-white rounded-lg shadow p-4">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div className="relative">
@@ -533,7 +611,7 @@ export default function NonConformancePage() {
         )}
 
         {/* List View */}
-        {filter !== 'DASHBOARD' && viewMode === 'list' && (
+        {filter !== 'DASHBOARD' && filter !== 'PARETO' && viewMode === 'list' && (
           <div className="bg-white rounded-lg shadow">
             <div className="overflow-x-auto">
               <table className="w-full table-fixed min-w-0">
@@ -636,7 +714,7 @@ export default function NonConformancePage() {
         )}
 
         {/* Grid View */}
-        {filter !== 'DASHBOARD' && viewMode === 'grid' && (
+        {filter !== 'DASHBOARD' && filter !== 'PARETO' && viewMode === 'grid' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredData.map((record) => {
               const rag = getStatusRAG(record.status)
@@ -692,7 +770,7 @@ export default function NonConformancePage() {
         )}
 
         {/* Board View (Kanban) */}
-        {filter !== 'DASHBOARD' && viewMode === 'board' && (
+        {filter !== 'DASHBOARD' && filter !== 'PARETO' && viewMode === 'board' && (
           <div className="overflow-x-auto">
             <div className="flex gap-4 min-w-max pb-4">
               {/* OPEN Column */}
@@ -938,7 +1016,7 @@ export default function NonConformancePage() {
           </div>
         )}
 
-        {filteredData.length === 0 && filter !== 'DASHBOARD' && (
+        {filteredData.length === 0 && filter !== 'DASHBOARD' && filter !== 'PARETO' && (
           <div className="text-center py-12 bg-white rounded-lg shadow">
             <AlertCircle className="h-12 w-12 text-slate-300 mx-auto mb-4" />
             <p className="text-slate-500">No cases found</p>

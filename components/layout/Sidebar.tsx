@@ -48,11 +48,11 @@ import {
   Factory,
   Workflow,
   FileCode,
+  BarChart3,
   Package,
   Users2,
   Zap,
   Trash2,
-  BarChart3,
   Eye,
   ShieldCheck,
   Scale as ComplianceIcon,
@@ -154,6 +154,7 @@ const improvementNavigation = [
 const adminNavigation = [
   { name: 'Users', href: '/admin/users', icon: UserCog },
   { name: 'Integrations', href: '/admin/integrations', icon: Plug },
+  { name: 'Reports', href: '/reports', icon: BarChart3 },
   { name: 'Branding', href: '/admin/branding', icon: Palette },
   { name: 'Logs', href: '/admin/logs', icon: LogsIcon },
 ]

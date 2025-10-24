@@ -196,15 +196,15 @@ export default function OverviewPage() {
             <Button 
               variant="outline" 
               className="h-20 flex-col"
-              onClick={() => setShowCalendarForm(true)}
+              onClick={() => router.push('/audits?view=matrix')}
             >
               <Calendar className="h-6 w-6 mb-2" />
-              <span className="text-sm">Schedule Audit</span>
+              <span className="text-sm">Audit Schedule</span>
             </Button>
             <Button 
               variant="outline" 
               className="h-20 flex-col"
-              onClick={() => router.push('/audits')}
+              onClick={() => router.push('/reports')}
             >
               <BarChart3 className="h-6 w-6 mb-2" />
               <span className="text-sm">View Reports</span>

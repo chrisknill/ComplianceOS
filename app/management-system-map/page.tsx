@@ -15,11 +15,18 @@ import ReactFlow, {
   BackgroundVariant,
   MarkerType,
 } from 'reactflow';
+import 'reactflow/dist/style.css';
 import { Shell } from '@/components/layout/Shell';
 import { Legend } from '@/components/management-map/Legend';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { 
   Select,
   SelectContent,
@@ -139,8 +146,8 @@ const initialNodes: Node[] = [
       code: 'PROC-001',
       status: 'green',
       owner: 'Quality Manager',
-      version: '1.3',
-      nextReview: '2024-11-15',
+      version: '3.2',
+      nextReview: '2025-06-30',
       description: 'Procedure for creation, review, approval, and distribution of documents',
       supportingDocs: [
         { type: 'sop', name: 'Document Creation SOP', url: '/documents/sops/doc-creation.pdf' },
@@ -210,6 +217,67 @@ const initialNodes: Node[] = [
         { type: 'sop', name: 'Audit Planning SOP', url: '/documents/sops/audit-planning.pdf' },
         { type: 'form', name: 'Audit Report Form', url: '/documents/forms/audit-report.pdf' },
         { type: 'wi', name: 'Audit Checklist Work Instruction', url: '/documents/work-instructions/audit-checklist.pdf' }
+      ]
+    },
+  },
+  // Additional procedures from the system
+  {
+    id: '6',
+    type: 'custom',
+    position: { x: 100, y: 500 },
+    data: {
+      id: 'proc-records-mgmt',
+      title: 'Records Management',
+      type: 'procedure',
+      code: 'PROC-002',
+      status: 'green',
+      owner: 'Quality Manager',
+      version: '2.1',
+      nextReview: '2025-07-15',
+      description: 'Procedure for creation, maintenance, retention and disposal of records',
+      supportingDocs: [
+        { type: 'sop', name: 'Record Retention SOP', url: '/documents/sops/record-retention.pdf' },
+        { type: 'form', name: 'Record Disposal Form', url: '/documents/forms/record-disposal.pdf' }
+      ]
+    },
+  },
+  {
+    id: '7',
+    type: 'custom',
+    position: { x: 400, y: 500 },
+    data: {
+      id: 'proc-corrective-action',
+      title: 'Corrective Action Procedure',
+      type: 'procedure',
+      code: 'PROC-003',
+      status: 'green',
+      owner: 'Quality Manager',
+      version: '1.8',
+      nextReview: '2025-12-15',
+      description: 'Process for identifying, investigating and correcting nonconformities',
+      supportingDocs: [
+        { type: 'form', name: 'Corrective Action Form', url: '/documents/forms/corrective-action.pdf' },
+        { type: 'wi', name: 'Root Cause Analysis WI', url: '/documents/work-instructions/root-cause-analysis.pdf' }
+      ]
+    },
+  },
+  {
+    id: '8',
+    type: 'custom',
+    position: { x: 700, y: 500 },
+    data: {
+      id: 'proc-mgmt-review',
+      title: 'Management Review',
+      type: 'procedure',
+      code: 'PROC-004',
+      status: 'green',
+      owner: 'CEO',
+      version: '2.5',
+      nextReview: '2025-09-30',
+      description: 'Process for top management to review the management system',
+      supportingDocs: [
+        { type: 'form', name: 'Management Review Form', url: '/documents/forms/mgmt-review.pdf' },
+        { type: 'sop', name: 'Management Review SOP', url: '/documents/sops/mgmt-review.pdf' }
       ]
     },
   },
@@ -333,6 +401,75 @@ const initialEdges: Edge[] = [
       width: 16,
       height: 16,
       color: '#059669',
+    },
+  },
+  // New connections for additional procedures
+  {
+    id: 'e2-6',
+    source: '2',
+    target: '6',
+    type: 'smoothstep',
+    animated: false,
+    label: 'Records management',
+    labelStyle: { fontSize: '12px', fill: '#374151' },
+    labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
+    style: { stroke: '#059669', strokeWidth: 2 },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      width: 16,
+      height: 16,
+      color: '#059669',
+    },
+  },
+  {
+    id: 'e5-7',
+    source: '5',
+    target: '7',
+    type: 'smoothstep',
+    animated: false,
+    label: 'Audit findings trigger actions',
+    labelStyle: { fontSize: '12px', fill: '#374151' },
+    labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
+    style: { stroke: '#dc2626', strokeWidth: 2 },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      width: 16,
+      height: 16,
+      color: '#dc2626',
+    },
+  },
+  {
+    id: 'e1-8',
+    source: '1',
+    target: '8',
+    type: 'smoothstep',
+    animated: false,
+    label: 'Management commitment',
+    labelStyle: { fontSize: '12px', fill: '#374151' },
+    labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
+    style: { stroke: '#2563eb', strokeWidth: 3 },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      width: 20,
+      height: 20,
+      color: '#2563eb',
+    },
+  },
+  {
+    id: 'e8-5',
+    source: '8',
+    target: '5',
+    type: 'smoothstep',
+    animated: false,
+    label: 'Reviews audit results',
+    labelStyle: { fontSize: '12px', fill: '#374151' },
+    labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
+    style: { stroke: '#6b7280', strokeWidth: 2 },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      width: 16,
+      height: 16,
+      color: '#6b7280',
     },
   },
 ];
@@ -753,20 +890,13 @@ export default function ManagementSystemMapPage() {
     type: [],
     status: [],
   });
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showLegend, setShowLegend] = useState(false);
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
-
-  // Initialize the map
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleToggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
@@ -827,7 +957,7 @@ export default function ManagementSystemMapPage() {
 
   return (
     <Shell>
-      <div className={`${isFullscreen ? 'fixed inset-0 z-50 ml-0' : 'h-full'} flex flex-col bg-gray-50 -m-6`}>
+      <div className={`${isFullscreen ? 'fixed inset-0 z-50 ml-0' : 'h-screen'} flex flex-col bg-gray-50 -m-6`}>
         {/* Toolbar */}
         <MapToolbar
           onChecklistOpen={handleChecklistOpen}
@@ -841,13 +971,14 @@ export default function ManagementSystemMapPage() {
           onClearFilters={handleClearFilters}
           nodeCount={nodes.length}
           edgeCount={edges.length}
+          onLegendOpen={() => setShowLegend(true)}
         />
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col">
           <div className="flex-1 flex">
             {/* React Flow Map */}
-            <div className="flex-1 relative">
+            <div className="flex-1 relative min-h-[600px]">
               <ReactFlowProvider>
                 <ReactFlow
                   nodes={nodes}
@@ -899,25 +1030,30 @@ export default function ManagementSystemMapPage() {
               </ReactFlowProvider>
             </div>
 
-                {/* Inspector Panel */}
-                {isInspectorOpen && (
-                  <InspectorPanel
-                    node={selectedNode}
-                    onClose={() => setIsInspectorOpen(false)}
-                    onPrevious={handlePreviousNode}
-                    onNext={handleNextNode}
-                    canGoPrevious={canGoPrevious}
-                    canGoNext={canGoNext}
-                  />
-                )}
+            {/* Inspector Panel */}
+            {isInspectorOpen && (
+              <InspectorPanel
+                node={selectedNode}
+                onClose={() => setIsInspectorOpen(false)}
+                onPrevious={handlePreviousNode}
+                onNext={handleNextNode}
+                canGoPrevious={canGoPrevious}
+                canGoNext={canGoNext}
+              />
+            )}
           </div>
-          
-              {/* Legend at Bottom */}
-              <div className="h-32 border-t bg-white shadow-lg overflow-y-auto">
-                <Legend />
-              </div>
         </div>
       </div>
+
+      {/* Legend Dialog */}
+      <Dialog open={showLegend} onOpenChange={setShowLegend}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Management System Map Key</DialogTitle>
+          </DialogHeader>
+          <Legend />
+        </DialogContent>
+      </Dialog>
     </Shell>
   );
 }

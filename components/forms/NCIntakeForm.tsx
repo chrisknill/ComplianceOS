@@ -12,6 +12,7 @@ interface NCIntakeFormProps {
   open: boolean
   onClose: () => void
   onSave: () => void
+  defaultCaseType?: string
 }
 
 interface Employee {
@@ -22,8 +23,8 @@ interface Employee {
   department: string
 }
 
-export function NCIntakeForm({ open, onClose, onSave }: NCIntakeFormProps) {
-  const [caseType, setCaseType] = useState<string>('NC')
+export function NCIntakeForm({ open, onClose, onSave, defaultCaseType = 'NC' }: NCIntakeFormProps) {
+  const [caseType, setCaseType] = useState<string>(defaultCaseType)
   const [employees, setEmployees] = useState<Employee[]>([])
   const [employeesLoading, setEmployeesLoading] = useState(false)
   const [formData, setFormData] = useState({
